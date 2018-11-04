@@ -1,6 +1,5 @@
 module Lib
-    ( someFunc
-    ) where
+  ( entryPoint
+  ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+entryPoint = undefined
