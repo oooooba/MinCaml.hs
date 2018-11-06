@@ -7,16 +7,14 @@ import           Test.Hspec
 import           MinCaml.Global
 import qualified MinCaml.Lexer  as Lexer
 
+specHelper :: String -> [Lexer.Token] -> Spec
+specHelper s expected = it s $ Lexer.runLexer s `shouldBe` expected
+
 spec :: Spec
 spec = do
   describe "lexing" $ do
-    let s = "true"
-    it s $ Lexer.runLexer s `shouldBe` [Lexer.BOOL True]
-    let s = "false"
-    it s $ Lexer.runLexer s `shouldBe` [Lexer.BOOL False]
-    let s = "(not)"
-    it s $ Lexer.runLexer s `shouldBe` [Lexer.LPAREN, Lexer.NOT, Lexer.RPAREN]
-    let s = "1 23 4"
-    it s $ Lexer.runLexer s `shouldBe` [Lexer.INT 1, Lexer.INT 23, Lexer.INT 4]
-    let s = "1.0 1.25"
-    it s $ Lexer.runLexer s `shouldBe` [Lexer.FLOAT $ read "1.0", Lexer.FLOAT $ read "1.25"]
+    specHelper "true" [Lexer.BOOL True]
+    specHelper "false" [Lexer.BOOL False]
+    specHelper "(not)" [Lexer.LPAREN, Lexer.NOT, Lexer.RPAREN]
+    specHelper "1 23 4" [Lexer.INT 1, Lexer.INT 23, Lexer.INT 4]
+    specHelper "1.0 1.25" [Lexer.FLOAT $ read "1.0", Lexer.FLOAT $ read "1.25"]
