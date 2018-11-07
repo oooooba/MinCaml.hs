@@ -26,5 +26,5 @@ exp : simple_exp { $1 }
 
 {
 parseError :: [Token] -> a
-parseError _ = error "Parse error"
+parseError tokens = error $ "Parse error: " ++ show tokens
 }
