@@ -18,3 +18,4 @@ spec = do
     specHelper "(not)" [Lexer.LPAREN, Lexer.NOT, Lexer.RPAREN]
     specHelper "1 23 4" [Lexer.INT 1, Lexer.INT 23, Lexer.INT 4]
     specHelper "1.0 1.25" [Lexer.FLOAT $ read "1.0", Lexer.FLOAT $ read "1.25"]
+    specHelper "1+2" [Lexer.INT 1, Lexer.PLUS, Lexer.INT 2]

@@ -18,6 +18,7 @@ tokens :-
   not                   { tokenize NOT }
   $digit+               { tokenizeInt }
   $digit+ (\. $digit*)? { tokenizeFloat }
+  \+                    { tokenize PLUS }
 
 {
 data Token
@@ -27,6 +28,7 @@ data Token
   | NOT
   | INT Int
   | FLOAT Float
+  | PLUS
   deriving (Show, Eq)
 
 tokenize :: Token -> String -> Token

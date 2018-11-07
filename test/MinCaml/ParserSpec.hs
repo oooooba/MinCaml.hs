@@ -19,3 +19,4 @@ spec = do
     specHelper "false" $ Syntax.Bool False
     specHelper "1" $ Syntax.Int 1
     specHelper "(())" Syntax.Unit
+    specHelper "1+2" $ Syntax.Add (Syntax.Int 1) (Syntax.Int 2)

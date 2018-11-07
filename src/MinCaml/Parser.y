@@ -14,15 +14,19 @@ import MinCaml.Syntax
   ')'  { RPAREN }
   bool { BOOL $$ }
   int  { INT $$ }
+  '+'  { PLUS }
+
+%left '+'
 
 %%
+
+exp : simple_exp  { $1 }
+    | exp '+' exp { Add $1 $3 }
 
 simple_exp : '(' exp ')' { $2 }
            | '(' ')'     { Unit }
            | bool        { Bool $1 }
            | int         { Int $1 }
-
-exp : simple_exp { $1 }
 
 {
 parseError :: [Token] -> a
