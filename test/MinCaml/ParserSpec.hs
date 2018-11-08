@@ -20,3 +20,6 @@ spec = do
     specHelper "1" $ Syntax.Int 1
     specHelper "(())" Syntax.Unit
     specHelper "1+2" $ Syntax.Add (Syntax.Int 1) (Syntax.Int 2)
+    specHelper "-1" $ Syntax.Neg (Syntax.Int 1)
+    specHelper "-1-2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Int 2)
+    specHelper "-1--2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Neg (Syntax.Int 2))

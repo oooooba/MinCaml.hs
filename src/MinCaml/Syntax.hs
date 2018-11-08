@@ -8,7 +8,10 @@ data T
   | Bool Bool
   | Int Int
   | Not T
+  | Neg T
   | Add T
+        T
+  | Sub T
         T
   | Eq T
        T

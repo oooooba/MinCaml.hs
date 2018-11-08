@@ -15,13 +15,17 @@ import MinCaml.Syntax
   bool { BOOL $$ }
   int  { INT $$ }
   '+'  { PLUS }
+  '-'  { MINUS }
 
-%left '+'
+%left '+' '-'
+%right prec_unary_minus
 
 %%
 
 exp : simple_exp  { $1 }
-    | exp '+' exp { Add $1 $3 }
+    | '-' exp %prec prec_unary_minus { Neg $2 }
+    | exp '+' exp                    { Add $1 $3 }
+    | exp '-' exp                    { Sub $1 $3 }
 
 simple_exp : '(' exp ')' { $2 }
            | '(' ')'     { Unit }
