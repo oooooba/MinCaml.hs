@@ -20,6 +20,9 @@ tokens :-
   $digit+ (\. $digit*)? { tokenizeFloat }
   \+                    { tokenize PLUS }
   \-                    { tokenize MINUS }
+  if                    { tokenize IF }
+  then                  { tokenize THEN }
+  else                  { tokenize ELSE }
 
 {
 data Token
@@ -31,6 +34,9 @@ data Token
   | FLOAT Float
   | PLUS
   | MINUS
+  | IF
+  | THEN
+  | ELSE
   deriving (Show, Eq)
 
 tokenize :: Token -> String -> Token

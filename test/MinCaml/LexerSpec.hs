@@ -21,3 +21,4 @@ spec = do
     specHelper "1+2" [Lexer.INT 1, Lexer.PLUS, Lexer.INT 2]
     specHelper "-1" [Lexer.MINUS, Lexer.INT 1]
     specHelper "-1-2" [Lexer.MINUS, Lexer.INT 1, Lexer.MINUS, Lexer.INT 2]
+    specHelper "if 1 then 2 else 3" [Lexer.IF, Lexer.INT 1, Lexer.THEN, Lexer.INT 2, Lexer.ELSE, Lexer.INT 3]
