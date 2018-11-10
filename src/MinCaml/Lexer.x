@@ -20,6 +20,7 @@ tokens :-
   $digit+ (\. $digit*)? { tokenizeFloat }
   \+                    { tokenize PLUS }
   \-                    { tokenize MINUS }
+  \=                    { tokenize EQUAL }
   if                    { tokenize IF }
   then                  { tokenize THEN }
   else                  { tokenize ELSE }
@@ -34,6 +35,7 @@ data Token
   | FLOAT Float
   | PLUS
   | MINUS
+  | EQUAL
   | IF
   | THEN
   | ELSE

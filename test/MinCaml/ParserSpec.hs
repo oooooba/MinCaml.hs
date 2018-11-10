@@ -23,4 +23,6 @@ spec = do
     specHelper "-1" $ Syntax.Neg (Syntax.Int 1)
     specHelper "-1-2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Int 2)
     specHelper "-1--2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Neg (Syntax.Int 2))
+    specHelper "1+2=3-4" $
+      Syntax.Eq (Syntax.Add (Syntax.Int 1) (Syntax.Int 2)) (Syntax.Sub (Syntax.Int 3) (Syntax.Int 4))
     specHelper "if 1 then 2 else 3" $ Syntax.If (Syntax.Int 1) (Syntax.Int 2) (Syntax.Int 3)
