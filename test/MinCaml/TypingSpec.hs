@@ -19,7 +19,7 @@ expected :: Type.Type -> Syntax.T -> Syntax.T
 expected t e = Syntax.Let ("_", t) e Syntax.Unit
 
 spec :: Spec
-spec = do
+spec =
   describe "typing" $ do
     it "unit literal" $ evalMinCaml (typing Syntax.Unit) initialGlobalStatus `shouldBe` expected Type.Unit Syntax.Unit
     it "integer literal" $

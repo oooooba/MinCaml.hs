@@ -12,7 +12,7 @@ specHelper :: String -> Syntax.T -> Spec
 specHelper s expected = it s $ (Parser.runParser . Lexer.runLexer) s `shouldBe` expected
 
 spec :: Spec
-spec = do
+spec =
   describe "parsing" $ do
     specHelper "()" Syntax.Unit
     specHelper "true" $ Syntax.Bool True

@@ -11,7 +11,7 @@ specHelper :: String -> [Lexer.Token] -> Spec
 specHelper s expected = it s $ Lexer.runLexer s `shouldBe` expected
 
 spec :: Spec
-spec = do
+spec =
   describe "lexing" $ do
     specHelper "true" [Lexer.BOOL True]
     specHelper "false" [Lexer.BOOL False]
