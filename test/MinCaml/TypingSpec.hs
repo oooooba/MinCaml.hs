@@ -5,9 +5,13 @@ module MinCaml.TypingSpec
 import           Test.Hspec
 
 import           MinCaml.Global
-import qualified MinCaml.Syntax as Syntax
-import qualified MinCaml.Type   as Type
-import qualified MinCaml.Typing as Typing
+import qualified MinCaml.Lexer    as Lexer
+import qualified MinCaml.Parser   as Parser
+import qualified MinCaml.Syntax   as Syntax
+import qualified MinCaml.Type     as Type
+import qualified MinCaml.Typing   as Typing
+
+import           MinCaml.TestCase
 
 typing :: Syntax.T -> MinCaml (Syntax.T, Type.Type)
 typing e = do
@@ -18,8 +22,13 @@ typing e = do
 expected :: Type.Type -> Syntax.T -> Syntax.T
 expected t e = Syntax.Let ("_", t) e Syntax.Unit
 
+specHelper :: TestCase -> Either String (Syntax.T, Type.Type) -> Spec
+specHelper testCase expected =
+  it (name testCase) $
+  evalMinCaml (Typing.f . Parser.runParser . Lexer.runLexer $ input testCase) initialGlobalStatus `shouldBe` expected
+
 spec :: Spec
-spec =
+spec = do
   describe "typing" $ do
     it "unit literal" $
       evalMinCaml (typing Syntax.Unit) initialGlobalStatus `shouldBe` Right (expected Type.Unit Syntax.Unit, Type.Unit)
@@ -47,3 +56,8 @@ spec =
                (Syntax.Int 1)
                (Syntax.Let ("y", Type.Int) (Syntax.Int 2) (Syntax.Add (Syntax.Var "x") (Syntax.Var "y"))))
         , Type.Unit)
+  describe "valid cases" $ do
+    specHelper validCase1 $ Right (Syntax.Unit, Type.Unit)
+    specHelper validCase2 $ Right (Syntax.Unit, Type.Unit)
+    specHelper validCase3 $ Right (Syntax.Int 42, Type.Int)
+    specHelper validCase4 $ Right (Syntax.Int 42, Type.Int)
