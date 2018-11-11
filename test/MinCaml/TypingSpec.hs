@@ -21,9 +21,10 @@ expected t e = Syntax.Let ("_", t) e Syntax.Unit
 spec :: Spec
 spec =
   describe "typing" $ do
-    it "unit literal" $ evalMinCaml (typing Syntax.Unit) initialGlobalStatus `shouldBe` expected Type.Unit Syntax.Unit
+    it "unit literal" $
+      evalMinCaml (typing Syntax.Unit) initialGlobalStatus `shouldBe` Right (expected Type.Unit Syntax.Unit)
     it "integer literal" $
-      evalMinCaml (typing $ Syntax.Int 42) initialGlobalStatus `shouldBe` expected Type.Int (Syntax.Int 42)
+      evalMinCaml (typing $ Syntax.Int 42) initialGlobalStatus `shouldBe` Right (expected Type.Int (Syntax.Int 42))
     it "integer add" $
       evalMinCaml
         (typing =<< do
@@ -35,9 +36,10 @@ spec =
                (Syntax.Int 1)
                (Syntax.Let ("y", t2) (Syntax.Int 2) (Syntax.Add (Syntax.Var "x") (Syntax.Var "y"))))
         initialGlobalStatus `shouldBe`
-      expected
-        Type.Int
-        (Syntax.Let
-           ("x", Type.Int)
-           (Syntax.Int 1)
-           (Syntax.Let ("y", Type.Int) (Syntax.Int 2) (Syntax.Add (Syntax.Var "x") (Syntax.Var "y"))))
+      Right
+        (expected
+           Type.Int
+           (Syntax.Let
+              ("x", Type.Int)
+              (Syntax.Int 1)
+              (Syntax.Let ("y", Type.Int) (Syntax.Int 2) (Syntax.Add (Syntax.Var "x") (Syntax.Var "y")))))
