@@ -153,11 +153,12 @@ unite = do
           return ty'
         _ -> return ty
 
-f :: Syntax.T -> MinCaml Syntax.T
+f :: Syntax.T -> MinCaml (Syntax.T, Type.Type)
 f e = do
   modify (\s -> s {extenv = Map.empty})
-  g Map.empty e >>= unify Type.Unit
+  eTy <- genType
+  g Map.empty e >>= unify eTy
   unite
   extenv' <- fmap extenv get >>= Map.traverseWithKey (\_ t -> derefType t)
   modify (\s -> s {extenv = extenv'})
-  derefTerm e
+  liftM2 (,) (derefTerm e) (derefType eTy)
