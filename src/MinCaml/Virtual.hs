@@ -18,7 +18,8 @@ data VirtualStatus = VirtualStatus
 type MinCamlVirtual a = ExceptT String (StateT VirtualStatus Identity) a
 
 g :: Map.Map Id.T Closure.T -> Closure.T -> MinCamlVirtual Asm.T
-g = undefined
+g _ Closure.Unit    = return $ Asm.Ans Asm.Nop
+g _ (Closure.Int i) = return $ Asm.Ans (Asm.Set i)
 
 h :: Closure.Fundef -> Asm.Fundef
 h = undefined
