@@ -22,8 +22,6 @@ spec = do
   describe "parsing" $ do
     specHelperOld "true" $ Syntax.Bool True
     specHelperOld "false" $ Syntax.Bool False
-    specHelperOld "1" $ Syntax.Int 1
-    specHelperOld "1+2" $ Syntax.Add (Syntax.Int 1) (Syntax.Int 2)
     specHelperOld "-1" $ Syntax.Neg (Syntax.Int 1)
     specHelperOld "-1-2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Int 2)
     specHelperOld "-1--2" $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Neg (Syntax.Int 2))
@@ -35,3 +33,11 @@ spec = do
     specHelper validCase2 Syntax.Unit
     specHelper validCase3 $ Syntax.Int 42
     specHelper validCase4 $ Syntax.Int 42
+    specHelper validCase5 $ Syntax.Add (Syntax.Int 1) (Syntax.Int 2)
+    specHelper validCase6 $ Syntax.Sub (Syntax.Int 3) (Syntax.Int 4)
+    specHelper validCase7 $ Syntax.Eq (Syntax.Int 5) (Syntax.Int 6)
+    specHelper validCase8 $ Syntax.Not $ Syntax.Eq (Syntax.Int 7) (Syntax.Int 8)
+    specHelper validCase9 $ Syntax.Le (Syntax.Int 9) (Syntax.Int 10)
+    specHelper validCase10 $ Syntax.Le (Syntax.Int 12) (Syntax.Int 11)
+    specHelper validCase11 $ Syntax.Not $ Syntax.Le (Syntax.Int 14) (Syntax.Int 13)
+    specHelper validCase12 $ Syntax.Not $ Syntax.Le (Syntax.Int 15) (Syntax.Int 16)
