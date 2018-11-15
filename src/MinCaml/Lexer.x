@@ -21,6 +21,11 @@ tokens :-
   \+                    { tokenize PLUS }
   \-                    { tokenize MINUS }
   \=                    { tokenize EQUAL }
+  \<>                   { tokenize LESS_GREATER }
+  \<=                   { tokenize LESS_EQUAL }
+  \>=                   { tokenize GREATER_EQUAL }
+  \<                    { tokenize LESS }
+  \>                    { tokenize GREATER }
   if                    { tokenize IF }
   then                  { tokenize THEN }
   else                  { tokenize ELSE }
@@ -36,6 +41,11 @@ data Token
   | PLUS
   | MINUS
   | EQUAL
+  | LESS_GREATER
+  | LESS_EQUAL
+  | GREATER_EQUAL
+  | LESS
+  | GREATER
   | IF
   | THEN
   | ELSE
