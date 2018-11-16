@@ -39,6 +39,7 @@ derefTerm (Syntax.Bool b) = return $ Syntax.Bool b
 derefTerm (Syntax.Int n) = return $ Syntax.Int n
 derefTerm (Syntax.Not e) = Syntax.Not <$> derefTerm e
 derefTerm (Syntax.Add e1 e2) = liftM2 Syntax.Add (derefTerm e1) (derefTerm e2)
+derefTerm (Syntax.Sub e1 e2) = liftM2 Syntax.Sub (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Eq e1 e2) = liftM2 Syntax.Eq (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Le e1 e2) = liftM2 Syntax.Le (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.If e1 e2 e3) = liftM3 Syntax.If (derefTerm e1) (derefTerm e2) (derefTerm e3)
@@ -96,10 +97,9 @@ g :: Map.Map Id.T Type.Type -> Syntax.T -> MinCaml Type.Type
 g _ Syntax.Unit = return Type.Unit
 g _ (Syntax.Bool _) = return Type.Bool
 g _ (Syntax.Int _) = return Type.Int
-g env (Syntax.Add e1 e2) = do
-  g env e1 >>= unify Type.Int
-  g env e2 >>= unify Type.Int
-  return Type.Int
+g env (Syntax.Not e) = g env e >>= unify Type.Bool >> return Type.Bool
+g env (Syntax.Add e1 e2) = gBinOpHelperRet env Type.Int e1 e2
+g env (Syntax.Sub e1 e2) = gBinOpHelperRet env Type.Int e1 e2
 g env (Syntax.Eq e1 e2) = gBinOpHelper env e1 e2 >> return Type.Bool
 g env (Syntax.Le e1 e2) = gBinOpHelper env e1 e2 >> return Type.Bool
 g env (Syntax.If e1 e2 e3) = do
@@ -135,6 +135,12 @@ gBinOpHelper env e1 e2 = do
   t1 <- g env e1
   t2 <- g env e2
   unify t1 t2 >> return t1
+
+gBinOpHelperRet :: Map.Map Id.T Type.Type -> Type.Type -> Syntax.T -> Syntax.T -> MinCaml Type.Type
+gBinOpHelperRet env t e1 e2 = do
+  g env e1 >>= unify t
+  g env e2 >>= unify t
+  return t
 
 unite :: MinCaml ()
 unite = do
