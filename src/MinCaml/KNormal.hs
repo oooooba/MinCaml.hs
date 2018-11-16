@@ -14,7 +14,18 @@ import qualified MinCaml.Type        as Type
 data T
   = Unit
   | Int Int
+  | Let (Id.T, Type.Type)
+        T
+        T
+  | Var Id.T
   deriving (Show, Eq)
+
+insertLet :: (T, Type.Type) -> (Id.T -> MinCaml (T, Type.Type)) -> MinCaml (T, Type.Type)
+insertLet (Var x, _) k = k x
+insertLet (e, t) k = do
+  x <- genVar t
+  (e', t') <- k x
+  return (Let (x, t) e e', t')
 
 g :: Map.Map Id.T Type.Type -> Syntax.T -> MinCaml (T, Type.Type)
 g _ Syntax.Unit    = return (Unit, Type.Unit)

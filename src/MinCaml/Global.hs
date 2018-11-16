@@ -10,20 +10,28 @@ import qualified MinCaml.Type               as Type
 
 data GlobalStatus = GlobalStatus
   { extenv           :: Map.Map Id.T Type.Type
+  , varIdCounter     :: Int
   , tyVarIdCounter   :: Type.TypeVarId
   , tyVarIdToTypeEnv :: Map.Map Type.TypeVarId Type.Type
   }
 
 type MinCaml a = ExceptT String (StateT GlobalStatus Identity) a
 
+genVar :: Type.Type -> MinCaml String
+genVar typ = do
+  varId <- fmap varIdCounter get
+  modify (\s -> s {varIdCounter = varId + 1})
+  return $ "T" ++ Id.idOfType typ ++ show varId
+
 genType :: MinCaml Type.Type
 genType = do
-  varId <- fmap tyVarIdCounter get
-  modify (\s -> s {tyVarIdCounter = varId + 1})
-  return $ Type.Var varId
+  tyVarId <- fmap tyVarIdCounter get
+  modify (\s -> s {tyVarIdCounter = tyVarId + 1})
+  return $ Type.Var tyVarId
 
 initialGlobalStatus :: GlobalStatus
-initialGlobalStatus = GlobalStatus {extenv = Map.empty, tyVarIdCounter = 0, tyVarIdToTypeEnv = Map.empty}
+initialGlobalStatus =
+  GlobalStatus {extenv = Map.empty, varIdCounter = 0, tyVarIdCounter = 0, tyVarIdToTypeEnv = Map.empty}
 
 runMinCaml :: MinCaml a -> GlobalStatus -> (Either String a, GlobalStatus)
 runMinCaml e s = runIdentity (runStateT (runExceptT e) s)
