@@ -14,6 +14,10 @@ import qualified MinCaml.Type        as Type
 data T
   = Unit
   | Int Int
+  | Add Id.T
+        Id.T
+  | Sub Id.T
+        Id.T
   | Let (Id.T, Type.Type)
         T
         T
@@ -27,9 +31,19 @@ insertLet (e, t) k = do
   (e', t') <- k x
   return (Let (x, t) e e', t')
 
+gBinOpHelper ::
+     Map.Map Id.T Type.Type -> Syntax.T -> Syntax.T -> (Id.T -> Id.T -> T) -> Type.Type -> MinCaml (T, Type.Type)
+gBinOpHelper env e1 e2 c t = do
+  p1 <- g env e1
+  insertLet p1 $ \x -> do
+    p2 <- g env e2
+    insertLet p2 $ \y -> return (c x y, t)
+
 g :: Map.Map Id.T Type.Type -> Syntax.T -> MinCaml (T, Type.Type)
-g _ Syntax.Unit    = return (Unit, Type.Unit)
-g _ (Syntax.Int i) = return (Int i, Type.Int)
+g _ Syntax.Unit          = return (Unit, Type.Unit)
+g _ (Syntax.Int i)       = return (Int i, Type.Int)
+g env (Syntax.Add e1 e2) = gBinOpHelper env e1 e2 Add Type.Int
+g env (Syntax.Sub e1 e2) = gBinOpHelper env e1 e2 Sub Type.Int
 
 f :: Syntax.T -> MinCaml T
 f e = fst <$> g Map.empty e
