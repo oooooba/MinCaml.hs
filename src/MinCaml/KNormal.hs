@@ -43,9 +43,9 @@ gBinOpHelper ::
      Map.Map Id.T Type.Type -> Syntax.T -> Syntax.T -> (Id.T -> Id.T -> T) -> Type.Type -> MinCaml (T, Type.Type)
 gBinOpHelper env e1 e2 c t = do
   p1 <- g env e1
-  insertLet p1 $ \x -> do
+  insertLet p1 $ \v1 -> do
     p2 <- g env e2
-    insertLet p2 $ \y -> return (c x y, t)
+    insertLet p2 $ \v2 -> return (c v1 v2, t)
 
 gIfCmpHelper ::
      Map.Map Id.T Type.Type

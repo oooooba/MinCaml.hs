@@ -27,13 +27,13 @@ spec =
     specHelper validCase3 $ Right (KNormal.Int 42)
     specHelper validCase4 $ Right (KNormal.Int 42)
     specHelper validCase5 $
-      Right
-        (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
-         KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.Add "Ti0" "Ti1")
+      Right $
+      KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.Add "Ti0" "Ti1"
     specHelper validCase6 $
-      Right
-        (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 3) $
-         KNormal.Let ("Ti1", Type.Int) (KNormal.Int 4) $ KNormal.Sub "Ti0" "Ti1")
+      Right $
+      KNormal.Let ("Ti0", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("Ti1", Type.Int) (KNormal.Int 4) $ KNormal.Sub "Ti0" "Ti1"
     specHelper validCase7 $
       Right $
       KNormal.Let ("Ti0", Type.Int) (KNormal.Int 5) $
