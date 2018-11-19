@@ -3,6 +3,11 @@ module MinCaml.Asm where
 import qualified MinCaml.Id   as Id
 import qualified MinCaml.Type as Type
 
+data IdOrImm
+  = V Id.T
+  | C Int
+  deriving (Show, Eq)
+
 data T
   = Ans Exp
   | Let (Id.T, Type.Type)
@@ -13,6 +18,18 @@ data T
 data Exp
   = Nop
   | Set Int
+  | Add Id.T
+        IdOrImm
+  | Sub Id.T
+        IdOrImm
+  | IfEq Id.T
+         IdOrImm
+         T
+         T
+  | IfLe Id.T
+         IdOrImm
+         T
+         T
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -28,3 +45,7 @@ data Prog =
        [Fundef]
        T
   deriving (Show, Eq)
+
+concat :: T -> (Id.T, Type.Type) -> T -> T
+concat (Ans exp) xt e        = Let xt exp e
+concat (Let xt exp e1) yt e2 = Let xt exp $ MinCaml.Asm.concat e1 yt e2
