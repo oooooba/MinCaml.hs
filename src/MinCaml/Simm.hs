@@ -10,8 +10,26 @@ import qualified MinCaml.Id     as Id
 
 g :: Map.Map Id.T Int -> Asm.T -> Asm.T
 g env (Asm.Ans exp) = Asm.Ans $ g' env exp
+g env (Asm.Let (x, t) (Asm.Set i) e) =
+  let e' = g (Map.insert x i env) e
+  in if x `elem` Asm.fv e'
+       then Asm.Let (x, t) (Asm.Set i) e'
+       else e'
+g env (Asm.Let xt exp e) = Asm.Let xt (g' env exp) (g env e)
 
 g' :: Map.Map Id.T Int -> Asm.Exp -> Asm.Exp
+g' env (Asm.Add x (Asm.V y))
+  | Map.member y env = Asm.Add x $ Asm.C $ env Map.! y
+g' env (Asm.Add x (Asm.V y))
+  | Map.member x env = Asm.Add y $ Asm.C $ env Map.! x
+g' env (Asm.Sub x (Asm.V y))
+  | Map.member y env = Asm.Sub x $ Asm.C $ env Map.! y
+g' env (Asm.IfEq x (Asm.V y) e1 e2)
+  | Map.member y env = Asm.IfEq x (Asm.C $ env Map.! y) (g env e1) (g env e2)
+g' env (Asm.IfLe x (Asm.V y) e1 e2)
+  | Map.member y env = Asm.IfLe x (Asm.C $ env Map.! y) (g env e1) (g env e2)
+g' env (Asm.IfEq x y' e1 e2) = Asm.IfEq x y' (g env e1) (g env e2)
+g' env (Asm.IfLe x y' e1 e2) = Asm.IfLe x y' (g env e1) (g env e2)
 g' _ e = e
 
 h :: Asm.Fundef -> Asm.Fundef
