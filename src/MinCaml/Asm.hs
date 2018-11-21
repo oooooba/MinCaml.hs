@@ -52,7 +52,7 @@ removeAndUniq :: Ord a => Set.Set a -> [a] -> [a]
 removeAndUniq _ [] = []
 removeAndUniq xs (x:ys)
   | x `Set.member` xs = removeAndUniq xs ys
-removeAndUniq xs (x:ys) = removeAndUniq (Set.insert x xs) ys
+removeAndUniq xs (x:ys) = x : removeAndUniq (Set.insert x xs) ys
 
 fvIdOrImm :: IdOrImm -> [Id.T]
 fvIdOrImm (V x) = [x]
