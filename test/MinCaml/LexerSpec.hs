@@ -39,3 +39,4 @@ spec = do
     specHelper validCase10 [Lexer.INT 11, Lexer.GREATER_EQUAL, Lexer.INT 12]
     specHelper validCase11 [Lexer.INT 13, Lexer.LESS, Lexer.INT 14]
     specHelper validCase12 [Lexer.INT 15, Lexer.GREATER, Lexer.INT 16]
+    specHelper validCase13 [Lexer.LET, Lexer.IDENT "x_", Lexer.EQUAL, Lexer.INT 42, Lexer.IN, Lexer.IDENT "x_"]

@@ -28,3 +28,5 @@ validCase10 = TestCase {name = "validCase10", input = "11>=12"}
 validCase11 = TestCase {name = "validCase11", input = "13<14"}
 
 validCase12 = TestCase {name = "validCase12", input = "15>16"}
+
+validCase13 = TestCase {name = "validCase13", input = "let x_ = 42 in x_"}
