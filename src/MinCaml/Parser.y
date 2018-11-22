@@ -1,11 +1,12 @@
 {
 module MinCaml.Parser (runParser) where
 
+import MinCaml.Global
 import MinCaml.Lexer
 import MinCaml.Syntax
 }
 
-%name runParser
+%name parser
 %tokentype { Token }
 %error { parseError }
 
@@ -51,6 +52,11 @@ simple_exp : '(' exp ')' { $2 }
            | int         { Int $1 }
 
 {
+runParser :: [Token] -> MinCaml T
+runParser tokens = do
+  let exp = parser tokens
+  return exp
+
 parseError :: [Token] -> a
 parseError tokens = error $ "Parse error: " ++ show tokens
 }

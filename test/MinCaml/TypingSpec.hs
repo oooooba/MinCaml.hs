@@ -25,7 +25,8 @@ expected t e = Syntax.Let ("_", t) e Syntax.Unit
 specHelper :: TestCase -> Either String (Syntax.T, Type.Type) -> Spec
 specHelper testCase expected =
   it (name testCase) $
-  evalMinCaml (Typing.f . Parser.runParser . Lexer.runLexer $ input testCase) initialGlobalStatus `shouldBe` expected
+  evalMinCaml ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f) initialGlobalStatus `shouldBe`
+  expected
 
 spec :: Spec
 spec = do

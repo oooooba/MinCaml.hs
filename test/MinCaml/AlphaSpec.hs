@@ -18,7 +18,7 @@ specHelper :: TestCase -> Either String KNormal.T -> Spec
 specHelper testCase expected =
   it (name testCase) $
   evalMinCaml
-    ((Typing.f . Parser.runParser . Lexer.runLexer $ input testCase) >>= KNormal.f . fst >>= Alpha.f)
+    ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f . fst >>= Alpha.f)
     initialGlobalStatus `shouldBe`
   expected
 
