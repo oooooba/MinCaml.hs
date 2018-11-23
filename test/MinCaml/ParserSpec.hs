@@ -8,6 +8,7 @@ import           MinCaml.Global
 import qualified MinCaml.Lexer    as Lexer
 import qualified MinCaml.Parser   as Parser
 import qualified MinCaml.Syntax   as Syntax
+import qualified MinCaml.Type     as Type
 
 import           MinCaml.TestCase
 
@@ -44,3 +45,4 @@ spec = do
     specHelper validCase10 $ Right $ Syntax.Le (Syntax.Int 12) (Syntax.Int 11)
     specHelper validCase11 $ Right $ Syntax.Not $ Syntax.Le (Syntax.Int 14) (Syntax.Int 13)
     specHelper validCase12 $ Right $ Syntax.Not $ Syntax.Le (Syntax.Int 15) (Syntax.Int 16)
+    specHelper validCase13 $ Right $ Syntax.Let ("x_", Type.Var 0) (Syntax.Int 42) (Syntax.Var "x_")
