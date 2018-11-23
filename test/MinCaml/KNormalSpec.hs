@@ -60,3 +60,4 @@ spec =
       Right $
       KNormal.Let ("Ti0", Type.Int) (KNormal.Int 15) $
       KNormal.Let ("Ti1", Type.Int) (KNormal.Int 16) $ KNormal.IfLe "Ti0" "Ti1" (KNormal.Int 0) (KNormal.Int 1)
+    specHelper validCase13 $ Right $ KNormal.Let ("x_", Type.Int) (KNormal.Int 42) $ KNormal.Var "x_"
