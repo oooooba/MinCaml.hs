@@ -30,3 +30,5 @@ validCase11 = TestCase {name = "validCase11", input = "13<14"}
 validCase12 = TestCase {name = "validCase12", input = "15>16"}
 
 validCase13 = TestCase {name = "validCase13", input = "let x_ = 42 in x_"}
+
+validCase14 = TestCase {name = "validCase14", input = "-1=-2-3"}

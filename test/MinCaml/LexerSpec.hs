@@ -23,8 +23,6 @@ spec = do
     specHelperOld "(not)" [Lexer.LPAREN, Lexer.NOT, Lexer.RPAREN]
     specHelperOld "1 23 4" [Lexer.INT 1, Lexer.INT 23, Lexer.INT 4]
     specHelperOld "1.0 1.25" [Lexer.FLOAT $ read "1.0", Lexer.FLOAT $ read "1.25"]
-    specHelperOld "-1" [Lexer.MINUS, Lexer.INT 1]
-    specHelperOld "-1-2" [Lexer.MINUS, Lexer.INT 1, Lexer.MINUS, Lexer.INT 2]
     specHelperOld "if 1 then 2 else 3" [Lexer.IF, Lexer.INT 1, Lexer.THEN, Lexer.INT 2, Lexer.ELSE, Lexer.INT 3]
   describe "valid cases" $ do
     specHelper validCase1 [Lexer.LPAREN, Lexer.RPAREN]
@@ -40,3 +38,4 @@ spec = do
     specHelper validCase11 [Lexer.INT 13, Lexer.LESS, Lexer.INT 14]
     specHelper validCase12 [Lexer.INT 15, Lexer.GREATER, Lexer.INT 16]
     specHelper validCase13 [Lexer.LET, Lexer.IDENT "x_", Lexer.EQUAL, Lexer.INT 42, Lexer.IN, Lexer.IDENT "x_"]
+    specHelper validCase14 [Lexer.MINUS, Lexer.INT 1, Lexer.EQUAL, Lexer.MINUS, Lexer.INT 2, Lexer.MINUS, Lexer.INT 3]

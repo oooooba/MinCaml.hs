@@ -26,11 +26,7 @@ spec = do
   describe "parsing" $ do
     specHelperOld "true" $ Right $ Syntax.Bool True
     specHelperOld "false" $ Right $ Syntax.Bool False
-    specHelperOld "-1" $ Right $ Syntax.Neg (Syntax.Int 1)
-    specHelperOld "-1-2" $ Right $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Int 2)
     specHelperOld "-1--2" $ Right $ Syntax.Sub (Syntax.Neg (Syntax.Int 1)) (Syntax.Neg (Syntax.Int 2))
-    specHelperOld "1+2=3-4" $
-      Right $ Syntax.Eq (Syntax.Add (Syntax.Int 1) (Syntax.Int 2)) (Syntax.Sub (Syntax.Int 3) (Syntax.Int 4))
     specHelperOld "if 1 then 2 else 3" $ Right $ Syntax.If (Syntax.Int 1) (Syntax.Int 2) (Syntax.Int 3)
   describe "valid cases" $ do
     specHelper validCase1 $ Right Syntax.Unit
@@ -46,3 +42,5 @@ spec = do
     specHelper validCase11 $ Right $ Syntax.Not $ Syntax.Le (Syntax.Int 14) (Syntax.Int 13)
     specHelper validCase12 $ Right $ Syntax.Not $ Syntax.Le (Syntax.Int 15) (Syntax.Int 16)
     specHelper validCase13 $ Right $ Syntax.Let ("x_", Type.Var 0) (Syntax.Int 42) (Syntax.Var "x_")
+    specHelper validCase14 $
+      Right $ Syntax.Eq (Syntax.Neg $ Syntax.Int 1) (Syntax.Sub (Syntax.Neg $ Syntax.Int 2) (Syntax.Int 3))
