@@ -71,3 +71,5 @@ spec = do
     specHelper validCase11 $ Right (Syntax.Not $ Syntax.Le (Syntax.Int 14) (Syntax.Int 13), Type.Bool)
     specHelper validCase12 $ Right (Syntax.Not $ Syntax.Le (Syntax.Int 15) (Syntax.Int 16), Type.Bool)
     specHelper validCase13 $ Right (Syntax.Let ("x_", Type.Int) (Syntax.Int 42) (Syntax.Var "x_"), Type.Int)
+    specHelper validCase14 $
+      Right (Syntax.Eq (Syntax.Neg $ Syntax.Int 1) (Syntax.Sub (Syntax.Neg $ Syntax.Int 2) (Syntax.Int 3)), Type.Bool)

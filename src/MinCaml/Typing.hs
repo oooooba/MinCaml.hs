@@ -38,6 +38,7 @@ derefTerm Syntax.Unit = return Syntax.Unit
 derefTerm (Syntax.Bool b) = return $ Syntax.Bool b
 derefTerm (Syntax.Int n) = return $ Syntax.Int n
 derefTerm (Syntax.Not e) = Syntax.Not <$> derefTerm e
+derefTerm (Syntax.Neg e) = Syntax.Neg <$> derefTerm e
 derefTerm (Syntax.Add e1 e2) = liftM2 Syntax.Add (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Sub e1 e2) = liftM2 Syntax.Sub (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Eq e1 e2) = liftM2 Syntax.Eq (derefTerm e1) (derefTerm e2)
@@ -98,6 +99,7 @@ g _ Syntax.Unit = return Type.Unit
 g _ (Syntax.Bool _) = return Type.Bool
 g _ (Syntax.Int _) = return Type.Int
 g env (Syntax.Not e) = g env e >>= unify Type.Bool >> return Type.Bool
+g env (Syntax.Neg e) = g env e >>= unify Type.Int >> return Type.Int
 g env (Syntax.Add e1 e2) = gBinOpHelperRet env Type.Int e1 e2
 g env (Syntax.Sub e1 e2) = gBinOpHelperRet env Type.Int e1 e2
 g env (Syntax.Eq e1 e2) = gBinOpHelper env e1 e2 >> return Type.Bool
