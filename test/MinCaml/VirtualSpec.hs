@@ -79,3 +79,4 @@ spec =
       Asm.Let ("Ti0.0", Type.Int) (Asm.Set 15) $
       Asm.Let ("Ti1.1", Type.Int) (Asm.Set 16) $
       Asm.Ans $ Asm.IfLe "Ti0.0" (Asm.V "Ti1.1") (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+    specHelper validCase13 $ Right $ Asm.Prog [] [] $ Asm.Let ("x_.0", Type.Int) (Asm.Set 42) $ Asm.Ans $ Asm.Mov "x_.0"

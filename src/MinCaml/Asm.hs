@@ -20,6 +20,7 @@ data T
 data Exp
   = Nop
   | Set Int
+  | Mov Id.T
   | Add Id.T
         IdOrImm
   | Sub Id.T

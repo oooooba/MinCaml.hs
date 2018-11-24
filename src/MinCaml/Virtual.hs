@@ -52,6 +52,11 @@ g env (Closure.Let (x, t) e1 e2) = do
   e1' <- g env e1
   e2' <- g (Map.insert x t env) e2
   return $ Asm.concat e1' (x, t) e2'
+g env (Closure.Var x) =
+  return $
+  case Map.lookup x env of
+    Just Type.Unit -> Asm.Ans Asm.Nop
+    _              -> Asm.Ans $ Asm.Mov x
 
 h :: Closure.Fundef -> Asm.Fundef
 h = undefined
