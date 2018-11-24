@@ -22,6 +22,7 @@ g env (KNormal.IfLe x y e1 e2) = liftM2 (KNormal.IfLe (find x env) (find y env))
 g env (KNormal.Let (x, t) e1 e2) = do
   x' <- genId x
   liftM2 (KNormal.Let (x', t)) (g env e1) $ g (Map.insert x x' env) e2
+g env (KNormal.Var x) = return $ KNormal.Var $ find x env
 
 f :: KNormal.T -> MinCaml KNormal.T
 f = g Map.empty
