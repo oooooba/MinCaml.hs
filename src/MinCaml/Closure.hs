@@ -13,6 +13,7 @@ import qualified MinCaml.Type               as Type
 data T
   = Unit
   | Int Int
+  | Neg Id.T
   | Add Id.T
         Id.T
   | Sub Id.T
@@ -53,6 +54,7 @@ type MinCamlClosure a = State ClosureStatus a
 g :: Map.Map Id.T Type.Type -> Set.Set Id.T -> KNormal.T -> MinCamlClosure T
 g _ _ KNormal.Unit = return Unit
 g _ _ (KNormal.Int i) = return $ Int i
+g _ _ (KNormal.Neg x) = return $ Neg x
 g _ _ (KNormal.Add x y) = return $ Add x y
 g _ _ (KNormal.Sub x y) = return $ Sub x y
 g env known (KNormal.IfEq x y e1 e2) = liftM2 (IfEq x y) (g env known e1) (g env known e2)
