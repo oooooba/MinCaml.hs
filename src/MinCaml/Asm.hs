@@ -21,6 +21,7 @@ data Exp
   = Nop
   | Set Int
   | Mov Id.T
+  | Neg Id.T
   | Add Id.T
         IdOrImm
   | Sub Id.T

@@ -36,6 +36,7 @@ gIfHelper c env x y e1 e2 = do
 g :: Map.Map Id.T Type.Type -> Closure.T -> MinCamlVirtual Asm.T
 g _ Closure.Unit = return $ Asm.Ans Asm.Nop
 g _ (Closure.Int i) = return $ Asm.Ans (Asm.Set i)
+g _ (Closure.Neg x) = return $ Asm.Ans (Asm.Neg x)
 g _ (Closure.Add x y) = return $ Asm.Ans (Asm.Add x $ Asm.V y)
 g _ (Closure.Sub x y) = return $ Asm.Ans (Asm.Sub x $ Asm.V y)
 g env (Closure.IfEq x y e1 e2) =
