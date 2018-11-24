@@ -15,6 +15,7 @@ find x = Map.findWithDefault x x
 g :: Map.Map Id.T Id.T -> KNormal.T -> MinCaml KNormal.T
 g _ KNormal.Unit = return KNormal.Unit
 g _ (KNormal.Int i) = return $ KNormal.Int i
+g env (KNormal.Neg x) = return $ KNormal.Neg $ find x env
 g env (KNormal.Add x y) = return $ KNormal.Add (find x env) (find y env)
 g env (KNormal.Sub x y) = return $ KNormal.Sub (find x env) (find y env)
 g env (KNormal.IfEq x y e1 e2) = liftM2 (KNormal.IfEq (find x env) (find y env)) (g env e1) (g env e2)
