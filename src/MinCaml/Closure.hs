@@ -28,6 +28,7 @@ data T
   | Let (Id.T, Type.Type)
         T
         T
+  | Var Id.T
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -57,6 +58,7 @@ g _ _ (KNormal.Sub x y) = return $ Sub x y
 g env known (KNormal.IfEq x y e1 e2) = liftM2 (IfEq x y) (g env known e1) (g env known e2)
 g env known (KNormal.IfLe x y e1 e2) = liftM2 (IfLe x y) (g env known e1) (g env known e2)
 g env known (KNormal.Let (x, t) e1 e2) = liftM2 (Let (x, t)) (g env known e1) (g env known e2)
+g _ _ (KNormal.Var x) = return $ Var x
 
 f :: KNormal.T -> MinCaml Prog
 f e = do

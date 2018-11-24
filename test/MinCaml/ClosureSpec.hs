@@ -70,3 +70,5 @@ spec =
       Closure.Prog [] $
       Closure.Let ("Ti0.0", Type.Int) (Closure.Int 15) $
       Closure.Let ("Ti1.1", Type.Int) (Closure.Int 16) $ Closure.IfLe "Ti0.0" "Ti1.1" (Closure.Int 0) (Closure.Int 1)
+    specHelper validCase13 $
+      Right $ Closure.Prog [] $ Closure.Let ("x_.0", Type.Int) (Closure.Int 42) $ Closure.Var "x_.0"
