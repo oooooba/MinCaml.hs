@@ -14,6 +14,7 @@ import qualified MinCaml.Type        as Type
 data T
   = Unit
   | Int Int
+  | Neg Id.T
   | Add Id.T
         Id.T
   | Sub Id.T
@@ -69,6 +70,7 @@ g _ Syntax.Unit = return (Unit, Type.Unit)
 g _ (Syntax.Bool b) = return (Int $ fromEnum b, Type.Int)
 g _ (Syntax.Int i) = return (Int i, Type.Int)
 g env (Syntax.Not e) = g env $ Syntax.If e (Syntax.Bool False) (Syntax.Bool True)
+g env (Syntax.Neg e) = g env e >>= flip insertLet (\x -> return (Neg x, Type.Int))
 g env (Syntax.Add e1 e2) = gBinOpHelper env e1 e2 Add Type.Int
 g env (Syntax.Sub e1 e2) = gBinOpHelper env e1 e2 Sub Type.Int
 g env cmp@(Syntax.Eq _ _) = g env $ Syntax.If cmp (Syntax.Bool True) (Syntax.Bool False)
