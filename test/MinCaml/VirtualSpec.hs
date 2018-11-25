@@ -90,3 +90,16 @@ spec =
       Asm.Let ("Ti4.5", Type.Int) (Asm.Set 3) $
       Asm.Let ("Ti5.2", Type.Int) (Asm.Sub "Ti3.3" $ Asm.V "Ti4.5") $
       Asm.Ans $ Asm.IfEq "Ti1.0" (Asm.V "Ti5.2") (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+    specHelper validCase15 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti0.0", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti1.1", Type.Int) (Asm.Set 0) $
+      Asm.Ans $
+      Asm.IfEq
+        "Ti0.0"
+        (Asm.V "Ti1.1")
+        (Asm.Let ("Ti2.2", Type.Int) (Asm.Set 1) $
+         Asm.Let ("Ti3.3", Type.Int) (Asm.Set 0) $
+         Asm.Ans $ Asm.IfEq "Ti2.2" (Asm.V "Ti3.3") (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0))
+        (Asm.Ans $ Asm.Set 0)
