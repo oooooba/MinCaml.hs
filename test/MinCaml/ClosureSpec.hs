@@ -81,3 +81,14 @@ spec =
         (Closure.Let ("Ti3.3", Type.Int) (Closure.Let ("Ti2.4", Type.Int) (Closure.Int 2) $ Closure.Neg "Ti2.4") $
          Closure.Let ("Ti4.5", Type.Int) (Closure.Int 3) $ Closure.Sub "Ti3.3" "Ti4.5") $
       Closure.IfEq "Ti1.0" "Ti5.2" (Closure.Int 1) (Closure.Int 0)
+    specHelper validCase15 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let ("Ti0.0", Type.Int) (Closure.Int 1) $
+      Closure.Let ("Ti1.1", Type.Int) (Closure.Int 0) $
+      Closure.IfEq
+        "Ti0.0"
+        "Ti1.1"
+        (Closure.Let ("Ti2.2", Type.Int) (Closure.Int 1) $
+         Closure.Let ("Ti3.3", Type.Int) (Closure.Int 0) $ Closure.IfEq "Ti2.2" "Ti3.3" (Closure.Int 1) (Closure.Int 0))
+        (Closure.Int 0)
