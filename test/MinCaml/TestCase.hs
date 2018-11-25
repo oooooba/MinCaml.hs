@@ -34,3 +34,5 @@ validCase13 = TestCase {name = "validCase13", input = "let x_ = 42 in x_"}
 validCase14 = TestCase {name = "validCase14", input = "-1=-2-3"}
 
 validCase15 = TestCase {name = "validCase15", input = "if true then false else not true"}
+
+validCase16 = TestCase {name = "validCase16", input = "let rec f x = x + 1 in f 2"}

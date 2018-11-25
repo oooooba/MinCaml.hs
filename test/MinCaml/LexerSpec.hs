@@ -42,3 +42,17 @@ spec = do
     specHelper
       validCase15
       [Lexer.IF, Lexer.BOOL True, Lexer.THEN, Lexer.BOOL False, Lexer.ELSE, Lexer.NOT, Lexer.BOOL True]
+    specHelper
+      validCase16
+      [ Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "f"
+      , Lexer.IDENT "x"
+      , Lexer.EQUAL
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.INT 1
+      , Lexer.IN
+      , Lexer.IDENT "f"
+      , Lexer.INT 2
+      ]

@@ -31,6 +31,7 @@ tokens :-
   else                                   { tokenize ELSE }
   let                                    { tokenize LET }
   in                                     { tokenize IN }
+  rec                                    { tokenize REC }
   $lower ($digit | $lower | $upper | _)* { tokenizeIdent }
 
 {
@@ -54,6 +55,7 @@ data Token
   | ELSE
   | LET
   | IN
+  | REC
   | IDENT String
   deriving (Show, Eq)
 
