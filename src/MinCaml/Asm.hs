@@ -62,6 +62,8 @@ fvIdOrImm _     = []
 
 fvExp :: Exp -> [Id.T]
 fvExp (Set _) = []
+fvExp (Mov x) = [x]
+fvExp (Neg x) = [x]
 fvExp (Add x y') = x : fvIdOrImm y'
 fvExp (Sub x y') = x : fvIdOrImm y'
 fvExp (IfEq x y' e1 e2) = x : fvIdOrImm y' ++ removeAndUniq Set.empty (fvHelper e1 ++ fvHelper e2)
