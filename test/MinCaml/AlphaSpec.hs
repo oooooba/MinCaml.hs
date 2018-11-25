@@ -70,3 +70,13 @@ spec =
         (KNormal.Let ("Ti3.3", Type.Int) (KNormal.Let ("Ti2.4", Type.Int) (KNormal.Int 2) $ KNormal.Neg "Ti2.4") $
          KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 3) $ KNormal.Sub "Ti3.3" "Ti4.5") $
       KNormal.IfEq "Ti1.0" "Ti5.2" (KNormal.Int 1) (KNormal.Int 0)
+    specHelper validCase15 $
+      Right $
+      KNormal.Let ("Ti0.0", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 0) $
+      KNormal.IfEq
+        "Ti0.0"
+        "Ti1.1"
+        (KNormal.Let ("Ti2.2", Type.Int) (KNormal.Int 1) $
+         KNormal.Let ("Ti3.3", Type.Int) (KNormal.Int 0) $ KNormal.IfEq "Ti2.2" "Ti3.3" (KNormal.Int 1) (KNormal.Int 0))
+        (KNormal.Int 0)
