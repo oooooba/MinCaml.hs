@@ -44,3 +44,4 @@ spec = do
     specHelper validCase13 $ Right $ Syntax.Let ("x_", Type.Var 0) (Syntax.Int 42) (Syntax.Var "x_")
     specHelper validCase14 $
       Right $ Syntax.Eq (Syntax.Neg $ Syntax.Int 1) (Syntax.Sub (Syntax.Neg $ Syntax.Int 2) (Syntax.Int 3))
+    specHelper validCase15 $ Right $ Syntax.If (Syntax.Bool True) (Syntax.Bool False) (Syntax.Not $ Syntax.Bool True)

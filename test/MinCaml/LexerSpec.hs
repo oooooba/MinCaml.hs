@@ -39,3 +39,6 @@ spec = do
     specHelper validCase12 [Lexer.INT 15, Lexer.GREATER, Lexer.INT 16]
     specHelper validCase13 [Lexer.LET, Lexer.IDENT "x_", Lexer.EQUAL, Lexer.INT 42, Lexer.IN, Lexer.IDENT "x_"]
     specHelper validCase14 [Lexer.MINUS, Lexer.INT 1, Lexer.EQUAL, Lexer.MINUS, Lexer.INT 2, Lexer.MINUS, Lexer.INT 3]
+    specHelper
+      validCase15
+      [Lexer.IF, Lexer.BOOL True, Lexer.THEN, Lexer.BOOL False, Lexer.ELSE, Lexer.NOT, Lexer.BOOL True]

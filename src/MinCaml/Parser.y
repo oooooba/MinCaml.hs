@@ -19,6 +19,7 @@ import qualified MinCaml.Type   as Type
   ')'   { RPAREN }
   bool  { BOOL $$ }
   int   { INT $$ }
+  not   { NOT }
   '+'   { PLUS }
   '-'   { MINUS }
   '='   { EQUAL }
@@ -40,10 +41,12 @@ import qualified MinCaml.Type   as Type
 %left '=' '<>' '<' '>' '<=' '>='
 %left '+' '-'
 %right prec_unary_minus
+%left prec_app
 
 %%
 
 exp : simple_exp  { $1 }
+    | not exp %prec prec_app                  { Not $2 }
     | '-' exp %prec prec_unary_minus          { Neg $2 }
     | exp '+' exp                             { Add $1 $3 }
     | exp '-' exp                             { Sub $1 $3 }
