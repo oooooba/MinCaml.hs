@@ -53,6 +53,35 @@ spec = do
       , Lexer.PLUS
       , Lexer.INT 1
       , Lexer.IN
+      , Lexer.INT 2
+      ]
+    specHelper
+      validCase17
+      [ Lexer.LET
+      , Lexer.REC
       , Lexer.IDENT "f"
+      , Lexer.IDENT "x"
+      , Lexer.EQUAL
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.INT 1
+      , Lexer.IN
+      , Lexer.IDENT "f"
+      , Lexer.INT 2
+      ]
+    specHelper
+      validCase18
+      [ Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "f"
+      , Lexer.IDENT "x"
+      , Lexer.IDENT "y"
+      , Lexer.EQUAL
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.IDENT "y"
+      , Lexer.IN
+      , Lexer.IDENT "f"
+      , Lexer.INT 1
       , Lexer.INT 2
       ]
