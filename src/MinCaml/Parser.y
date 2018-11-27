@@ -88,7 +88,7 @@ addType (Let (x, Type.Var (-1)) e1 e2) = do
 addType (LetRec fundef e) = do
   let (x, Type.Var (-1)) = name fundef
   xt <- genType
-  yts <- mapM (\yt -> if snd yt == Type.Var (-1) then error "addType" else genType >>= (\t -> return (fst yt, t))) $ args fundef
+  yts <- mapM (\yt -> if snd yt /= Type.Var (-1) then error "addType" else genType >>= (\t -> return (fst yt, t))) $ args fundef
   body' <- addType $ body fundef
   e' <- addType e
   return $ LetRec (Fundef (x, xt) yts body') e'
