@@ -121,10 +121,10 @@ g _ (Syntax.Var x) = do
       modify (\s -> s {extenv = Map.insert x t env})
       return t
 g env (Syntax.LetRec (Syntax.Fundef (x, t) yts e1) e2) = do
-  let env = Map.insert x t env
-  e1Ty <- g (foldl (\e (y, t) -> Map.insert y t e) env yts) e1
+  let env' = Map.insert x t env
+  e1Ty <- g (foldl (\e (y, t) -> Map.insert y t e) env' yts) e1
   unify t (Type.Fun (fmap snd yts) e1Ty)
-  g env e2
+  g env' e2
 g env (Syntax.App e es) = do
   t <- genType
   esTy <- mapM (g env) es
