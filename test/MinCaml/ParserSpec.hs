@@ -45,3 +45,17 @@ spec = do
     specHelper validCase14 $
       Right $ Syntax.Eq (Syntax.Neg $ Syntax.Int 1) (Syntax.Sub (Syntax.Neg $ Syntax.Int 2) (Syntax.Int 3))
     specHelper validCase15 $ Right $ Syntax.If (Syntax.Bool True) (Syntax.Bool False) (Syntax.Not $ Syntax.Bool True)
+    specHelper validCase16 $
+      Right $
+      Syntax.LetRec (Syntax.Fundef ("f", Type.Var 0) [("x", Type.Var 1)] $ Syntax.Add (Syntax.Var "x") (Syntax.Int 1)) $
+      Syntax.Int 2
+    specHelper validCase17 $
+      Right $
+      Syntax.LetRec (Syntax.Fundef ("f", Type.Var 0) [("x", Type.Var 1)] $ Syntax.Add (Syntax.Var "x") (Syntax.Int 1)) $
+      Syntax.App (Syntax.Var "f") [Syntax.Int 2]
+    specHelper validCase18 $
+      Right $
+      Syntax.LetRec
+        (Syntax.Fundef ("f", Type.Var 0) [("x", Type.Var 1), ("y", Type.Var 2)] $
+         Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
+      Syntax.App (Syntax.Var "f") [Syntax.Int 1, Syntax.Int 2]

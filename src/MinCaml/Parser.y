@@ -33,6 +33,7 @@ import qualified MinCaml.Type   as Type
   else  { ELSE }
   let   { LET }
   in    { IN }
+  rec   { REC }
   ident { IDENT $$ }
 
 %nonassoc in
@@ -58,12 +59,22 @@ exp : simple_exp  { $1 }
     | exp '>=' exp                            { Le $3 $1 }
     | if exp then exp else exp %prec prec_if  { If $2 $4 $6 }
     | let ident '=' exp in exp %prec prec_let { Let (addTmpType $2) $4 $6 }
+    | let rec fundef in exp %prec prec_let    { LetRec $3 $5 }
+    | simple_exp actual_args %prec prec_app   { App $1 $2 }
 
 simple_exp : '(' exp ')' { $2 }
            | '(' ')'     { Unit }
            | bool        { Bool $1 }
            | int         { Int $1 }
            | ident       { Var $1 }
+
+fundef : ident formal_args '=' exp { Fundef (addTmpType $1) $2 $4 }
+
+formal_args : ident formal_args { addTmpType $1 : $2 }
+            | ident             { [addTmpType $1] }
+
+actual_args : actual_args simple_exp %prec prec_app { $1 ++ [$2] }
+            | simple_exp %prec prec_app             { [$1] }
 
 {
 runParser :: [Token] -> MinCaml T
