@@ -23,12 +23,19 @@ derefType :: Type.Type -> MinCaml Type.Type
 derefType (Type.Fun t1s t2) = liftM2 Type.Fun (mapM derefType t1s) (derefType t2)
 derefType (Type.Tuple ts) = Type.Tuple <$> mapM derefType ts
 derefType (Type.Array t) = Type.Array <$> derefType t
-derefType (Type.Var tyVarId) = do
-  env <- fmap tyVarIdToTypeEnv get
-  case Map.lookup tyVarId env of
-    Just t  -> return t
-    Nothing -> return Type.Int
+derefType (Type.Var tyVarId) = derefTypeHelper tyVarId
 derefType t = return t
+
+derefTypeHelper :: Type.TypeVarId -> MinCaml Type.Type
+derefTypeHelper tyVarId = do
+  env <- fmap tyVarIdToTypeEnv get
+  case env Map.! tyVarId of
+    Type.Var tyVarId' -> do
+      t <- derefTypeHelper tyVarId' >>= derefType
+      env' <- fmap tyVarIdToTypeEnv get
+      modify (\s -> s {tyVarIdToTypeEnv = Map.insert tyVarId' t env'})
+      return t
+    t -> derefType t
 
 derefIdType :: (Id.T, Type.Type) -> MinCaml (Id.T, Type.Type)
 derefIdType (x, t) = (\t -> (x, t)) <$> derefType t
@@ -144,29 +151,11 @@ gBinOpHelperRet env t e1 e2 = do
   g env e2 >>= unify t
   return t
 
-unite :: MinCaml ()
-unite = do
-  env <- fmap tyVarIdToTypeEnv get
-  Map.traverseWithKey uniteHelper env
-  return ()
-  where
-    uniteHelper :: Type.TypeVarId -> Type.Type -> MinCaml Type.Type
-    uniteHelper tyVarId ty =
-      case ty of
-        Type.Var tyVarId' -> do
-          ty' <- fromJust . Map.lookup tyVarId' <$> fmap tyVarIdToTypeEnv get
-          ty' <- uniteHelper tyVarId' ty'
-          env' <- fmap tyVarIdToTypeEnv get
-          modify (\s -> s {tyVarIdToTypeEnv = Map.insert tyVarId ty' env'})
-          return ty'
-        _ -> return ty
-
 f :: Syntax.T -> MinCaml (Syntax.T, Type.Type)
 f e = do
   modify (\s -> s {extenv = Map.empty})
   eTy <- genType
   g Map.empty e >>= unify eTy
-  unite
   extenv' <- fmap extenv get >>= Map.traverseWithKey (\_ t -> derefType t)
   modify (\s -> s {extenv = extenv'})
   liftM2 (,) (derefTerm e) (derefType eTy)
