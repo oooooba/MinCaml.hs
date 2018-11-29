@@ -1,5 +1,6 @@
 module MinCaml.KNormal
   ( T(..)
+  , Fundef(..)
   , f
   ) where
 
@@ -31,7 +32,15 @@ data T
         T
         T
   | Var Id.T
+  | LetRec Fundef
+           T
   deriving (Show, Eq)
+
+data Fundef = Fundef
+  { name :: (Id.T, Type.Type)
+  , args :: [(Id.T, Type.Type)]
+  , body :: T
+  } deriving (Show, Eq)
 
 insertLet :: (T, Type.Type) -> (Id.T -> MinCaml (T, Type.Type)) -> MinCaml (T, Type.Type)
 insertLet (Var x, _) k = k x
@@ -85,6 +94,11 @@ g env (Syntax.Let (x, t) e1 e2) = do
   return (Let (x, t) e1' e2', t2)
 g env (Syntax.Var x)
   | Map.member x env = return (Var x, env Map.! x)
+g env (Syntax.LetRec (Syntax.Fundef (x, t) yts e1) e2) = do
+  let env' = Map.insert x t env
+  (e2', t2) <- g env' e2
+  (e1', _) <- g (foldl (\e (y, t) -> Map.insert y t e) env' yts) e1
+  return (LetRec (Fundef (x, t) yts e1') e2', t2)
 
 f :: Syntax.T -> MinCaml T
 f e = fst <$> g Map.empty e
