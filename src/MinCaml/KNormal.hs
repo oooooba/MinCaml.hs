@@ -34,6 +34,8 @@ data T
   | Var Id.T
   | LetRec Fundef
            T
+  | App Id.T
+        [Id.T]
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -99,6 +101,17 @@ g env (Syntax.LetRec (Syntax.Fundef (x, t) yts e1) e2) = do
   (e2', t2) <- g env' e2
   (e1', _) <- g (foldl (\e (y, t) -> Map.insert y t e) env' yts) e1
   return (LetRec (Fundef (x, t) yts e1') e2', t2)
+g env (Syntax.App e1 e2s) = do
+  p1 <- g env e1
+  case p1 of
+    (_, Type.Fun _ t) ->
+      insertLet p1 $ \f ->
+        let bind xs [] = return (App f xs, t)
+            bind xs (e2:e2s) = do
+              p2 <- g env e2
+              insertLet p2 (\x -> bind (xs ++ [x]) e2s)
+        in bind [] e2s
+    _ -> error "assert"
 
 f :: Syntax.T -> MinCaml T
 f e = fst <$> g Map.empty e

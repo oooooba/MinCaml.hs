@@ -85,3 +85,16 @@ spec =
         (KNormal.Fundef ("f", Type.Fun [Type.Int] Type.Int) [("x", Type.Int)] $
          KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $ KNormal.Add "x" "Ti0") $
       KNormal.Int 2
+    specHelper validCase17 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f", Type.Fun [Type.Int] Type.Int) [("x", Type.Int)] $
+         KNormal.Let ("Ti1", Type.Int) (KNormal.Int 1) $ KNormal.Add "x" "Ti1") $
+      KNormal.Let ("Ti0", Type.Int) (KNormal.Int 2) $ KNormal.App "f" ["Ti0"]
+    specHelper validCase18 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f", Type.Fun [Type.Int, Type.Int] Type.Int) [("x", Type.Int), ("y", Type.Int)] $
+         KNormal.Add "x" "y") $
+      KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.App "f" ["Ti0", "Ti1"]
