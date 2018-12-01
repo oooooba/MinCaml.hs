@@ -56,6 +56,17 @@ data ClosureStatus = ClosureStatus
 
 type MinCamlClosure a = State ClosureStatus a
 
+fv :: T -> Set.Set Id.T
+fv Unit = Set.empty
+fv (Int _) = Set.empty
+fv (Neg x) = Set.singleton x
+fv (Add x y) = Set.fromList [x, y]
+fv (Sub x y) = Set.fromList [x, y]
+fv (IfEq x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) (fv e2)
+fv (IfLe x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) (fv e2)
+fv (Let (x, t) e1 e2) = Set.union (fv e1) $ Set.delete x $ fv e2
+fv (Var x) = Set.singleton x
+
 g :: Map.Map Id.T Type.Type -> Set.Set Id.T -> KNormal.T -> MinCamlClosure T
 g _ _ KNormal.Unit = return Unit
 g _ _ (KNormal.Int i) = return $ Int i
