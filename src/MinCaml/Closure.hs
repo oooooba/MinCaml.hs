@@ -1,4 +1,9 @@
-module MinCaml.Closure where
+module MinCaml.Closure
+  ( Fundef
+  , T(..)
+  , Prog(..)
+  , f
+  ) where
 
 import           Control.Monad              (liftM2)
 import           Control.Monad.State.Strict (State, get, modify, runState)
