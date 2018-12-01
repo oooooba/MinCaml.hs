@@ -59,3 +59,12 @@ spec = do
         (Syntax.Fundef ("f", Type.Var 0) [("x", Type.Var 1), ("y", Type.Var 2)] $
          Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
       Syntax.App (Syntax.Var "f") [Syntax.Int 1, Syntax.Int 2]
+    specHelper validCase19 $
+      Right $
+      Syntax.LetRec
+        (Syntax.Fundef ("f", Type.Var 0) [("n", Type.Var 1)] $
+         Syntax.If
+           (Syntax.Le (Syntax.Var "n") (Syntax.Int 0))
+           (Syntax.Int 0)
+           (Syntax.Add (Syntax.Var "n") $ Syntax.App (Syntax.Var "f") [Syntax.Sub (Syntax.Var "n") (Syntax.Int 1)])) $
+      Syntax.App (Syntax.Var "f") [Syntax.Int 5]

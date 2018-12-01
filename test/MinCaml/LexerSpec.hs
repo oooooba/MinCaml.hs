@@ -85,3 +85,29 @@ spec = do
       , Lexer.INT 1
       , Lexer.INT 2
       ]
+    specHelper
+      validCase19
+      [ Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "f"
+      , Lexer.IDENT "n"
+      , Lexer.EQUAL
+      , Lexer.IF
+      , Lexer.IDENT "n"
+      , Lexer.LESS_EQUAL
+      , Lexer.INT 0
+      , Lexer.THEN
+      , Lexer.INT 0
+      , Lexer.ELSE
+      , Lexer.IDENT "n"
+      , Lexer.PLUS
+      , Lexer.IDENT "f"
+      , Lexer.LPAREN
+      , Lexer.IDENT "n"
+      , Lexer.MINUS
+      , Lexer.INT 1
+      , Lexer.RPAREN
+      , Lexer.IN
+      , Lexer.IDENT "f"
+      , Lexer.INT 5
+      ]

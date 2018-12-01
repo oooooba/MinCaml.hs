@@ -40,3 +40,5 @@ validCase16 = TestCase {name = "validCase16", input = "let rec f x = x + 1 in 2"
 validCase17 = TestCase {name = "validCase17", input = "let rec f x = x + 1 in f 2"}
 
 validCase18 = TestCase {name = "validCase18", input = "let rec f x y = x + y in f 1 2"}
+
+validCase19 = TestCase {name = "validCase19", input = "let rec f n = if n <= 0 then 0 else n + f (n - 1) in f 5"}
