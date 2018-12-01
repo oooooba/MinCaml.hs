@@ -11,6 +11,7 @@ import           MinCaml.Global
 import qualified MinCaml.Id          as Id
 import qualified MinCaml.Syntax      as Syntax
 import qualified MinCaml.Type        as Type
+import qualified MinCaml.Util        as Util
 
 data T
   = Unit
@@ -99,7 +100,7 @@ g env (Syntax.Var x)
 g env (Syntax.LetRec (Syntax.Fundef (x, t) yts e1) e2) = do
   let env' = Map.insert x t env
   (e2', t2) <- g env' e2
-  (e1', _) <- g (foldl (\e (y, t) -> Map.insert y t e) env' yts) e1
+  (e1', _) <- g (Util.addList yts env') e1
   return (LetRec (Fundef (x, t) yts e1') e2', t2)
 g env (Syntax.App e1 e2s) = do
   p1 <- g env e1
