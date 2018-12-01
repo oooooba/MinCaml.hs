@@ -33,6 +33,7 @@ g env (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
   let env'' = foldl (\e (v1, v2) -> Map.insert v1 v2 e) env' $ zip ys ys'
   fundef <- KNormal.Fundef (find x env', t) (fmap (\(y, t) -> (find y env'', t)) yts) <$> g env'' e1
   KNormal.LetRec fundef <$> g env' e2
+g env (KNormal.App x ys) = return $ KNormal.App (find x env) $ fmap (`find` env) ys
 
 f :: KNormal.T -> MinCaml KNormal.T
 f = g Map.empty
