@@ -15,6 +15,11 @@ import qualified MinCaml.Id                 as Id
 import qualified MinCaml.KNormal            as KNormal
 import qualified MinCaml.Type               as Type
 
+data Closure = Closure
+  { entry    :: Id.L
+  , actualFv :: [Id.T]
+  } deriving (Show, Eq)
+
 data T
   = Unit
   | Int Int
@@ -35,6 +40,13 @@ data T
         T
         T
   | Var Id.T
+  | MakeCls (Id.T, Type.Type)
+            Closure
+            T
+  | AppCls Id.T
+           [Id.T]
+  | AppDir Id.L
+           [Id.T]
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -66,6 +78,9 @@ fv (IfEq x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) (fv e2)
 fv (IfLe x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) (fv e2)
 fv (Let (x, t) e1 e2) = Set.union (fv e1) $ Set.delete x $ fv e2
 fv (Var x) = Set.singleton x
+fv (MakeCls (x, t) (Closure l ys) e) = Set.delete x $ Set.union (Set.fromList ys) (fv e)
+fv (AppCls x ys) = Set.fromList $ x : ys
+fv (AppDir _ xs) = Set.fromList xs
 
 g :: Map.Map Id.T Type.Type -> Set.Set Id.T -> KNormal.T -> MinCamlClosure T
 g _ _ KNormal.Unit = return Unit
