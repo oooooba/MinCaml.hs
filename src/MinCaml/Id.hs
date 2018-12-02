@@ -4,7 +4,9 @@ import qualified MinCaml.Type as Type
 
 type T = String
 
-type L = String
+newtype L =
+  L String
+  deriving (Show, Eq)
 
 idOfType :: Type.Type -> String
 idOfType Type.Unit      = "u"
