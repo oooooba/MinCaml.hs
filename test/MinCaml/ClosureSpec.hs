@@ -100,3 +100,36 @@ spec =
           Closure.Let ("Ti0.2", Type.Int) (Closure.Int 1) $ Closure.Add "x.1" "Ti0.2"
         ] $
       Closure.Int 2
+    specHelper validCase17 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "f.0", Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] [] $
+          Closure.Let ("Ti1.2", Type.Int) (Closure.Int 1) $ Closure.Add "x.1" "Ti1.2"
+        ] $
+      Closure.Let ("Ti0.3", Type.Int) (Closure.Int 2) $ Closure.AppDir (Id.L "f.0") ["Ti0.3"]
+    specHelper validCase18 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "f.0", Type.Fun [Type.Int, Type.Int] Type.Int) [("x.1", Type.Int), ("y.2", Type.Int)] [] $
+          Closure.Add "x.1" "y.2"
+        ] $
+      Closure.Let ("Ti0.3", Type.Int) (Closure.Int 1) $
+      Closure.Let ("Ti1.4", Type.Int) (Closure.Int 2) $ Closure.AppDir (Id.L "f.0") ["Ti0.3", "Ti1.4"]
+    specHelper validCase19 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "f.0", Type.Fun [Type.Int] Type.Int) [("n.1", Type.Int)] [] $
+          Closure.Let ("Ti1.2", Type.Int) (Closure.Int 0) $
+          Closure.IfLe
+            "n.1"
+            "Ti1.2"
+            (Closure.Int 0)
+            (Closure.Let
+               ("Ti4.3", Type.Int)
+               (Closure.Let
+                  ("Ti3.4", Type.Int)
+                  (Closure.Let ("Ti2.5", Type.Int) (Closure.Int 1) $ Closure.Sub "n.1" "Ti2.5") $
+                Closure.AppDir (Id.L "f.0") ["Ti3.4"]) $
+             Closure.Add "n.1" "Ti4.3")
+        ] $
+      Closure.Let ("Ti0.6", Type.Int) (Closure.Int 5) $ Closure.AppDir (Id.L "f.0") ["Ti0.6"]

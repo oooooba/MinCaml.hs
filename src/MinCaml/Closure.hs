@@ -116,6 +116,9 @@ g env known (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
     if x `elem` fv e2'
       then MakeCls (x, t) (Closure (Id.L x) zs) e2'
       else e2'
+g env known (KNormal.App x ys)
+  | x `elem` known = return $ AppDir (Id.L x) ys
+g env known (KNormal.App f xs) = return $ AppCls f xs
 
 f :: KNormal.T -> MinCaml Prog
 f e = do
