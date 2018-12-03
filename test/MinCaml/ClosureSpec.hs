@@ -7,6 +7,7 @@ import           Test.Hspec
 import qualified MinCaml.Alpha    as Alpha
 import qualified MinCaml.Closure  as Closure
 import           MinCaml.Global
+import qualified MinCaml.Id       as Id
 import qualified MinCaml.KNormal  as KNormal
 import qualified MinCaml.Lexer    as Lexer
 import qualified MinCaml.Parser   as Parser
@@ -92,3 +93,10 @@ spec =
         (Closure.Let ("Ti2.2", Type.Int) (Closure.Int 1) $
          Closure.Let ("Ti3.3", Type.Int) (Closure.Int 0) $ Closure.IfEq "Ti2.2" "Ti3.3" (Closure.Int 1) (Closure.Int 0))
         (Closure.Int 0)
+    specHelper validCase16 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "f.0", Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] [] $
+          Closure.Let ("Ti0.2", Type.Int) (Closure.Int 1) $ Closure.Add "x.1" "Ti0.2"
+        ] $
+      Closure.Int 2

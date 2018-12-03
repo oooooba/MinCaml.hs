@@ -1,5 +1,5 @@
 module MinCaml.Closure
-  ( Fundef
+  ( Fundef(..)
   , T(..)
   , Prog(..)
   , f
@@ -14,6 +14,7 @@ import           MinCaml.Global
 import qualified MinCaml.Id                 as Id
 import qualified MinCaml.KNormal            as KNormal
 import qualified MinCaml.Type               as Type
+import qualified MinCaml.Util               as Util
 
 data Closure = Closure
   { entry    :: Id.L
@@ -92,6 +93,29 @@ g env known (KNormal.IfEq x y e1 e2) = liftM2 (IfEq x y) (g env known e1) (g env
 g env known (KNormal.IfLe x y e1 e2) = liftM2 (IfLe x y) (g env known e1) (g env known e2)
 g env known (KNormal.Let (x, t) e1 e2) = liftM2 (Let (x, t)) (g env known e1) (g env known e2)
 g _ _ (KNormal.Var x) = return $ Var x
+g env known (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
+  toplevelBackup <- fmap toplevel get
+  let env' = Map.insert x t env
+  let known' = Set.insert x known
+  e1' <- g (Util.addList yts env') known' e1
+  let zs = Set.difference (fv e1') (Set.fromList $ fmap fst yts)
+  (known'', e1'') <-
+    if Set.null zs
+      then return (known', e1')
+      else do
+        modify (\s -> s {toplevel = toplevelBackup})
+        e1' <- g (Util.addList yts env') known e1
+        return (known, e1')
+  let zs = Set.toList $ Set.difference (fv e1'') (Set.insert x $ Set.fromList $ fmap fst yts)
+  let zts = fmap (\z -> (z, env' Map.! z)) zs
+  currentToplevel <- fmap toplevel get
+  let fundef = Fundef (Id.L x, t) yts zts e1''
+  modify (\s -> s {toplevel = fundef : currentToplevel})
+  e2' <- g env' known'' e2
+  return $
+    if x `elem` fv e2'
+      then MakeCls (x, t) (Closure (Id.L x) zs) e2'
+      else e2'
 
 f :: KNormal.T -> MinCaml Prog
 f e = do
