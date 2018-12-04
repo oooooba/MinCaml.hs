@@ -38,7 +38,7 @@ data Exp
 
 data Fundef = Fundef
   { name  :: Id.L
-  , args  :: [Id.L]
+  , args  :: [Id.T]
   , fargs :: [Id.T]
   , body  :: T
   , ret   :: Type.Type
@@ -79,3 +79,9 @@ fv e = removeAndUniq Set.empty $ fvHelper e
 concat :: T -> (Id.T, Type.Type) -> T -> T
 concat (Ans exp) xt e        = Let xt exp e
 concat (Let xt exp e1) yt e2 = Let xt exp $ MinCaml.Asm.concat e1 yt e2
+
+align :: Int -> Int
+align i =
+  if (i `mod` 8) == 0
+    then i
+    else i + 4
