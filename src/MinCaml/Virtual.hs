@@ -20,6 +20,35 @@ data VirtualStatus = VirtualStatus
 
 type MinCamlVirtual a = ExceptT String (StateT VirtualStatus Identity) a
 
+classify ::
+     [(Id.T, Type.Type)] -> (a, b) -> ((a, b) -> Id.T -> (a, b)) -> ((a, b) -> Id.T -> Type.Type -> (a, b)) -> (a, b)
+classify xts ini addf addi =
+  foldl
+    (\acc (x, t) ->
+       case t of
+         Type.Unit -> acc
+         _         -> addi acc x t)
+    ini
+    xts
+
+separate :: [(Id.T, Type.Type)] -> ([Id.T], [Id.T])
+separate xts = classify xts ([], []) (\(int, float) x -> (int, float ++ [x])) (\(int, float) x _ -> (int ++ [x], float))
+
+expand ::
+     [(Id.T, Type.Type)]
+  -> (Int, Asm.T)
+  -> (Id.T -> Int -> Asm.T -> Asm.T)
+  -> (Id.T -> Type.Type -> Int -> Asm.T -> Asm.T)
+  -> (Int, Asm.T)
+expand xts ini addf addi =
+  classify
+    xts
+    ini
+    (\(offset, acc) x ->
+       let offset' = Asm.align offset
+       in (offset' + 8, addf x offset' acc))
+    (\(offset, acc) x t -> (offset + 4, addi x t offset acc))
+
 gIfHelper ::
      (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)
   -> Map.Map Id.T Type.Type
