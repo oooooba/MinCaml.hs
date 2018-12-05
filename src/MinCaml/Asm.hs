@@ -1,9 +1,10 @@
 module MinCaml.Asm where
 
-import qualified Data.Set     as Set
+import qualified Data.Set       as Set
 
-import qualified MinCaml.Id   as Id
-import qualified MinCaml.Type as Type
+import           MinCaml.Global
+import qualified MinCaml.Id     as Id
+import qualified MinCaml.Type   as Type
 
 data IdOrImm
   = V Id.T
@@ -20,12 +21,17 @@ data T
 data Exp
   = Nop
   | Set Int
+  | SetL Id.L
   | Mov Id.T
   | Neg Id.T
   | Add Id.T
         IdOrImm
   | Sub Id.T
         IdOrImm
+  | St Id.T
+       Id.T
+       IdOrImm
+       Int
   | IfEq Id.T
          IdOrImm
          T
@@ -49,6 +55,14 @@ data Prog =
        [Fundef]
        T
   deriving (Show, Eq)
+
+seq :: (Exp, T) -> MinCaml T
+seq (e1, e2) = do
+  x <- genVar Type.Unit
+  return $ Let (x, Type.Unit) e1 e2
+
+regHp :: String
+regHp = "min_caml_hp"
 
 removeAndUniq :: Ord a => Set.Set a -> [a] -> [a]
 removeAndUniq _ [] = []

@@ -89,6 +89,20 @@ g env (Closure.Var x) =
   case Map.lookup x env of
     Just Type.Unit -> Asm.Ans Asm.Nop
     _              -> Asm.Ans $ Asm.Mov x
+g env (Closure.MakeCls (x, t) (Closure.Closure l ys) e2) = do
+  e2' <- g (Map.insert x t env) e2
+  (offset, storeFv) <-
+    expand
+      (fmap (\y -> (y, env Map.! y)) ys)
+      (4, e2')
+      undefined
+      (\y _ offset storeFv -> Asm.seq (Asm.St y x (Asm.C offset) 1, storeFv))
+  z <- genId "l"
+  cont <- Asm.seq (Asm.St z x (Asm.C 0) 1, storeFv)
+  return $
+    Asm.Let (x, t) (Asm.Mov Asm.regHp) $
+    Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C $ Asm.align offset)) $
+    Asm.Let (z, Type.Int) (Asm.SetL l) cont
 
 h :: Closure.Fundef -> Asm.Fundef
 h = undefined
