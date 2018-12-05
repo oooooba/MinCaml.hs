@@ -2,52 +2,54 @@ module MinCaml.Virtual
   ( f
   ) where
 
-import           Control.Monad.Except       (ExceptT, runExceptT, throwError)
-import           Control.Monad.Identity     (Identity, runIdentity)
-import           Control.Monad.State.Strict (StateT, get, runStateT)
-import qualified Data.Map                   as Map
+import           Control.Applicative  ((<$>))
+import           Control.Monad        (foldM)
+import           Control.Monad.Except (throwError)
+import qualified Data.Map             as Map
 
-import qualified MinCaml.Asm                as Asm
-import qualified MinCaml.Closure            as Closure
+import qualified MinCaml.Asm          as Asm
+import qualified MinCaml.Closure      as Closure
 import           MinCaml.Global
-import qualified MinCaml.Id                 as Id
-import qualified MinCaml.Type               as Type
-
-data VirtualStatus = VirtualStatus
-  { globalStatus :: GlobalStatus
-  , fdata        :: [(Id.L, Float)]
-  }
-
-type MinCamlVirtual a = ExceptT String (StateT VirtualStatus Identity) a
+import qualified MinCaml.Id           as Id
+import qualified MinCaml.Type         as Type
 
 classify ::
-     [(Id.T, Type.Type)] -> (a, b) -> ((a, b) -> Id.T -> (a, b)) -> ((a, b) -> Id.T -> Type.Type -> (a, b)) -> (a, b)
+     [(Id.T, Type.Type)]
+  -> (a, b)
+  -> ((a, b) -> Id.T -> MinCaml (a, b))
+  -> ((a, b) -> Id.T -> Type.Type -> MinCaml (a, b))
+  -> MinCaml (a, b)
 classify xts ini addf addi =
-  foldl
+  foldM
     (\acc (x, t) ->
        case t of
-         Type.Unit -> acc
+         Type.Unit -> return acc
          _         -> addi acc x t)
     ini
     xts
 
-separate :: [(Id.T, Type.Type)] -> ([Id.T], [Id.T])
-separate xts = classify xts ([], []) (\(int, float) x -> (int, float ++ [x])) (\(int, float) x _ -> (int ++ [x], float))
+separate :: [(Id.T, Type.Type)] -> MinCaml ([Id.T], [Id.T])
+separate xts =
+  classify
+    xts
+    ([], [])
+    (\(int, float) x -> return (int, float ++ [x]))
+    (\(int, float) x _ -> return (int ++ [x], float))
 
 expand ::
      [(Id.T, Type.Type)]
   -> (Int, Asm.T)
-  -> (Id.T -> Int -> Asm.T -> Asm.T)
-  -> (Id.T -> Type.Type -> Int -> Asm.T -> Asm.T)
-  -> (Int, Asm.T)
+  -> (Id.T -> Int -> Asm.T -> MinCaml Asm.T)
+  -> (Id.T -> Type.Type -> Int -> Asm.T -> MinCaml Asm.T)
+  -> MinCaml (Int, Asm.T)
 expand xts ini addf addi =
   classify
     xts
     ini
-    (\(offset, acc) x ->
+    (\(offset, acc) x -> do
        let offset' = Asm.align offset
-       in (offset' + 8, addf x offset' acc))
-    (\(offset, acc) x t -> (offset + 4, addi x t offset acc))
+       addf x offset' acc >>= \a -> return (offset' + 8, a))
+    (\(offset, acc) x t -> addi x t offset acc >>= \a -> return (offset + 4, a))
 
 gIfHelper ::
      (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)
@@ -56,13 +58,13 @@ gIfHelper ::
   -> Id.T
   -> Closure.T
   -> Closure.T
-  -> MinCamlVirtual Asm.T
+  -> MinCaml Asm.T
 gIfHelper c env x y e1 e2 = do
   e1' <- g env e1
   e2' <- g env e2
   return $ Asm.Ans $ c x (Asm.V y) e1' e2'
 
-g :: Map.Map Id.T Type.Type -> Closure.T -> MinCamlVirtual Asm.T
+g :: Map.Map Id.T Type.Type -> Closure.T -> MinCaml Asm.T
 g _ Closure.Unit = return $ Asm.Ans Asm.Nop
 g _ (Closure.Int i) = return $ Asm.Ans (Asm.Set i)
 g _ (Closure.Neg x) = return $ Asm.Ans (Asm.Neg x)
@@ -93,9 +95,5 @@ h = undefined
 
 f :: Closure.Prog -> MinCaml Asm.Prog
 f (Closure.Prog fundefs e) = do
-  gs <- get
   let fundefs' = fmap h fundefs
-  let (e', vs) = runIdentity (runStateT (runExceptT $ g Map.empty e) VirtualStatus {globalStatus = gs, fdata = []})
-  case e' of
-    Left msg  -> throwError msg
-    Right e'' -> return $ Asm.Prog (fdata vs) fundefs' e''
+  Asm.Prog [] fundefs' <$> g Map.empty e

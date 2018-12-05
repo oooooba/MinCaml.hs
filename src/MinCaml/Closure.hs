@@ -1,5 +1,6 @@
 module MinCaml.Closure
-  ( Fundef(..)
+  ( Closure(..)
+  , Fundef(..)
   , T(..)
   , Prog(..)
   , f
