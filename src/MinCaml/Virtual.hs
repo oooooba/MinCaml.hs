@@ -12,6 +12,7 @@ import qualified MinCaml.Closure      as Closure
 import           MinCaml.Global
 import qualified MinCaml.Id           as Id
 import qualified MinCaml.Type         as Type
+import qualified MinCaml.Util         as Util
 
 classify ::
      [(Id.T, Type.Type)]
@@ -104,10 +105,17 @@ g env (Closure.MakeCls (x, t) (Closure.Closure l ys) e2) = do
     Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C $ Asm.align offset)) $
     Asm.Let (z, Type.Int) (Asm.SetL l) cont
 
-h :: Closure.Fundef -> Asm.Fundef
-h = undefined
+h :: Closure.Fundef -> MinCaml Asm.Fundef
+h (Closure.Fundef (Id.L x, t) yts zts e) = do
+  (int, float) <- separate yts
+  e' <- g (Map.insert x t $ Util.addList yts $ Util.addList zts Map.empty) e
+  (offset, load) <-
+    expand zts (4, e') undefined (\z t offset load -> return $ Asm.Let (z, t) (Asm.Ld x (Asm.C offset) 1) load)
+  case t of
+    Type.Fun _ t2 -> return $ Asm.Fundef (Id.L x) int float load t2
+    _             -> throwError "Virtual.h never reached"
 
 f :: Closure.Prog -> MinCaml Asm.Prog
 f (Closure.Prog fundefs e) = do
-  let fundefs' = fmap h fundefs
+  fundefs' <- mapM h fundefs
   Asm.Prog [] fundefs' <$> g Map.empty e

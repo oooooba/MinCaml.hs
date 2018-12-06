@@ -28,6 +28,9 @@ data Exp
         IdOrImm
   | Sub Id.T
         IdOrImm
+  | Ld Id.T
+       IdOrImm
+       Int
   | St Id.T
        Id.T
        IdOrImm

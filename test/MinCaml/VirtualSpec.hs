@@ -8,6 +8,7 @@ import qualified MinCaml.Alpha    as Alpha
 import qualified MinCaml.Asm      as Asm
 import qualified MinCaml.Closure  as Closure
 import           MinCaml.Global
+import qualified MinCaml.Id       as Id
 import qualified MinCaml.KNormal  as KNormal
 import qualified MinCaml.Lexer    as Lexer
 import qualified MinCaml.Parser   as Parser
@@ -103,3 +104,15 @@ spec =
          Asm.Let ("Ti3.3", Type.Int) (Asm.Set 0) $
          Asm.Ans $ Asm.IfEq "Ti2.2" (Asm.V "Ti3.3") (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0))
         (Asm.Ans $ Asm.Set 0)
+    specHelper validCase16 $
+      Right $
+      Asm.Prog
+        []
+        [ Asm.Fundef
+            (Id.L "f.0")
+            ["x.1"]
+            []
+            (Asm.Let ("Ti0.2", Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add "x.1" (Asm.V "Ti0.2"))
+            Type.Int
+        ] $
+      Asm.Ans $ Asm.Set 2
