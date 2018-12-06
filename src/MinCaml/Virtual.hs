@@ -104,6 +104,9 @@ g env (Closure.MakeCls (x, t) (Closure.Closure l ys) e2) = do
     Asm.Let (x, t) (Asm.Mov Asm.regHp) $
     Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C $ Asm.align offset)) $
     Asm.Let (z, Type.Int) (Asm.SetL l) cont
+g env (Closure.AppDir (Id.L x) ys) = do
+  (int, float) <- separate (fmap (\y -> (y, env Map.! y)) ys)
+  return $ Asm.Ans $ Asm.CallDir (Id.L x) int float
 
 h :: Closure.Fundef -> MinCaml Asm.Fundef
 h (Closure.Fundef (Id.L x, t) yts zts e) = do

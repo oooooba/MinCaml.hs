@@ -116,3 +116,15 @@ spec =
             Type.Int
         ] $
       Asm.Ans $ Asm.Set 2
+    specHelper validCase17 $
+      Right $
+      Asm.Prog
+        []
+        [ Asm.Fundef
+            (Id.L "f.0")
+            ["x.1"]
+            []
+            (Asm.Let ("Ti1.2", Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add "x.1" (Asm.V "Ti1.2"))
+            Type.Int
+        ] $
+      Asm.Let ("Ti0.3", Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") ["Ti0.3"] []

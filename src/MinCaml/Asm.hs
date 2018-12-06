@@ -43,6 +43,9 @@ data Exp
          IdOrImm
          T
          T
+  | CallDir Id.L
+            [Id.T]
+            [Id.T]
   deriving (Show, Eq)
 
 data Fundef = Fundef
