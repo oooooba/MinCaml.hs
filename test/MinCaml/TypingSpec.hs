@@ -106,3 +106,26 @@ spec = do
                (Syntax.Add (Syntax.Var "n") $ Syntax.App (Syntax.Var "f") [Syntax.Sub (Syntax.Var "n") (Syntax.Int 1)])) $
           Syntax.App (Syntax.Var "f") [Syntax.Int 5]
         , Type.Int)
+    specHelper validCase20 $
+      Right
+        ( Syntax.LetRec
+            (Syntax.Fundef ("f", Type.Fun [Type.Int] $ Type.Fun [Type.Int] Type.Int) [("x", Type.Int)] $
+             Syntax.LetRec
+               (Syntax.Fundef ("g", Type.Fun [Type.Int] Type.Int) [("y", Type.Int)] $
+                Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
+             Syntax.Var "g") $
+          Syntax.App (Syntax.App (Syntax.Var "f") [Syntax.Int 1]) [Syntax.Int 2]
+        , Type.Int)
+    specHelper validCase21 $
+      Right
+        ( Syntax.Let ("x", Type.Int) (Syntax.Int 1) $
+          Syntax.LetRec
+            (Syntax.Fundef ("f", Type.Fun [Type.Int] Type.Int) [("y", Type.Int)] $
+             Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
+          Syntax.LetRec
+            (Syntax.Fundef ("g", Type.Fun [Type.Int] Type.Int) [("z", Type.Int)] $
+             Syntax.Add (Syntax.Var "z") (Syntax.Int 2)) $
+          Syntax.App
+            (Syntax.If (Syntax.Eq (Syntax.Int 3) (Syntax.Int 4)) (Syntax.Var "f") (Syntax.Var "g"))
+            [Syntax.Int 5]
+        , Type.Int)

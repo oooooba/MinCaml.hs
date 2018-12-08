@@ -111,3 +111,64 @@ spec = do
       , Lexer.IDENT "f"
       , Lexer.INT 5
       ]
+    specHelper
+      validCase20
+      [ Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "f"
+      , Lexer.IDENT "x"
+      , Lexer.EQUAL
+      , Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "g"
+      , Lexer.IDENT "y"
+      , Lexer.EQUAL
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.IDENT "y"
+      , Lexer.IN
+      , Lexer.IDENT "g"
+      , Lexer.IN
+      , Lexer.LPAREN
+      , Lexer.IDENT "f"
+      , Lexer.INT 1
+      , Lexer.RPAREN
+      , Lexer.INT 2
+      ]
+    specHelper
+      validCase21
+      [ Lexer.LET
+      , Lexer.IDENT "x"
+      , Lexer.EQUAL
+      , Lexer.INT 1
+      , Lexer.IN
+      , Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "f"
+      , Lexer.IDENT "y"
+      , Lexer.EQUAL
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.IDENT "y"
+      , Lexer.IN
+      , Lexer.LET
+      , Lexer.REC
+      , Lexer.IDENT "g"
+      , Lexer.IDENT "z"
+      , Lexer.EQUAL
+      , Lexer.IDENT "z"
+      , Lexer.PLUS
+      , Lexer.INT 2
+      , Lexer.IN
+      , Lexer.LPAREN
+      , Lexer.IF
+      , Lexer.INT 3
+      , Lexer.EQUAL
+      , Lexer.INT 4
+      , Lexer.THEN
+      , Lexer.IDENT "f"
+      , Lexer.ELSE
+      , Lexer.IDENT "g"
+      , Lexer.RPAREN
+      , Lexer.INT 5
+      ]

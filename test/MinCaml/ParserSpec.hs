@@ -68,3 +68,17 @@ spec = do
            (Syntax.Int 0)
            (Syntax.Add (Syntax.Var "n") $ Syntax.App (Syntax.Var "f") [Syntax.Sub (Syntax.Var "n") (Syntax.Int 1)])) $
       Syntax.App (Syntax.Var "f") [Syntax.Int 5]
+    specHelper validCase20 $
+      Right $
+      Syntax.LetRec
+        (Syntax.Fundef ("f", Type.Var 0) [("x", Type.Var 1)] $
+         Syntax.LetRec
+           (Syntax.Fundef ("g", Type.Var 2) [("y", Type.Var 3)] $ Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
+         Syntax.Var "g") $
+      Syntax.App (Syntax.App (Syntax.Var "f") [Syntax.Int 1]) [Syntax.Int 2]
+    specHelper validCase21 $
+      Right $
+      Syntax.Let ("x", Type.Var 0) (Syntax.Int 1) $
+      Syntax.LetRec (Syntax.Fundef ("f", Type.Var 1) [("y", Type.Var 2)] $ Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
+      Syntax.LetRec (Syntax.Fundef ("g", Type.Var 3) [("z", Type.Var 4)] $ Syntax.Add (Syntax.Var "z") (Syntax.Int 2)) $
+      Syntax.App (Syntax.If (Syntax.Eq (Syntax.Int 3) (Syntax.Int 4)) (Syntax.Var "f") (Syntax.Var "g")) [Syntax.Int 5]
