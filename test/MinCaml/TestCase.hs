@@ -50,3 +50,9 @@ validCase21 =
   { name = "validCase21"
   , input = "let x = 1 in let rec f y = x + y in let rec g z = z + 2 in (if 3 = 4 then f else g) 5"
   }
+
+validCase22 = TestCase {name = "validCase22", input = "1+2+3+4"}
+
+validCase23 = TestCase {name = "validCase23", input = "(1-2)+(3-4)"}
+
+validCase24 = TestCase {name = "validCase24", input = "1+(2-3)+4"}

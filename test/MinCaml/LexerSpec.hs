@@ -172,3 +172,30 @@ spec = do
       , Lexer.RPAREN
       , Lexer.INT 5
       ]
+    specHelper validCase22 [Lexer.INT 1, Lexer.PLUS, Lexer.INT 2, Lexer.PLUS, Lexer.INT 3, Lexer.PLUS, Lexer.INT 4]
+    specHelper
+      validCase23
+      [ Lexer.LPAREN
+      , Lexer.INT 1
+      , Lexer.MINUS
+      , Lexer.INT 2
+      , Lexer.RPAREN
+      , Lexer.PLUS
+      , Lexer.LPAREN
+      , Lexer.INT 3
+      , Lexer.MINUS
+      , Lexer.INT 4
+      , Lexer.RPAREN
+      ]
+    specHelper
+      validCase24
+      [ Lexer.INT 1
+      , Lexer.PLUS
+      , Lexer.LPAREN
+      , Lexer.INT 2
+      , Lexer.MINUS
+      , Lexer.INT 3
+      , Lexer.RPAREN
+      , Lexer.PLUS
+      , Lexer.INT 4
+      ]

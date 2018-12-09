@@ -129,3 +129,9 @@ spec = do
             (Syntax.If (Syntax.Eq (Syntax.Int 3) (Syntax.Int 4)) (Syntax.Var "f") (Syntax.Var "g"))
             [Syntax.Int 5]
         , Type.Int)
+    specHelper validCase22 $
+      Right (Syntax.Add (Syntax.Add (Syntax.Add (Syntax.Int 1) $ Syntax.Int 2) $ Syntax.Int 3) $ Syntax.Int 4, Type.Int)
+    specHelper validCase23 $
+      Right (Syntax.Add (Syntax.Sub (Syntax.Int 1) $ Syntax.Int 2) $ Syntax.Sub (Syntax.Int 3) $ Syntax.Int 4, Type.Int)
+    specHelper validCase24 $
+      Right (Syntax.Add (Syntax.Add (Syntax.Int 1) $ Syntax.Sub (Syntax.Int 2) $ Syntax.Int 3) $ Syntax.Int 4, Type.Int)

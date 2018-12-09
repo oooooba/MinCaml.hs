@@ -82,3 +82,9 @@ spec = do
       Syntax.LetRec (Syntax.Fundef ("f", Type.Var 1) [("y", Type.Var 2)] $ Syntax.Add (Syntax.Var "x") (Syntax.Var "y")) $
       Syntax.LetRec (Syntax.Fundef ("g", Type.Var 3) [("z", Type.Var 4)] $ Syntax.Add (Syntax.Var "z") (Syntax.Int 2)) $
       Syntax.App (Syntax.If (Syntax.Eq (Syntax.Int 3) (Syntax.Int 4)) (Syntax.Var "f") (Syntax.Var "g")) [Syntax.Int 5]
+    specHelper validCase22 $
+      Right $ Syntax.Add (Syntax.Add (Syntax.Add (Syntax.Int 1) $ Syntax.Int 2) $ Syntax.Int 3) $ Syntax.Int 4
+    specHelper validCase23 $
+      Right $ Syntax.Add (Syntax.Sub (Syntax.Int 1) $ Syntax.Int 2) $ Syntax.Sub (Syntax.Int 3) $ Syntax.Int 4
+    specHelper validCase24 $
+      Right $ Syntax.Add (Syntax.Add (Syntax.Int 1) $ Syntax.Sub (Syntax.Int 2) $ Syntax.Int 3) $ Syntax.Int 4
