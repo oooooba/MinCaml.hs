@@ -14,7 +14,7 @@ data GlobalStatus = GlobalStatus
   , varIdCounter     :: Int
   , tyVarIdCounter   :: Type.TypeVarId
   , tyVarIdToTypeEnv :: Map.Map Type.TypeVarId Type.Type
-  }
+  } deriving (Show, Eq)
 
 type MinCaml a = ExceptT String (StateT GlobalStatus Identity) a
 
