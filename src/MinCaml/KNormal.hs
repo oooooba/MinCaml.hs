@@ -2,6 +2,7 @@ module MinCaml.KNormal
   ( T(..)
   , Fundef(..)
   , f
+  , f2
   ) where
 
 import           Control.Applicative ((<$>))
@@ -116,3 +117,72 @@ g env (Syntax.App e1 e2s) = do
 
 f :: Syntax.T -> MinCaml T
 f e = fst <$> g Map.empty e
+
+insertLet2 :: Map.Map Id.T Type.Type -> Syntax.T -> MinCaml (Id.T, Type.Type, T -> T)
+insertLet2 env (Syntax.Var x) = return (x, env Map.! x, id)
+insertLet2 env e = do
+  (e', t) <- g2 env e
+  x <- genVar t
+  return (x, t, Let (x, t) e')
+
+g2BinOpHelper ::
+     Map.Map Id.T Type.Type -> Syntax.T -> Syntax.T -> (Id.T -> Id.T -> T) -> Type.Type -> MinCaml (T, Type.Type)
+g2BinOpHelper env e1 e2 c t = do
+  (x1, _, k1) <- insertLet2 env e1
+  (x2, _, k2) <- insertLet2 env e2
+  return (k1 $ k2 $ c x1 x2, t)
+
+g2IfCmpHelper ::
+     Map.Map Id.T Type.Type
+  -> Syntax.T
+  -> Syntax.T
+  -> Syntax.T
+  -> Syntax.T
+  -> (Id.T -> Id.T -> T -> T -> T)
+  -> MinCaml (T, Type.Type)
+g2IfCmpHelper env e1 e2 et ef c = do
+  (x1, _, k1) <- insertLet2 env e1
+  (x2, _, k2) <- insertLet2 env e2
+  (et', t) <- g2 env et
+  (ef', _) <- g2 env ef
+  return (k1 $ k2 $ c x1 x2 et' ef', t)
+
+g2 :: Map.Map Id.T Type.Type -> Syntax.T -> MinCaml (T, Type.Type)
+g2 _ Syntax.Unit = return (Unit, Type.Unit)
+g2 _ (Syntax.Bool b) = return (Int $ fromEnum b, Type.Int)
+g2 _ (Syntax.Int i) = return (Int i, Type.Int)
+g2 env (Syntax.Not e) = g2 env $ Syntax.If e (Syntax.Bool False) (Syntax.Bool True)
+g2 env (Syntax.Neg e) = do
+  (x, _, k) <- insertLet2 env e
+  return (k $ Neg x, Type.Int)
+g2 env (Syntax.Add e1 e2) = g2BinOpHelper env e1 e2 Add Type.Int
+g2 env (Syntax.Sub e1 e2) = g2BinOpHelper env e1 e2 Sub Type.Int
+g2 env cmp@(Syntax.Eq _ _) = g2 env $ Syntax.If cmp (Syntax.Bool True) (Syntax.Bool False)
+g2 env cmp@(Syntax.Le _ _) = g2 env $ Syntax.If cmp (Syntax.Bool True) (Syntax.Bool False)
+g2 env (Syntax.If (Syntax.Not e1) e2 e3) = g2 env $ Syntax.If e1 e3 e2
+g2 env (Syntax.If (Syntax.Eq e1 e2) e3 e4) = g2IfCmpHelper env e1 e2 e3 e4 IfEq
+g2 env (Syntax.If (Syntax.Le e1 e2) e3 e4) = g2IfCmpHelper env e1 e2 e3 e4 IfLe
+g2 env (Syntax.If e1 e2 e3) = g env $ Syntax.If (Syntax.Eq e1 $ Syntax.Bool False) e3 e2
+g2 env (Syntax.Let (x, t) e1 e2) = do
+  (e1', _) <- g2 env e1
+  (e2', t2) <- g2 (Map.insert x t env) e2
+  return (Let (x, t) e1' e2', t2)
+g2 env (Syntax.Var x) = return (Var x, env Map.! x)
+g2 env (Syntax.LetRec (Syntax.Fundef (x, t) yts e1) e2) = do
+  let env' = Map.insert x t env
+  (e2', t2) <- g2 env' e2
+  (e1', _) <- g2 (Util.addList yts env') e1
+  return (LetRec (Fundef (x, t) yts e1') e2', t2)
+g2 env (Syntax.App e1 e2s) = do
+  (x1, t1, k1) <- insertLet2 env e1
+  case t1 of
+    Type.Fun _ t -> do
+      let bind (x2s, k2s) [] = return (k1 $ foldl (\e k -> k e) (App x1 $ reverse x2s) k2s, t)
+          bind (x2s, k2s) (e2:e2s) = do
+            (x2, _, k2) <- insertLet2 env e2
+            bind (x2 : x2s, k2 : k2s) e2s
+      bind ([], []) e2s
+    _ -> error "assert"
+
+f2 :: Syntax.T -> MinCaml T
+f2 e = fst <$> g2 Map.empty e

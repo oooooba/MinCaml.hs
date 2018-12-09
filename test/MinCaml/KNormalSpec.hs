@@ -21,8 +21,16 @@ specHelper testCase expected =
     initialGlobalStatus `shouldBe`
   expected
 
+specHelper2 :: TestCase -> Spec
+specHelper2 testCase =
+  it (name testCase) $
+  runMinCaml ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f . fst) initialGlobalStatus `shouldBe`
+  runMinCaml
+    ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f2 . fst)
+    initialGlobalStatus
+
 spec :: Spec
-spec =
+spec = do
   describe "valid cases" $ do
     specHelper validCase1 $ Right KNormal.Unit
     specHelper validCase2 $ Right KNormal.Unit
@@ -135,3 +143,60 @@ spec =
         (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 3) $
          KNormal.Let ("Ti1", Type.Int) (KNormal.Int 4) $ KNormal.IfEq "Ti0" "Ti1" (KNormal.Var "f") (KNormal.Var "g")) $
       KNormal.Let ("Ti3", Type.Int) (KNormal.Int 5) $ KNormal.App "Tf2" ["Ti3"]
+    specHelper validCase22 $
+      Right $
+      KNormal.Let
+        ("Ti4", Type.Int)
+        (KNormal.Let
+           ("Ti2", Type.Int)
+           (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+            KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.Add "Ti0" "Ti1") $
+         KNormal.Let ("Ti3", Type.Int) (KNormal.Int 3) $ KNormal.Add "Ti2" "Ti3") $
+      KNormal.Let ("Ti5", Type.Int) (KNormal.Int 4) $ KNormal.Add "Ti4" "Ti5"
+    specHelper validCase23 $
+      Right $
+      KNormal.Let
+        ("Ti2", Type.Int)
+        (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+         KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.Sub "Ti0" "Ti1") $
+      KNormal.Let
+        ("Ti5", Type.Int)
+        (KNormal.Let ("Ti3", Type.Int) (KNormal.Int 3) $
+         KNormal.Let ("Ti4", Type.Int) (KNormal.Int 4) $ KNormal.Sub "Ti3" "Ti4") $
+      KNormal.Add "Ti2" "Ti5"
+    specHelper validCase24 $
+      Right $
+      KNormal.Let
+        ("Ti4", Type.Int)
+        (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+         KNormal.Let
+           ("Ti3", Type.Int)
+           (KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $
+            KNormal.Let ("Ti2", Type.Int) (KNormal.Int 3) $ KNormal.Sub "Ti1" "Ti2") $
+         KNormal.Add "Ti0" "Ti3") $
+      KNormal.Let ("Ti5", Type.Int) (KNormal.Int 4) $ KNormal.Add "Ti4" "Ti5"
+  describe "k-normalization without continuations" $ do
+    specHelper2 validCase1
+    specHelper2 validCase2
+    specHelper2 validCase3
+    specHelper2 validCase4
+    specHelper2 validCase5
+    specHelper2 validCase6
+    specHelper2 validCase7
+    specHelper2 validCase8
+    specHelper2 validCase9
+    specHelper2 validCase10
+    specHelper2 validCase11
+    specHelper2 validCase12
+    specHelper2 validCase13
+    specHelper2 validCase14
+    specHelper2 validCase15
+    specHelper2 validCase16
+    specHelper2 validCase17
+    specHelper2 validCase18
+    specHelper2 validCase19
+    specHelper2 validCase20
+    specHelper2 validCase21
+    specHelper2 validCase22
+    specHelper2 validCase23
+    specHelper2 validCase24
