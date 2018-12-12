@@ -133,3 +133,34 @@ spec =
              Closure.Add "n.1" "Ti4.3")
         ] $
       Closure.Let ("Ti0.6", Type.Int) (Closure.Int 5) $ Closure.AppDir (Id.L "f.0") ["Ti0.6"]
+    specHelper validCase20 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "g.2", Type.Fun [Type.Int] Type.Int) [("y.3", Type.Int)] [("x.1", Type.Int)] $
+          Closure.Add "x.1" "y.3"
+        , Closure.Fundef (Id.L "f.0", Type.Fun [Type.Int] $ Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] [] $
+          Closure.MakeCls ("g.2", Type.Fun [Type.Int] Type.Int) (Closure.Closure (Id.L "g.2") ["x.1"]) $
+          Closure.Var "g.2"
+        ] $
+      Closure.Let
+        ("Tf1.4", Type.Fun [Type.Int] Type.Int)
+        (Closure.Let ("Ti0.5", Type.Int) (Closure.Int 1) $ Closure.AppDir (Id.L "f.0") ["Ti0.5"]) $
+      Closure.Let ("Ti2.6", Type.Int) (Closure.Int 2) $ Closure.AppCls "Tf1.4" ["Ti2.6"]
+    specHelper validCase21 $
+      Right $
+      Closure.Prog
+        [ Closure.Fundef (Id.L "f.1", Type.Fun [Type.Int] Type.Int) [("y.2", Type.Int)] [("x.0", Type.Int)] $
+          Closure.Add "x.0" "y.2"
+        --
+        , Closure.Fundef (Id.L "g.3", Type.Fun [Type.Int] Type.Int) [("z.4", Type.Int)] [] $
+          Closure.Let ("Ti4.5", Type.Int) (Closure.Int 2) $ Closure.Add "z.4" "Ti4.5"
+        ] $
+      Closure.Let ("x.0", Type.Int) (Closure.Int 1) $
+      Closure.MakeCls ("f.1", Type.Fun [Type.Int] Type.Int) (Closure.Closure (Id.L "f.1") ["x.0"]) $
+      Closure.MakeCls ("g.3", Type.Fun [Type.Int] Type.Int) (Closure.Closure (Id.L "g.3") []) $
+      Closure.Let
+        ("Tf2.6", Type.Fun [Type.Int] Type.Int)
+        (Closure.Let ("Ti0.7", Type.Int) (Closure.Int 3) $
+         Closure.Let ("Ti1.8", Type.Int) (Closure.Int 4) $
+         Closure.IfEq "Ti0.7" "Ti1.8" (Closure.Var "f.1") (Closure.Var "g.3")) $
+      Closure.Let ("Ti3.9", Type.Int) (Closure.Int 5) $ Closure.AppCls "Tf2.6" ["Ti3.9"]
