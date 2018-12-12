@@ -92,7 +92,7 @@ g _ _ (KNormal.Add x y) = return $ Add x y
 g _ _ (KNormal.Sub x y) = return $ Sub x y
 g env known (KNormal.IfEq x y e1 e2) = liftM2 (IfEq x y) (g env known e1) (g env known e2)
 g env known (KNormal.IfLe x y e1 e2) = liftM2 (IfLe x y) (g env known e1) (g env known e2)
-g env known (KNormal.Let (x, t) e1 e2) = liftM2 (Let (x, t)) (g env known e1) (g env known e2)
+g env known (KNormal.Let (x, t) e1 e2) = liftM2 (Let (x, t)) (g env known e1) (g (Map.insert x t env) known e2)
 g _ _ (KNormal.Var x) = return $ Var x
 g env known (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
   toplevelBackup <- fmap toplevel get
