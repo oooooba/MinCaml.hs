@@ -151,7 +151,6 @@ spec =
       Closure.Prog
         [ Closure.Fundef (Id.L "f.1", Type.Fun [Type.Int] Type.Int) [("y.2", Type.Int)] [("x.0", Type.Int)] $
           Closure.Add "x.0" "y.2"
-        --
         , Closure.Fundef (Id.L "g.3", Type.Fun [Type.Int] Type.Int) [("z.4", Type.Int)] [] $
           Closure.Let ("Ti4.5", Type.Int) (Closure.Int 2) $ Closure.Add "z.4" "Ti4.5"
         ] $
