@@ -43,6 +43,9 @@ data Exp
          IdOrImm
          T
          T
+  | CallCls Id.T
+            [Id.T]
+            [Id.T]
   | CallDir Id.L
             [Id.T]
             [Id.T]
