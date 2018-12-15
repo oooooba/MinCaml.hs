@@ -76,6 +76,9 @@ seq (e1, e2) = do
 regHp :: String
 regHp = "min_caml_hp"
 
+isReg :: Id.T -> Bool
+isReg x = head x == '%' || x == regHp
+
 removeAndUniq :: Ord a => Set.Set a -> [a] -> [a]
 removeAndUniq _ [] = []
 removeAndUniq xs (x:ys)
