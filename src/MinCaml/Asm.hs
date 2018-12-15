@@ -49,6 +49,9 @@ data Exp
   | CallDir Id.L
             [Id.T]
             [Id.T]
+  | Save Id.T
+         Id.T
+  | Restore Id.T
   deriving (Show, Eq)
 
 data Fundef = Fundef
