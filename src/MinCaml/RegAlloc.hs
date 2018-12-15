@@ -4,8 +4,6 @@ module MinCaml.RegAlloc
 
 import           Data.Either    (fromRight)
 import qualified Data.Map       as Map
-import           Prelude        hiding (return)
-import qualified Prelude
 
 import qualified MinCaml.Asm    as Asm
 import           MinCaml.Global
@@ -18,12 +16,9 @@ data Exc
           Type.Type
   deriving (Show, Eq)
 
-type MinCamlRegAlloc a = Either Exc (MinCaml a)
+type MinCamlRegAlloc a = Either Exc a
 
 type RegEnv = Map.Map Id.T Id.T
-
-return :: a -> MinCamlRegAlloc a
-return = Right . Prelude.return
 
 gAuxAndRestore :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAuxAndRestore dest cont regenv exp =
@@ -39,12 +34,15 @@ g :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.T -> MinCamlRegAlloc (Asm.T, Re
 g dest cont regenv (Asm.Ans exp) = gAuxAndRestore dest cont regenv exp
 g dest cont regenv (Asm.Let xt@(x, t) exp e) = undefined
 
+-- ToDo: modify to use Global.genVar to make fresh variable
+neverUsedIdentifier :: String
+neverUsedIdentifier = "'never used identifier'"
+
 h :: Asm.Fundef -> MinCamlRegAlloc Asm.Fundef
 h = undefined
 
 f :: Asm.Prog -> MinCaml Asm.Prog
 f (Asm.Prog fdata fundefs e) = do
-  fundefs' <- sequence $ fromRight undefined $ mapM h fundefs
-  tmp <- genVar Type.Unit
-  (e', regenv') <- fromRight undefined $ g (tmp, Type.Unit) (Asm.Ans Asm.Nop) Map.empty e
+  let fundefs' = fromRight undefined $ mapM h fundefs
+  let (e', _) = fromRight undefined $ g (neverUsedIdentifier ++ show 0, Type.Unit) (Asm.Ans Asm.Nop) Map.empty e
   Prelude.return $ Asm.Prog fdata fundefs' e'
