@@ -20,7 +20,7 @@ data Exc
 
 type MinCamlRegAlloc a = Either Exc (MinCaml a)
 
-type RegEnv = Map.Map Id.T Type.Type
+type RegEnv = Map.Map Id.T Id.T
 
 return :: a -> MinCamlRegAlloc a
 return = Right . Prelude.return
