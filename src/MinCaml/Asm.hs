@@ -73,6 +73,30 @@ seq (e1, e2) = do
   x <- genVar Type.Unit
   return $ Let (x, Type.Unit) e1 e2
 
+regEax :: String
+regEax = "%eax"
+
+regEbx :: String
+regEbx = "%ebx"
+
+regEcx :: String
+regEcx = "%ecx"
+
+regEdx :: String
+regEdx = "%edx"
+
+regEsi :: String
+regEsi = "%esi"
+
+regEdi :: String
+regEdi = "%edi"
+
+regs :: [Id.T]
+regs = [regEax, regEbx, regEcx, regEdx, regEsi, regEdi]
+
+allregs :: [Id.T]
+allregs = regs
+
 regHp :: String
 regHp = "min_caml_hp"
 

@@ -38,3 +38,7 @@ spec =
     specHelper validCase2 $ Right $ Asm.Prog [] [] (Asm.Ans Asm.Nop)
     specHelper validCase3 $ Right $ Asm.Prog [] [] (Asm.Ans $ Asm.Set 42)
     specHelper validCase4 $ Right $ Asm.Prog [] [] (Asm.Ans $ Asm.Set 42)
+    specHelper validCase5 $
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add Asm.regEax (Asm.C 2)
+    specHelper validCase6 $
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 3) $ Asm.Ans $ Asm.Sub Asm.regEax (Asm.C 4)
