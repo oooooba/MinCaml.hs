@@ -90,13 +90,21 @@ fvIdOrImm (V x) = [x]
 fvIdOrImm _     = []
 
 fvExp :: Exp -> [Id.T]
+fvExp Nop = []
 fvExp (Set _) = []
+fvExp (SetL _) = []
+fvExp (Restore _) = []
 fvExp (Mov x) = [x]
 fvExp (Neg x) = [x]
+fvExp (Save x _) = [x]
 fvExp (Add x y') = x : fvIdOrImm y'
 fvExp (Sub x y') = x : fvIdOrImm y'
+fvExp (Ld x y' _) = x : fvIdOrImm y'
+fvExp (St x y z' _) = x : y : fvIdOrImm z'
 fvExp (IfEq x y' e1 e2) = x : fvIdOrImm y' ++ removeAndUniq Set.empty (fvHelper e1 ++ fvHelper e2)
 fvExp (IfLe x y' e1 e2) = x : fvIdOrImm y' ++ removeAndUniq Set.empty (fvHelper e1 ++ fvHelper e2)
+fvExp (CallCls x ys zs) = x : ys ++ zs
+fvExp (CallDir _ ys zs) = ys ++ zs
 
 fvHelper :: T -> [Id.T]
 fvHelper (Ans exp) = fvExp exp
