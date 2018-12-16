@@ -103,18 +103,18 @@ find' :: Asm.IdOrImm -> RegEnv -> MinCamlRegAlloc Asm.IdOrImm
 find' (Asm.V x) regenv = Asm.V <$> find x Type.Int regenv
 find' c _              = return c
 
+wrap :: RegEnv -> Asm.T -> (Asm.T, RegEnv)
+wrap = flip (,)
+
+wrapExp :: RegEnv -> Asm.Exp -> (Asm.T, RegEnv)
+wrapExp regenv = wrap regenv . Asm.Ans
+
 gAuxAndRestore :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAuxAndRestore dest cont regenv exp = do
   globalStatus <- get
   case run (gAux dest cont regenv exp) globalStatus of
     Left (NoReg x t) -> g dest cont regenv $ Asm.Let (x, t) (Asm.Restore x) $ Asm.Ans exp
     Right (result, globalStatus') -> put globalStatus' >> return result
-
-wrap :: RegEnv -> Asm.T -> (Asm.T, RegEnv)
-wrap = flip (,)
-
-wrapExp :: RegEnv -> Asm.Exp -> (Asm.T, RegEnv)
-wrapExp regenv = wrap regenv . Asm.Ans
 
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
