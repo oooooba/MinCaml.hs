@@ -17,10 +17,9 @@ import           MinCaml.Global
 import qualified MinCaml.Id                 as Id
 import qualified MinCaml.Type               as Type
 
-data Exc
-  = NotFound
-  | NoReg Id.T
-          Type.Type
+data Exc =
+  NoReg Id.T
+        Type.Type
   deriving (Show, Eq)
 
 type MinCamlRegAlloc a = StateT GlobalStatus (ExceptT Exc Identity) a
