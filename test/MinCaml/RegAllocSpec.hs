@@ -42,3 +42,33 @@ spec =
       Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add Asm.regEax (Asm.C 2)
     specHelper validCase6 $
       Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 3) $ Asm.Ans $ Asm.Sub Asm.regEax (Asm.C 4)
+    specHelper validCase7 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 5) $
+      Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 6) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+    specHelper validCase8 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 7) $
+      Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 8) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+    specHelper validCase9 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 9) $
+      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 10) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+    specHelper validCase10 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 12) $
+      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 11) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+    specHelper validCase11 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 14) $
+      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 13) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+    specHelper validCase12 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 15) $
+      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 16) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)

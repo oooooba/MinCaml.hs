@@ -116,11 +116,63 @@ gAuxAndRestore dest cont regenv exp = do
     Left (NoReg x t) -> g dest cont regenv $ Asm.Let (x, t) (Asm.Restore x) $ Asm.Ans exp
     Right (result, globalStatus') -> put globalStatus' >> return result
 
+gAuxIf ::
+     (Id.T, Type.Type)
+  -> Asm.T
+  -> RegEnv
+  -> Asm.Exp
+  -> (Asm.T -> Asm.T -> MinCamlRegAlloc Asm.Exp)
+  -> Asm.T
+  -> Asm.T
+  -> MinCamlRegAlloc (Asm.T, RegEnv)
+gAuxIf dest cont regenv exp constr e1 e2 = do
+  (e1', regenv1) <- g dest cont regenv e1
+  (e2', regenv2) <- g dest cont regenv e2
+  let regenv' = foldl (extractRegEnv regenv1 regenv2) Map.empty $ Asm.fv cont
+  wrap regenv' <$>
+    foldl
+      (\e x ->
+         if x == fst dest || not (Map.member x regenv) || Map.member x regenv'
+           then e
+           else e >>= seqHelper (Asm.Save (regenv Map.! x) x))
+      (Asm.Ans <$> constr e1' e2')
+      (Asm.fv cont)
+  where
+    extractRegEnv :: RegEnv -> RegEnv -> RegEnv -> Id.T -> RegEnv
+    extractRegEnv _ _ regenv' x
+      | Asm.isReg x = regenv'
+    extractRegEnv regenv1 regenv2 regenv' x
+      | Map.member x regenv1 && Map.member x regenv2 =
+        let r1 = regenv1 Map.! x
+            r2 = regenv2 Map.! x
+        in if r1 == r2
+             then Map.insert x r1 regenv'
+             else regenv'
+    extractRegEnv _ _ regenv' _ = regenv'
+
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Set _) = return (Asm.Ans exp, regenv)
 gAux dest cont regenv (Asm.Add x y') = wrapExp regenv <$> liftM2 Asm.Add (find x Type.Int regenv) (find' y' regenv)
 gAux dest cont regenv (Asm.Sub x y') = wrapExp regenv <$> liftM2 Asm.Sub (find x Type.Int regenv) (find' y' regenv)
+gAux dest cont regenv exp@(Asm.IfEq x y' e1 e2) =
+  gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfEq Type.Int regenv x y') e1 e2
+gAux dest cont regenv exp@(Asm.IfLe x y' e1 e2) =
+  gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfLe Type.Int regenv x y') e1 e2
+
+gAuxIfHelper ::
+     (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)
+  -> Type.Type
+  -> RegEnv
+  -> Id.T
+  -> Asm.IdOrImm
+  -> Asm.T
+  -> Asm.T
+  -> MinCamlRegAlloc Asm.Exp
+gAuxIfHelper c t regenv x y' e1' e2' = do
+  rx <- find x t regenv
+  ry' <- find' y' regenv
+  return $ c rx ry' e1' e2'
 
 seqHelper :: Asm.Exp -> Asm.T -> MinCamlRegAlloc Asm.T
 seqHelper exp e = do
