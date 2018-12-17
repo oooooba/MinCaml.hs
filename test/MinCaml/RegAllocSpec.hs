@@ -72,3 +72,5 @@ spec =
       Asm.Prog [] [] $
       Asm.Let (Asm.regEax, Type.Int) (Asm.Set 15) $
       Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 16) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+    specHelper validCase13 $
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 42) $ Asm.Ans $ Asm.Mov Asm.regEax

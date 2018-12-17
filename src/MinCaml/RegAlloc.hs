@@ -153,6 +153,7 @@ gAuxIf dest cont regenv exp constr e1 e2 = do
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Set _) = return (Asm.Ans exp, regenv)
+gAux dest cont regenv exp@(Asm.Mov x) = wrapExp regenv . Asm.Mov <$> find x Type.Int regenv
 gAux dest cont regenv (Asm.Add x y') = wrapExp regenv <$> liftM2 Asm.Add (find x Type.Int regenv) (find' y' regenv)
 gAux dest cont regenv (Asm.Sub x y') = wrapExp regenv <$> liftM2 Asm.Sub (find x Type.Int regenv) (find' y' regenv)
 gAux dest cont regenv exp@(Asm.IfEq x y' e1 e2) =
