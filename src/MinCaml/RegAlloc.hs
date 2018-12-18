@@ -31,7 +31,17 @@ data AllocResult
   | Spill Id.T
   deriving (Show, Eq)
 
+targetHelper :: Id.T -> (Id.T, Type.Type) -> Asm.T -> Asm.T -> (Bool, [Id.T])
+targetHelper src (dest, t) e1 e2 =
+  let (c1, rs1) = target src (dest, t) e1
+      (c2, rs2) = target src (dest, t) e2
+  in (c1 && c2, rs1 ++ rs2)
+
 target' :: Id.T -> (Id.T, Type.Type) -> Asm.Exp -> (Bool, [Id.T])
+target' src (dest, t) (Asm.Mov x)
+  | x == src && Asm.isReg dest = assert (t /= Type.Unit) (False, [dest])
+target' src (dest, t) (Asm.IfEq _ _ e1 e2) = targetHelper src (dest, t) e1 e2
+target' src (dest, t) (Asm.IfLe _ _ e1 e2) = targetHelper src (dest, t) e1 e2
 target' _ _ _ = (False, [])
 
 target :: Id.T -> (Id.T, Type.Type) -> Asm.T -> (Bool, [Id.T])
@@ -44,8 +54,12 @@ target src dest (Asm.Let xt exp e) =
             in (c2, rs1 ++ rs2)
 
 source' :: Type.Type -> Asm.Exp -> [Id.T]
-source' t (Asm.Add x (Asm.C _)) = [x]
-source' t (Asm.Add x (Asm.V y)) = [x, y]
+source' _ (Asm.Mov x)           = [x]
+source' _ (Asm.Neg x)           = [x]
+source' _ (Asm.Add x (Asm.C _)) = [x]
+source' _ (Asm.Sub x (Asm.C _)) = [x]
+source' t (Asm.IfEq _ _ e1 e2)  = source t e1 ++ source t e2
+source' t (Asm.IfLe _ _ e1 e2)  = source t e1 ++ source t e2
 source' _ _                     = []
 
 source :: Type.Type -> Asm.T -> [Id.T]
