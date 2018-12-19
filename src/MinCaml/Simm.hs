@@ -24,6 +24,10 @@ g' env (Asm.Add x (Asm.V y))
   | Map.member x env = Asm.Add y $ Asm.C $ env Map.! x
 g' env (Asm.Sub x (Asm.V y))
   | Map.member y env = Asm.Sub x $ Asm.C $ env Map.! y
+g' env (Asm.Ld x (Asm.V y) 1)
+  | Map.member y env = Asm.Ld x (Asm.C $ env Map.! y) 1
+g' env (Asm.St x y (Asm.V z) 1)
+  | Map.member z env = Asm.St x y (Asm.C $ env Map.! z) 1
 g' env (Asm.IfEq x (Asm.V y) e1 e2)
   | Map.member y env = Asm.IfEq x (Asm.C $ env Map.! y) (g env e1) (g env e2)
 g' env (Asm.IfLe x (Asm.V y) e1 e2)
