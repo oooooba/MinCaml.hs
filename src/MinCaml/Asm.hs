@@ -94,8 +94,14 @@ regEdi = "%edi"
 regs :: [Id.T]
 regs = [regEax, regEbx, regEcx, regEdx, regEsi, regEdi]
 
+fregs :: [Id.T]
+fregs = undefined
+
 allregs :: [Id.T]
 allregs = regs
+
+regCl :: String
+regCl = last regs
 
 regHp :: String
 regHp = "min_caml_hp"

@@ -197,6 +197,13 @@ seqHelper exp e = do
   put globalStatus'
   return $ fromRight undefined result
 
+genVarHelper :: Type.Type -> MinCamlRegAlloc Id.T
+genVarHelper t = do
+  globalStatus <- get
+  let (result, globalStatus') = runMinCaml (genVar t) globalStatus
+  put globalStatus'
+  return $ fromRight undefined result
+
 g :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.T -> MinCamlRegAlloc (Asm.T, RegEnv)
 g dest cont regenv (Asm.Ans exp) = gAuxAndRestore dest cont regenv exp
 g dest cont regenv (Asm.Let xt@(x, t) exp e) = do
@@ -219,7 +226,22 @@ g dest cont regenv (Asm.Let xt@(x, t) exp e) = do
       return (Asm.concat e1' (r, t) e2', regenv2)
 
 h :: Asm.Fundef -> MinCamlRegAlloc Asm.Fundef
-h = undefined
+h (Asm.Fundef (Id.L x) ys zs e t) = do
+  let regenv = Map.insert x Asm.regCl Map.empty
+  let (i, argRegs, regenv') =
+        foldl
+          (\(i, argRegs, regenv) y ->
+             let r = Asm.regs !! i
+             in (i + 1, argRegs ++ [r], assert (not $ Asm.isReg y) $ Map.insert y r regenv))
+          (0, [], regenv)
+          ys
+  let (_, fargRegs, regenv'') = (undefined, [], regenv')
+  a <-
+    case t of
+      Type.Unit -> genVarHelper Type.Unit
+      _         -> return $ head Asm.regs
+  (e', _) <- g (a, t) (Asm.Ans $ Asm.Mov a) regenv'' e
+  return $ Asm.Fundef (Id.L x) argRegs fargRegs e' t
 
 run :: MinCamlRegAlloc a -> GlobalStatus -> Either Exc (a, GlobalStatus)
 run e s = runIdentity (runExceptT $ runStateT e s)

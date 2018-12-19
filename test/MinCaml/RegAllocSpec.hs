@@ -94,3 +94,7 @@ spec =
         (Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $
          Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 0) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0))
         (Asm.Ans $ Asm.Set 0)
+    specHelper validCase16 $
+      Right $
+      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regEax] [] (Asm.Ans $ Asm.Add Asm.regEax $ Asm.C 1) Type.Int] $
+      Asm.Ans $ Asm.Set 2
