@@ -144,3 +144,30 @@ spec =
       Asm.Let ("Ti0.5", Type.Int) (Asm.Set 1) $
       Asm.Let ("Tf1.4", Type.Fun [Type.Int] Type.Int) (Asm.CallDir (Id.L "f.0") ["Ti0.5"] []) $
       Asm.Let ("Ti2.6", Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallCls "Tf1.4" ["Ti2.6"] []
+    specHelper validCase21 $
+      Right $
+      Asm.Prog
+        []
+        [ Asm.Fundef
+            (Id.L "f.1")
+            ["y.2"]
+            []
+            (Asm.Let ("x.0", Type.Int) (Asm.Ld "f.1" (Asm.C 4) 1) $ Asm.Ans $ Asm.Add "x.0" $ Asm.V "y.2")
+            Type.Int
+        , Asm.Fundef (Id.L "g.3") ["z.4"] [] (Asm.Ans $ Asm.Add "z.4" $ Asm.C 2) Type.Int
+        ] $
+      Asm.Let ("x.0", Type.Int) (Asm.Set 1) $
+      Asm.Let ("f.1", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
+      Asm.Let ("l.11", Type.Int) (Asm.SetL $ Id.L "f.1") $
+      Asm.Let ("Tu7", Type.Unit) (Asm.St "l.11" "f.1" (Asm.C 0) 1) $
+      Asm.Let ("Tu6", Type.Unit) (Asm.St "x.0" "f.1" (Asm.C 4) 1) $
+      Asm.Let ("g.3", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
+      Asm.Let ("l.10", Type.Int) (Asm.SetL $ Id.L "g.3") $
+      Asm.Let ("Tu5", Type.Unit) (Asm.St "l.10" "g.3" (Asm.C 0) 1) $
+      Asm.Let ("Ti0.7", Type.Int) (Asm.Set 3) $
+      Asm.Let
+        ("Tf2.6", Type.Fun [Type.Int] Type.Int)
+        (Asm.IfEq "Ti0.7" (Asm.C 4) (Asm.Ans $ Asm.Mov "f.1") (Asm.Ans $ Asm.Mov "g.3")) $
+      Asm.Let ("Ti3.9", Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallCls "Tf2.6" ["Ti3.9"] []
