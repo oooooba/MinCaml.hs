@@ -164,6 +164,28 @@ gAuxIf dest cont regenv exp constr e1 e2 = do
              else regenv'
     extractRegEnv _ _ regenv' _ = regenv'
 
+gAuxCall ::
+     (Id.T, Type.Type)
+  -> Asm.T
+  -> RegEnv
+  -> Asm.Exp
+  -> ([Id.T] -> [Id.T] -> Asm.Exp)
+  -> [Id.T]
+  -> [Id.T]
+  -> MinCamlRegAlloc (Asm.T, RegEnv)
+gAuxCall dest cont regenv exp constr ys zs = do
+  ys' <- mapM (\y -> find y Type.Int regenv) ys
+  zs' <- mapM (const undefined) zs
+  e <-
+    foldl
+      (\e x ->
+         if x == fst dest || x `notElem` regenv
+           then e
+           else e >>= seqHelper (Asm.Save (regenv Map.! x) x))
+      (return $ Asm.Ans $ constr ys' zs') $
+    Asm.fv cont
+  return (e, Map.empty)
+
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Set _) = return (Asm.Ans exp, regenv)
@@ -175,6 +197,10 @@ gAux dest cont regenv exp@(Asm.IfEq x y' e1 e2) =
   gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfEq Type.Int regenv x y') e1 e2
 gAux dest cont regenv exp@(Asm.IfLe x y' e1 e2) =
   gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfLe Type.Int regenv x y') e1 e2
+gAux dest cont regenv exp@(Asm.CallDir (Id.L x) ys zs) =
+  if length ys > length Asm.regs || length zs > length Asm.fregs
+    then error $ "cannot allocate registers for arguments to " ++ show x
+    else gAuxCall dest cont regenv exp (Asm.CallDir $ Id.L x) ys zs
 
 gAuxIfHelper ::
      (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)

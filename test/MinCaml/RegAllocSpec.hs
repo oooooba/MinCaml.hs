@@ -98,3 +98,7 @@ spec =
       Right $
       Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regEax] [] (Asm.Ans $ Asm.Add Asm.regEax $ Asm.C 1) Type.Int] $
       Asm.Ans $ Asm.Set 2
+    specHelper validCase17 $
+      Right $
+      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regEax] [] (Asm.Ans $ Asm.Add Asm.regEax $ Asm.C 1) Type.Int] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEax] []

@@ -95,7 +95,7 @@ regs :: [Id.T]
 regs = [regEax, regEbx, regEcx, regEdx, regEsi, regEdi]
 
 fregs :: [Id.T]
-fregs = undefined
+fregs = []
 
 allregs :: [Id.T]
 allregs = regs
