@@ -91,6 +91,9 @@ regEsi = "%esi"
 regEdi :: String
 regEdi = "%edi"
 
+regSp :: String
+regSp = "%ebp"
+
 regs :: [Id.T]
 regs = [regEax, regEbx, regEcx, regEdx, regEsi, regEdi]
 

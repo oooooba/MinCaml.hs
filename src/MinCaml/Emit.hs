@@ -17,11 +17,25 @@ data EmitStatus = EmitStatus
 
 type MinCamlEmit a = StateT EmitStatus Identity a
 
+data Dest
+  = Tail
+  | NonTail Id.T
+  deriving (Show, Eq)
+
 out :: [String] -> MinCamlEmit ()
 out line = do
   s <- get
   let buf = buffer s
   put $ s {buffer = line : buf}
+
+regX86Esp :: String
+regX86Esp = "%esp"
+
+regX86Ebp :: String
+regX86Ebp = "%ebp"
+
+g :: (Dest, Asm.T) -> MinCamlEmit ()
+g = undefined
 
 h :: Asm.Fundef -> MinCamlEmit ()
 h = undefined
@@ -29,21 +43,48 @@ h = undefined
 run :: MinCamlEmit a -> EmitStatus -> (a, EmitStatus)
 run e s = runIdentity $ runStateT e s
 
-fAux :: Asm.Prog -> MinCamlEmit ()
-fAux (Asm.Prog fdata fundefs e) = do
-  out [".data"]
-  out [".balign", show 8]
-  mapM_ (\(Id.L x, d) -> out [show x, show d]) fdata
-  out [".text"]
-  mapM_ h fundefs
-  out [".global", "min_caml_start"]
-  out ["min_caml_start:"]
-
-f :: Asm.Prog -> MinCaml [[String]]
-f prog = do
+f :: Asm.Prog -> MinCaml ([[String]], [[String]], [[String]])
+f (Asm.Prog fdata fundefs e) = do
   gs <- get
   let es = EmitStatus gs []
-      (_, es') = run (fAux prog) es
-      gs' = globalStatus es'
+      (_, es') = run (mapM_ (\(Id.L x, d) -> out [show x, show d]) fdata) es
+      asmFdata = reverse $ buffer es'
+      (_, es'') = run (mapM_ h fundefs) es'
+      asmFundefs = reverse $ buffer es''
+      (_, es''') = run (g (NonTail $ head Asm.regs, e)) es'
+      asmE = reverse $ buffer es'''
+      gs' = globalStatus es'''
   put gs'
-  return . reverse $ buffer es'
+  return (asmFdata, asmFundefs, asmE)
+
+fFull :: Asm.Prog -> MinCaml [[String]]
+fFull prog = do
+  (asmFdata, asmFundefs, asmE) <- f prog
+  return $
+    [[".data"], [".balign", show 8]] ++
+    asmFdata ++
+    [[".text"]] ++
+    asmFundefs ++
+    [ [".global", "min_caml_start"]
+    , ["min_caml_start:"]
+    , ["pushl", Asm.regEax]
+    , ["pushl", Asm.regEbx]
+    , ["pushl", Asm.regEcx]
+    , ["pushl", Asm.regEdx]
+    , ["pushl", Asm.regEsi]
+    , ["pushl", Asm.regEdi]
+    , ["pushl", regX86Ebp]
+    , ["movl", show 32, "(", regX86Esp, ")", ",", Asm.regSp]
+    , ["movl", show 36, "(", regX86Esp, ")", ",", head Asm.regs]
+    , ["movl", head Asm.regs, ",", Asm.regHp]
+    ] ++
+    asmE ++
+    [ ["popl", regX86Ebp]
+    , ["popl", Asm.regEdi]
+    , ["popl", Asm.regEsi]
+    , ["popl", Asm.regEdx]
+    , ["popl", Asm.regEcx]
+    , ["popl", Asm.regEbx]
+    , ["popl", Asm.regEax]
+    , ["ret"]
+    ]
