@@ -4,6 +4,7 @@ module MinCaml.Emit
 
 import           Control.Monad.Identity     (Identity, runIdentity)
 import           Control.Monad.State.Strict (StateT, get, put, runStateT)
+import           Data.Either                (fromRight)
 
 import qualified MinCaml.Asm                as Asm
 import           MinCaml.Global
@@ -34,8 +35,27 @@ regX86Esp = "%esp"
 regX86Ebp :: String
 regX86Ebp = "%ebp"
 
+genVarHelper :: Type.Type -> MinCamlEmit Id.T
+genVarHelper t = do
+  es <- get
+  let gs = globalStatus es
+  let (result, gs') = runMinCaml (genVar t) gs
+  let es' = es {globalStatus = gs'}
+  put es'
+  return $ fromRight undefined result
+
+gAuxNonRetHelper :: Asm.Exp -> MinCamlEmit ()
+gAuxNonRetHelper exp = do
+  genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
+  out ["ret"]
+
+gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
+gAux (NonTail _, Asm.Nop) = return ()
+gAux (Tail, exp@Asm.Nop)  = gAuxNonRetHelper exp
+
 g :: (Dest, Asm.T) -> MinCamlEmit ()
-g = undefined
+g (dest, Asm.Ans exp)          = gAux (dest, exp)
+g (dest, Asm.Let (x, t) exp e) = gAux (NonTail x, exp) >> g (dest, e)
 
 h :: Asm.Fundef -> MinCamlEmit ()
 h = undefined
