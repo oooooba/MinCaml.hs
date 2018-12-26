@@ -51,7 +51,9 @@ gAuxNonRetHelper exp = do
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
-gAux (Tail, exp@Asm.Nop)  = gAuxNonRetHelper exp
+gAux (NonTail x, Asm.Set i) = out ["movl", show i, ",", x]
+gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out ["ret"]
+gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out ["ret"]
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
