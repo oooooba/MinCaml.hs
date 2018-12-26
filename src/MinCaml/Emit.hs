@@ -29,6 +29,15 @@ out line = do
   let buf = buffer s
   put $ s {buffer = line : buf}
 
+out0 :: String -> MinCamlEmit ()
+out0 instr = out [instr]
+
+out1 :: String -> String -> MinCamlEmit ()
+out1 instr op1 = out [instr, op1]
+
+out2 :: String -> String -> String -> MinCamlEmit ()
+out2 instr op1 op2 = out [instr, op1, ",", op2]
+
 regX86Esp :: String
 regX86Esp = "%esp"
 
@@ -51,9 +60,9 @@ gAuxNonRetHelper exp = do
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
-gAux (NonTail x, Asm.Set i) = out ["movl", show i, ",", x]
-gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out ["ret"]
-gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out ["ret"]
+gAux (NonTail x, Asm.Set i) = out2 "movl" (show i) x
+gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
+gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)

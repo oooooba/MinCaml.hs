@@ -39,3 +39,4 @@ spec =
     specHelper validCase1 $ Right ([], [], [])
     specHelper validCase2 $ Right ([], [], [])
     specHelper validCase3 $ Right ([], [], [["movl", "42", ",", Asm.regEax]])
+    specHelper validCase4 $ Right ([], [], [["movl", "42", ",", Asm.regEax]])
