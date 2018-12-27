@@ -56,7 +56,7 @@ genVarHelper t = do
 gAuxNonRetHelper :: Asm.Exp -> MinCamlEmit ()
 gAuxNonRetHelper exp = do
   genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
-  out ["ret"]
+  out0 "ret"
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
