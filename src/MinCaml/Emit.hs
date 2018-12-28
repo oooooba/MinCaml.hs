@@ -53,6 +53,10 @@ genVarHelper t = do
   put es'
   return $ fromRight undefined result
 
+ppIdOrImm :: Asm.IdOrImm -> String
+ppIdOrImm (Asm.V x) = x
+ppIdOrImm (Asm.C i) = "$" ++ show i
+
 gAuxNonRetHelper :: Asm.Exp -> MinCamlEmit ()
 gAuxNonRetHelper exp = do
   genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
@@ -61,8 +65,20 @@ gAuxNonRetHelper exp = do
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
 gAux (NonTail x, Asm.Set i) = out2 "movl" (show i) x
+gAux (NonTail x, Asm.Add y z')
+  | Asm.V x == z' = out2 "addl" y x
+gAux (NonTail x, Asm.Add y z')
+  | x /= y = out2 "movl" y x >> out2 "addl" (ppIdOrImm z') x
+gAux (NonTail x, Asm.Add y z') = out2 "addl" (ppIdOrImm z') x
+gAux (NonTail x, Asm.Sub y z')
+  | Asm.V x == z' = out2 "subl" y x
+gAux (NonTail x, Asm.Sub y z')
+  | x /= y = out2 "movl" y x >> out2 "subl" (ppIdOrImm z') x
+gAux (NonTail x, Asm.Sub y z') = out2 "subl" (ppIdOrImm z') x
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
 gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
