@@ -37,11 +37,18 @@ targetHelper src (dest, t) e1 e2 =
       (c2, rs2) = target src (dest, t) e2
   in (c1 && c2, rs1 ++ rs2)
 
+targetArgs :: Id.T -> [Id.T] -> Int -> [Id.T] -> [Id.T]
+targetArgs _ _ _ [] = []
+targetArgs src all n (y:ys)
+  | src == y = all !! n : targetArgs src all (n + 1) ys
+targetArgs src all n (_:ys) = targetArgs src all (n + 1) ys
+
 target' :: Id.T -> (Id.T, Type.Type) -> Asm.Exp -> (Bool, [Id.T])
 target' src (dest, t) (Asm.Mov x)
   | x == src && Asm.isReg dest = assert (t /= Type.Unit) (False, [dest])
 target' src (dest, t) (Asm.IfEq _ _ e1 e2) = targetHelper src (dest, t) e1 e2
 target' src (dest, t) (Asm.IfLe _ _ e1 e2) = targetHelper src (dest, t) e1 e2
+target' src (dest, t) (Asm.CallDir _ ys zs) = (True, targetArgs src Asm.regs 0 ys ++ targetArgs src Asm.fregs 0 zs)
 target' _ _ _ = (False, [])
 
 target :: Id.T -> (Id.T, Type.Type) -> Asm.T -> (Bool, [Id.T])
@@ -54,13 +61,18 @@ target src dest (Asm.Let xt exp e) =
             in (c2, rs1 ++ rs2)
 
 source' :: Type.Type -> Asm.Exp -> [Id.T]
-source' _ (Asm.Mov x)           = [x]
-source' _ (Asm.Neg x)           = [x]
+source' _ (Asm.Mov x) = [x]
+source' _ (Asm.Neg x) = [x]
 source' _ (Asm.Add x (Asm.C _)) = [x]
+source' _ (Asm.Add x (Asm.V y)) = [x, y]
 source' _ (Asm.Sub x (Asm.C _)) = [x]
-source' t (Asm.IfEq _ _ e1 e2)  = source t e1 ++ source t e2
-source' t (Asm.IfLe _ _ e1 e2)  = source t e1 ++ source t e2
-source' _ _                     = []
+source' t (Asm.IfEq _ _ e1 e2) = source t e1 ++ source t e2
+source' t (Asm.IfLe _ _ e1 e2) = source t e1 ++ source t e2
+source' t Asm.CallDir {} =
+  case t of
+    Type.Unit -> []
+    _         -> [head Asm.regs]
+source' _ _ = []
 
 source :: Type.Type -> Asm.T -> [Id.T]
 source t (Asm.Ans exp)   = source' t exp
@@ -189,6 +201,7 @@ gAuxCall dest cont regenv exp constr ys zs = do
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Set _) = return (Asm.Ans exp, regenv)
+gAux dest cont regenv exp@(Asm.Restore _) = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Mov x) = wrapExp regenv . Asm.Mov <$> find x Type.Int regenv
 gAux dest cont regenv exp@(Asm.Neg x) = wrapExp regenv . Asm.Neg <$> find x Type.Int regenv
 gAux dest cont regenv (Asm.Add x y') = wrapExp regenv <$> liftM2 Asm.Add (find x Type.Int regenv) (find' y' regenv)
@@ -201,6 +214,7 @@ gAux dest cont regenv exp@(Asm.CallDir (Id.L x) ys zs) =
   if length ys > length Asm.regs || length zs > length Asm.fregs
     then error $ "cannot allocate registers for arguments to " ++ show x
     else gAuxCall dest cont regenv exp (Asm.CallDir $ Id.L x) ys zs
+gAux _ _ _ (Asm.Save _ _) = error "never reached"
 
 gAuxIfHelper ::
      (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)
