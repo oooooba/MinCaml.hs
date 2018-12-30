@@ -191,7 +191,7 @@ gAuxCall dest cont regenv exp constr ys zs = do
   e <-
     foldl
       (\e x ->
-         if x == fst dest || x `notElem` regenv
+         if x == fst dest || x `Map.notMember` regenv
            then e
            else e >>= seqHelper (Asm.Save (regenv Map.! x) x))
       (return $ Asm.Ans $ constr ys' zs') $

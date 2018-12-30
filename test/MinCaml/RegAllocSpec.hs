@@ -109,3 +109,20 @@ spec =
         [Asm.Fundef (Id.L "f.0") [Asm.regEax, Asm.regEbx] [] (Asm.Ans $ Asm.Add Asm.regEax (Asm.V Asm.regEbx)) Type.Int] $
       Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $
       Asm.Let (Asm.regEbx, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEax, Asm.regEbx] []
+    specHelper validCase19 $
+      Right $
+      Asm.Prog
+        []
+        [ Asm.Fundef
+            (Id.L "f.0")
+            [Asm.regEax]
+            []
+            (Asm.Ans $
+             Asm.IfLe Asm.regEax (Asm.C 0) (Asm.Ans $ Asm.Set 0) $
+             Asm.Let (Asm.regEbx, Type.Int) (Asm.Sub Asm.regEax (Asm.C 1)) $
+             Asm.Let ("Tu6", Type.Unit) (Asm.Save Asm.regEax "n.1") $
+             Asm.Let (Asm.regEax, Type.Int) (Asm.CallDir (Id.L "f.0") [Asm.regEbx] []) $
+             Asm.Let (Asm.regEbx, Type.Int) (Asm.Restore "n.1") $ Asm.Ans $ Asm.Add Asm.regEbx (Asm.V Asm.regEax))
+            Type.Int
+        ] $
+      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEax] []
