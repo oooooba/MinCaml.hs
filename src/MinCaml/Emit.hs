@@ -44,14 +44,20 @@ regX86Esp = "%esp"
 regX86Ebp :: String
 regX86Ebp = "%ebp"
 
-genVarHelper :: Type.Type -> MinCamlEmit Id.T
-genVarHelper t = do
+callMinCaml :: MinCaml a -> MinCamlEmit a
+callMinCaml mc = do
   es <- get
   let gs = globalStatus es
-  let (result, gs') = runMinCaml (genVar t) gs
+  let (result, gs') = runMinCaml mc gs
   let es' = es {globalStatus = gs'}
   put es'
   return $ fromRight undefined result
+
+genIdHelper :: String -> MinCamlEmit String
+genIdHelper s = callMinCaml (genId s)
+
+genVarHelper :: Type.Type -> MinCamlEmit Id.T
+genVarHelper t = callMinCaml (genVar t)
 
 ppIdOrImm :: Asm.IdOrImm -> String
 ppIdOrImm (Asm.V x) = x
