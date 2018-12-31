@@ -3,8 +3,10 @@ module MinCaml.Emit
   ) where
 
 import           Control.Monad.Identity     (Identity, runIdentity)
-import           Control.Monad.State.Strict (StateT, get, put, runStateT)
+import           Control.Monad.State.Strict (StateT, get, modify, put,
+                                             runStateT)
 import           Data.Either                (fromRight)
+import qualified Data.Set                   as Set
 
 import qualified MinCaml.Asm                as Asm
 import           MinCaml.Global
@@ -14,6 +16,7 @@ import qualified MinCaml.Type               as Type
 data EmitStatus = EmitStatus
   { globalStatus :: GlobalStatus
   , buffer       :: [[String]]
+  , stackset     :: Set.Set Id.T
   } deriving (Show, Eq)
 
 type MinCamlEmit a = StateT EmitStatus Identity a
@@ -68,6 +71,32 @@ gAuxNonRetHelper exp = do
   genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
   out0 "ret"
 
+gAuxTailIf :: Asm.T -> Asm.T -> String -> String -> MinCamlEmit ()
+gAuxTailIf e1 e2 b bn = do
+  bElse <- genIdHelper (b ++ "_else")
+  out1 bn bElse
+  stacksetBack <- fmap stackset get
+  g (Tail, e1)
+  out0 $ bElse ++ ":"
+  modify (\s -> s {stackset = stacksetBack})
+  g (Tail, e2)
+
+gAuxNonTailIf :: Dest -> Asm.T -> Asm.T -> String -> String -> MinCamlEmit ()
+gAuxNonTailIf dest e1 e2 b bn = do
+  bElse <- genIdHelper (b ++ "_else")
+  bCont <- genIdHelper (b ++ "_cont")
+  out1 bn bElse
+  stacksetBack <- fmap stackset get
+  g (dest, e1)
+  stackset1 <- fmap stackset get
+  out1 "jmp" bCont
+  out0 $ bElse ++ ":"
+  modify (\s -> s {stackset = stacksetBack})
+  g (dest, e2)
+  out0 $ bCont ++ ":"
+  stackset2 <- fmap stackset get
+  modify (\s -> s {stackset = Set.intersection stackset1 stackset2})
+
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
 gAux (NonTail x, Asm.Set i) = out2 "movl" (show i) x
@@ -85,6 +114,10 @@ gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
 gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
+gAux (Tail, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "je" "jne"
+gAux (Tail, Asm.IfLe x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "jle" "jg"
+gAux (NonTail z, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxNonTailIf (NonTail z) e1 e2 "je" "jne"
+gAux (NonTail z, Asm.IfLe x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxNonTailIf (NonTail z) e1 e2 "jle" "jg"
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
@@ -99,7 +132,7 @@ run e s = runIdentity $ runStateT e s
 f :: Asm.Prog -> MinCaml ([[String]], [[String]], [[String]])
 f (Asm.Prog fdata fundefs e) = do
   gs <- get
-  let es = EmitStatus gs []
+  let es = EmitStatus gs [] Set.empty
       (_, es') = run (mapM_ (\(Id.L x, d) -> out [show x, show d]) fdata) es
       asmFdata = reverse $ buffer es'
       (_, es'') = run (mapM_ h fundefs) es'
