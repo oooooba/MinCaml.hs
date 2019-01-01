@@ -1,5 +1,6 @@
 module MinCaml.Emit
   ( f
+  , f'
   ) where
 
 import           Control.Monad.Identity     (Identity, runIdentity)
@@ -151,8 +152,8 @@ f (Asm.Prog fdata fundefs e) = do
   put gs'
   return (asmFdata, asmFundefs, asmE)
 
-fFull :: Asm.Prog -> MinCaml [[String]]
-fFull prog = do
+f' :: Asm.Prog -> MinCaml [[String]]
+f' prog = do
   (asmFdata, asmFundefs, asmE) <- f prog
   return $
     [[".data"], [".balign", show 8]] ++
