@@ -121,3 +121,20 @@ spec =
           , ["jle_cont.3:"]
           ])
     specHelper validCase13 $ Right ([], [], [["movl", "42", ",", Asm.regEax]])
+    specHelper validCase14 $
+      Right
+        ( []
+        , []
+        , [ ["movl", "1", ",", Asm.regEax]
+          , ["negl", Asm.regEax]
+          , ["movl", "2", ",", Asm.regEbx]
+          , ["negl", Asm.regEbx]
+          , ["subl", "$3", ",", Asm.regEbx]
+          , ["cmpl", Asm.regEbx, ",", Asm.regEax]
+          , ["jne", "je_else.6"]
+          , ["movl", "1", ",", Asm.regEax]
+          , ["jmp", "je_cont.7"]
+          , ["je_else.6:"]
+          , ["movl", "0", ",", Asm.regEax]
+          , ["je_cont.7:"]
+          ])
