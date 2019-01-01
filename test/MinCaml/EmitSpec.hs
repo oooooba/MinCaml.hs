@@ -120,3 +120,4 @@ spec =
           , ["movl", "1", ",", Asm.regEax]
           , ["jle_cont.3:"]
           ])
+    specHelper validCase13 $ Right ([], [], [["movl", "42", ",", Asm.regEax]])

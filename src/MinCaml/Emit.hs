@@ -100,6 +100,9 @@ gAuxNonTailIf dest e1 e2 b bn = do
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
 gAux (NonTail x, Asm.Set i) = out2 "movl" (show i) x
+gAux (NonTail x, Asm.Mov y)
+  | x /= y = out2 "movl" y x
+gAux (NonTail x, Asm.Mov y) = return ()
 gAux (NonTail x, Asm.Add y z')
   | Asm.V x == z' = out2 "addl" y x
 gAux (NonTail x, Asm.Add y z')
@@ -112,6 +115,7 @@ gAux (NonTail x, Asm.Sub y z')
 gAux (NonTail x, Asm.Sub y z') = out2 "subl" (ppIdOrImm z') x
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
 gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
 gAux (Tail, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "je" "jne"
