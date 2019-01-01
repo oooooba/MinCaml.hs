@@ -100,7 +100,7 @@ gAuxNonTailIf dest e1 e2 b bn = do
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
-gAux (NonTail x, Asm.Set i) = out2 "movl" (show i) x
+gAux (NonTail x, Asm.Set i) = out2 "movl" ("$" ++ show i) x
 gAux (NonTail x, Asm.Mov y)
   | x /= y = out2 "movl" y x
 gAux (NonTail x, Asm.Mov y) = return ()
