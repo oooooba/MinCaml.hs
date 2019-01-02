@@ -40,10 +40,9 @@ process inputHandle outputHandle = do
     Right asm  -> hPutStr outputHandle $ flatten asm
 
 file :: String -> IO ()
-file base = do
-  let inputFilename = base ++ ".ml"
-      outputFilename = base ++ ".s"
-  withFile inputFilename ReadMode (withFile outputFilename WriteMode . process)
+file inputPath = do
+  let outputPath = inputPath ++ ".s"
+  withFile inputPath ReadMode (withFile outputPath WriteMode . process)
 
 main :: IO ()
 main = do
