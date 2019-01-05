@@ -94,17 +94,20 @@ regEdi = "%edi"
 regSp :: String
 regSp = "%ebp"
 
-regs :: [Id.T]
-regs = [regEax, regEbx, regEcx, regEdx, regEsi, regEdi]
+callArgumentRegs :: [Id.T]
+callArgumentRegs = [regEbx, regEcx, regEdx, regEsi, regEdi]
+
+callResultReg :: Id.T
+callResultReg = regEax
 
 fregs :: [Id.T]
 fregs = []
 
-allregs :: [Id.T]
-allregs = regs
+allocatableRegs :: [Id.T]
+allocatableRegs = callResultReg : callArgumentRegs
 
 regCl :: String
-regCl = last regs
+regCl = last callArgumentRegs
 
 regHp :: String
 regHp = "min_caml_hp"

@@ -48,7 +48,8 @@ target' src (dest, t) (Asm.Mov x)
   | x == src && Asm.isReg dest = assert (t /= Type.Unit) (False, [dest])
 target' src (dest, t) (Asm.IfEq _ _ e1 e2) = targetHelper src (dest, t) e1 e2
 target' src (dest, t) (Asm.IfLe _ _ e1 e2) = targetHelper src (dest, t) e1 e2
-target' src (dest, t) (Asm.CallDir _ ys zs) = (True, targetArgs src Asm.regs 0 ys ++ targetArgs src Asm.fregs 0 zs)
+target' src (dest, t) (Asm.CallDir _ ys zs) =
+  (True, targetArgs src Asm.callArgumentRegs 0 ys ++ targetArgs src Asm.fregs 0 zs)
 target' _ _ _ = (False, [])
 
 target :: Id.T -> (Id.T, Type.Type) -> Asm.T -> (Bool, [Id.T])
@@ -71,7 +72,8 @@ source' t (Asm.IfLe _ _ e1 e2) = source t e1 ++ source t e2
 source' t Asm.CallDir {} =
   case t of
     Type.Unit -> []
-    _         -> [head Asm.regs]
+    _         -> [Asm.callResultReg]
+    --_         -> [head Asm.callArgumentRegs]
 source' _ _ = []
 
 source :: Type.Type -> Asm.T -> [Id.T]
@@ -85,7 +87,7 @@ alloc cont regenv x t prefer = assert (not (Map.member x regenv)) $ allocBody ()
     all =
       case t of
         Type.Unit -> []
-        _         -> Asm.allregs
+        _         -> Asm.allocatableRegs
     allocBody :: () -> AllocResult
     allocBody _
       | null all = Alloc "%unit"
@@ -211,7 +213,7 @@ gAux dest cont regenv exp@(Asm.IfEq x y' e1 e2) =
 gAux dest cont regenv exp@(Asm.IfLe x y' e1 e2) =
   gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfLe Type.Int regenv x y') e1 e2
 gAux dest cont regenv exp@(Asm.CallDir (Id.L x) ys zs) =
-  if length ys > length Asm.regs || length zs > length Asm.fregs
+  if length ys > length Asm.callArgumentRegs || length zs > length Asm.fregs
     then error $ "cannot allocate registers for arguments to " ++ show x
     else gAuxCall dest cont regenv exp (Asm.CallDir $ Id.L x) ys zs
 gAux _ _ _ (Asm.Save _ _) = error "never reached"
@@ -271,7 +273,7 @@ h (Asm.Fundef (Id.L x) ys zs e t) = do
   let (i, argRegs, regenv') =
         foldl
           (\(i, argRegs, regenv) y ->
-             let r = Asm.regs !! i
+             let r = Asm.callArgumentRegs !! i
              in (i + 1, argRegs ++ [r], assert (not $ Asm.isReg y) $ Map.insert y r regenv))
           (0, [], regenv)
           ys
@@ -279,7 +281,7 @@ h (Asm.Fundef (Id.L x) ys zs e t) = do
   a <-
     case t of
       Type.Unit -> genVarHelper Type.Unit
-      _         -> return $ head Asm.regs
+      _         -> return Asm.callResultReg
   (e', _) <- g (a, t) (Asm.Ans $ Asm.Mov a) regenv'' e
   return $ Asm.Fundef (Id.L x) argRegs fargRegs e' t
 

@@ -118,11 +118,11 @@ gAux (NonTail x, Asm.Sub y z')
   | x /= y = out2 "movl" y x >> out2 "subl" (ppIdOrImm z') x
 gAux (NonTail x, Asm.Sub y z') = out2 "subl" (ppIdOrImm z') x
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
-gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail $ head Asm.regs, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
+gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
 gAux (Tail, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "je" "jne"
 gAux (Tail, Asm.IfLe x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "jle" "jg"
 gAux (NonTail z, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxNonTailIf (NonTail z) e1 e2 "je" "jne"
@@ -146,7 +146,7 @@ f (Asm.Prog fdata fundefs e) = do
       asmFdata = reverse $ buffer es'
       (_, es'') = run (mapM_ h fundefs) es'
       asmFundefs = reverse $ buffer es''
-      (_, es''') = run (g (NonTail $ head Asm.regs, e)) es'
+      (_, es''') = run (g (NonTail Asm.callResultReg, e)) es'
       asmE = reverse $ buffer es'''
       gs' = globalStatus es'''
   put gs'
@@ -170,8 +170,8 @@ f' prog = do
     , ["pushl", Asm.regEdi]
     , ["pushl", regX86Ebp]
     , ["movl", show 32, "(", regX86Esp, ")", ",", Asm.regSp]
-    , ["movl", show 36, "(", regX86Esp, ")", ",", head Asm.regs]
-    , ["movl", head Asm.regs, ",", Asm.regHp]
+    , ["movl", show 36, "(", regX86Esp, ")", ",", Asm.callResultReg]
+    , ["movl", Asm.callResultReg, ",", Asm.regHp]
     ] ++
     asmE ++
     [ ["popl", regX86Ebp]
