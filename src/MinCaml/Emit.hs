@@ -113,7 +113,7 @@ gAux (NonTail x, Asm.Add y z')
   | x /= y = out2 "movl" y x >> out2 "addl" (ppIdOrImm z') x
 gAux (NonTail x, Asm.Add y z') = out2 "addl" (ppIdOrImm z') x
 gAux (NonTail x, Asm.Sub y z')
-  | Asm.V x == z' = out2 "subl" y x
+  | Asm.V x == z' = out2 "subl" y x >> out1 "negl" x
 gAux (NonTail x, Asm.Sub y z')
   | x /= y = out2 "movl" y x >> out2 "subl" (ppIdOrImm z') x
 gAux (NonTail x, Asm.Sub y z') = out2 "subl" (ppIdOrImm z') x
