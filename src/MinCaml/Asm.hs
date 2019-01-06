@@ -158,3 +158,51 @@ align i =
   if (i `mod` 8) == 0
     then i
     else i + 4
+
+instr0 instr = [instr]
+
+instr1 instr op1 = [instr, op1]
+
+instr2 instr op1 op2 = [instr, op1, ",", op2]
+
+{-
+- ToDo: fix to use intel syntax
+-}
+type Label = String
+
+data Operand
+  = Reg Id.T
+  | Imm Int
+  | Mem Id.T
+        Int
+  | Lab Label
+  deriving (Show, Eq)
+
+instrPush (Reg reg) = instr1 "pushl" reg
+
+instrPop (Reg reg) = instr1 "popl" reg
+
+instrMov (Reg dst) (Reg src) = instr2 "movl" src dst
+instrMov (Reg dst) (Imm imm) = instr2 "movl" ("$" ++ show imm) dst
+instrMov (Reg dst) (Mem base offset) = instr2 "movl" (show offset ++ "(" ++ base ++ ")") dst
+
+instrNeg (Reg reg) = instr1 "negl" reg
+
+instrAdd (Reg reg1) (Reg reg2) = instr2 "addl" reg2 reg1
+instrAdd (Reg reg) (Imm imm)   = instr2 "addl" ("$" ++ show imm) reg
+
+instrSub (Reg reg1) (Reg reg2) = instr2 "subl" reg2 reg1
+instrSub (Reg reg) (Imm imm)   = instr2 "subl" ("$" ++ show imm) reg
+
+instrCmp (Reg reg1) (Reg reg2) = instr2 "cmpl" reg2 reg1
+instrCmp (Reg reg) (Imm imm)   = instr2 "cmpl" ("$" ++ show imm) reg
+
+instrJmp (Lab label) = instr1 "jmp" label
+
+instrJne (Lab label) = instr1 "jne" label
+
+instrJg (Lab label) = instr1 "jg" label
+
+instrRet = instr0 "ret"
+
+pinstrLabel label = instr0 $ label ++ ":"

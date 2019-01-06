@@ -63,70 +63,74 @@ genIdHelper s = callMinCaml (genId s)
 genVarHelper :: Type.Type -> MinCamlEmit Id.T
 genVarHelper t = callMinCaml (genVar t)
 
-ppIdOrImm :: Asm.IdOrImm -> String
-ppIdOrImm (Asm.V x) = x
-ppIdOrImm (Asm.C i) = "$" ++ show i
+ppIdOrImm :: Asm.IdOrImm -> Asm.Operand
+ppIdOrImm (Asm.V x) = Asm.Reg x
+ppIdOrImm (Asm.C i) = Asm.Imm i
 
 gAuxNonRetHelper :: Asm.Exp -> MinCamlEmit ()
 gAuxNonRetHelper exp = do
   genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
-  out0 "ret"
+  out Asm.instrRet
 
-gAuxTailIf :: Asm.T -> Asm.T -> String -> String -> MinCamlEmit ()
-gAuxTailIf e1 e2 b bn = do
-  bElse <- genIdHelper (b ++ "_else")
-  out1 bn bElse
+gAuxTailIf :: Asm.T -> Asm.T -> String -> (Asm.Operand -> [String]) -> MinCamlEmit ()
+gAuxTailIf e1 e2 labelBase bn = do
+  bElse <- genIdHelper (labelBase ++ "_else")
+  out $ bn $ Asm.Lab bElse
   stacksetBack <- fmap stackset get
   g (Tail, e1)
-  out0 $ bElse ++ ":"
+  out $ Asm.pinstrLabel bElse
   modify (\s -> s {stackset = stacksetBack})
   g (Tail, e2)
 
-gAuxNonTailIf :: Dest -> Asm.T -> Asm.T -> String -> String -> MinCamlEmit ()
-gAuxNonTailIf dest e1 e2 b bn = do
-  bElse <- genIdHelper (b ++ "_else")
-  bCont <- genIdHelper (b ++ "_cont")
-  out1 bn bElse
+gAuxNonTailIf :: Dest -> Asm.T -> Asm.T -> String -> (Asm.Operand -> [String]) -> MinCamlEmit ()
+gAuxNonTailIf dest e1 e2 labelBase bn = do
+  bElse <- genIdHelper (labelBase ++ "_else")
+  bCont <- genIdHelper (labelBase ++ "_cont")
+  out $ bn $ Asm.Lab bElse
   stacksetBack <- fmap stackset get
   g (dest, e1)
   stackset1 <- fmap stackset get
-  out1 "jmp" bCont
-  out0 $ bElse ++ ":"
+  out $ Asm.instrJmp $ Asm.Lab bCont
+  out $ Asm.pinstrLabel bElse
   modify (\s -> s {stackset = stacksetBack})
   g (dest, e2)
-  out0 $ bCont ++ ":"
+  out $ Asm.pinstrLabel bCont
   stackset2 <- fmap stackset get
   modify (\s -> s {stackset = Set.intersection stackset1 stackset2})
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
-gAux (NonTail x, Asm.Set i) = out2 "movl" ("$" ++ show i) x
+gAux (NonTail x, Asm.Set i) = out $ Asm.instrMov (Asm.Reg x) $ Asm.Imm i
 gAux (NonTail x, Asm.Mov y)
-  | x /= y = out2 "movl" y x
+  | x /= y = out $ Asm.instrMov (Asm.Reg x) $ Asm.Reg y
 gAux (NonTail x, Asm.Mov y) = return ()
 gAux (NonTail x, Asm.Neg y)
-  | x /= y = out2 "movl" y x >> out1 "negl" x
-gAux (NonTail x, Asm.Neg y) = out1 "negl" x
+  | x /= y = out (Asm.instrMov (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrNeg $ Asm.Reg x)
+gAux (NonTail x, Asm.Neg y) = out $ Asm.instrNeg $ Asm.Reg x
 gAux (NonTail x, Asm.Add y z')
-  | Asm.V x == z' = out2 "addl" y x
+  | Asm.V x == z' = out $ Asm.instrAdd (Asm.Reg x) $ Asm.Reg y
 gAux (NonTail x, Asm.Add y z')
-  | x /= y = out2 "movl" y x >> out2 "addl" (ppIdOrImm z') x
-gAux (NonTail x, Asm.Add y z') = out2 "addl" (ppIdOrImm z') x
+  | x /= y = out (Asm.instrMov (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrAdd (Asm.Reg x) $ ppIdOrImm z')
+gAux (NonTail x, Asm.Add y z') = out $ Asm.instrAdd (Asm.Reg x) $ ppIdOrImm z'
 gAux (NonTail x, Asm.Sub y z')
-  | Asm.V x == z' = out2 "subl" y x >> out1 "negl" x
+  | Asm.V x == z' = out (Asm.instrSub (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrNeg $ Asm.Reg x)
 gAux (NonTail x, Asm.Sub y z')
-  | x /= y = out2 "movl" y x >> out2 "subl" (ppIdOrImm z') x
-gAux (NonTail x, Asm.Sub y z') = out2 "subl" (ppIdOrImm z') x
-gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out0 "ret"
-gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
-gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out0 "ret"
-gAux (Tail, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "je" "jne"
-gAux (Tail, Asm.IfLe x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxTailIf e1 e2 "jle" "jg"
-gAux (NonTail z, Asm.IfEq x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxNonTailIf (NonTail z) e1 e2 "je" "jne"
-gAux (NonTail z, Asm.IfLe x y' e1 e2) = out2 "cmpl" (ppIdOrImm y') x >> gAuxNonTailIf (NonTail z) e1 e2 "jle" "jg"
+  | x /= y = out (Asm.instrMov (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrSub (Asm.Reg x) $ ppIdOrImm z')
+gAux (NonTail x, Asm.Sub y z') = out $ Asm.instrSub (Asm.Reg x) $ ppIdOrImm z'
+gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, Asm.IfEq x y' e1 e2) =
+  out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxTailIf e1 e2 "ifeq_tail" Asm.instrJne
+gAux (Tail, Asm.IfLe x y' e1 e2) =
+  out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxTailIf e1 e2 "ifle_tail" Asm.instrJg
+gAux (NonTail z, Asm.IfEq x y' e1 e2) =
+  out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifeq_nontail" Asm.instrJne
+gAux (NonTail z, Asm.IfLe x y' e1 e2) =
+  out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifle_nontail" Asm.instrJg
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
@@ -161,25 +165,25 @@ f' prog = do
     [[".text"]] ++
     asmFundefs ++
     [ [".global", "min_caml_start"]
-    , ["min_caml_start:"]
-    , ["pushl", Asm.regEax]
-    , ["pushl", Asm.regEbx]
-    , ["pushl", Asm.regEcx]
-    , ["pushl", Asm.regEdx]
-    , ["pushl", Asm.regEsi]
-    , ["pushl", Asm.regEdi]
-    , ["pushl", regX86Ebp]
-    , ["movl", show 32, "(", regX86Esp, ")", ",", Asm.regSp]
-    , ["movl", show 36, "(", regX86Esp, ")", ",", Asm.callResultReg]
-    , ["movl", Asm.callResultReg, ",", Asm.regHp]
+    , Asm.pinstrLabel "min_caml_start"
+    , Asm.instrPush $ Asm.Reg Asm.regEax
+    , Asm.instrPush $ Asm.Reg Asm.regEbx
+    , Asm.instrPush $ Asm.Reg Asm.regEcx
+    , Asm.instrPush $ Asm.Reg Asm.regEdx
+    , Asm.instrPush $ Asm.Reg Asm.regEsi
+    , Asm.instrPush $ Asm.Reg Asm.regEdi
+    , Asm.instrPush $ Asm.Reg regX86Ebp
+    , Asm.instrMov (Asm.Reg Asm.regSp) $ Asm.Mem regX86Esp 32
+    , Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Mem regX86Esp 36
+    , Asm.instrMov (Asm.Reg Asm.regHp) $ Asm.Reg Asm.callResultReg
     ] ++
     asmE ++
-    [ ["popl", regX86Ebp]
-    , ["popl", Asm.regEdi]
-    , ["popl", Asm.regEsi]
-    , ["popl", Asm.regEdx]
-    , ["popl", Asm.regEcx]
-    , ["popl", Asm.regEbx]
-    , ["popl", Asm.regEax]
-    , ["ret"]
+    [ Asm.instrPop $ Asm.Reg regX86Ebp
+    , Asm.instrPop $ Asm.Reg Asm.regEdi
+    , Asm.instrPop $ Asm.Reg Asm.regEsi
+    , Asm.instrPop $ Asm.Reg Asm.regEdx
+    , Asm.instrPop $ Asm.Reg Asm.regEcx
+    , Asm.instrPop $ Asm.Reg Asm.regEbx
+    , Asm.instrPop $ Asm.Reg Asm.regEax
+    , Asm.instrRet
     ]
