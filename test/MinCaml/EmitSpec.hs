@@ -38,105 +38,105 @@ spec =
   describe "valid cases" $ do
     specHelper validCase1 $ Right ([], [], [])
     specHelper validCase2 $ Right ([], [], [])
-    specHelper validCase3 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 42])
-    specHelper validCase4 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 42])
+    specHelper validCase3 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 42])
+    specHelper validCase4 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 42])
     specHelper validCase5 $
-      Right ([], [], [Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1, Asm.instrAdd (Asm.Reg Asm.regEax) $ Asm.Imm 2])
+      Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1, Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 2])
     specHelper validCase6 $
-      Right ([], [], [Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 3, Asm.instrSub (Asm.Reg Asm.regEax) $ Asm.Imm 4])
+      Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 3, Asm.instrSub (Asm.Reg Asm.regRax) $ Asm.Imm 4])
     specHelper validCase7 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 5
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 6
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 5
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 6
           , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.3"
           , Asm.pinstrLabel "ifeq_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifeq_nontail_cont.3"
           ])
     specHelper validCase8 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 7
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 8
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 7
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 8
           , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.3"
           , Asm.pinstrLabel "ifeq_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.pinstrLabel "ifeq_nontail_cont.3"
           ])
     specHelper validCase9 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 9
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 10
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 9
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 10
           , Asm.instrJg $ Asm.Lab "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.instrJmp $ Asm.Lab "ifle_nontail_cont.3"
           , Asm.pinstrLabel "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifle_nontail_cont.3"
           ])
     specHelper validCase10 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 12
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 11
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 12
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 11
           , Asm.instrJg $ Asm.Lab "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.instrJmp $ Asm.Lab "ifle_nontail_cont.3"
           , Asm.pinstrLabel "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifle_nontail_cont.3"
           ])
     specHelper validCase11 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 14
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 13
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 14
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 13
           , Asm.instrJg $ Asm.Lab "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.instrJmp $ Asm.Lab "ifle_nontail_cont.3"
           , Asm.pinstrLabel "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.pinstrLabel "ifle_nontail_cont.3"
           ])
     specHelper validCase12 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 15
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Imm 16
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 15
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 16
           , Asm.instrJg $ Asm.Lab "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.instrJmp $ Asm.Lab "ifle_nontail_cont.3"
           , Asm.pinstrLabel "ifle_nontail_else.2"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.pinstrLabel "ifle_nontail_cont.3"
           ])
-    specHelper validCase13 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 42])
+    specHelper validCase13 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 42])
     specHelper validCase14 $
       Right
         ( []
         , []
-        , [ Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
-          , Asm.instrNeg $ Asm.Reg Asm.regEax
-          , Asm.instrMov (Asm.Reg Asm.regEbx) $ Asm.Imm 2
-          , Asm.instrNeg $ Asm.Reg Asm.regEbx
-          , Asm.instrSub (Asm.Reg Asm.regEbx) $ Asm.Imm 3
-          , Asm.instrCmp (Asm.Reg Asm.regEax) $ Asm.Reg Asm.regEbx
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrNeg $ Asm.Reg Asm.regRax
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 2
+          , Asm.instrNeg $ Asm.Reg Asm.regRdi
+          , Asm.instrSub (Asm.Reg Asm.regRdi) $ Asm.Imm 3
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
           , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.6"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.7"
           , Asm.pinstrLabel "ifeq_nontail_else.6"
-          , Asm.instrMov (Asm.Reg Asm.regEax) $ Asm.Imm 0
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifeq_nontail_cont.7"
           ])

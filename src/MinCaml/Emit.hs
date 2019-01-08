@@ -42,11 +42,11 @@ out1 instr op1 = out [instr, op1]
 out2 :: String -> String -> String -> MinCamlEmit ()
 out2 instr op1 op2 = out [instr, op1, ",", op2]
 
-regX86Esp :: String
-regX86Esp = "%esp"
+regX86Rsp :: String
+regX86Rsp = "%rsp"
 
-regX86Ebp :: String
-regX86Ebp = "%ebp"
+regX86Rbp :: String
+regX86Rbp = "%rbp"
 
 callMinCaml :: MinCaml a -> MinCamlEmit a
 callMinCaml mc = do
@@ -166,24 +166,24 @@ f' prog = do
     asmFundefs ++
     [ [".global", "min_caml_start"]
     , Asm.pinstrLabel "min_caml_start"
-    , Asm.instrPush $ Asm.Reg Asm.regEax
-    , Asm.instrPush $ Asm.Reg Asm.regEbx
-    , Asm.instrPush $ Asm.Reg Asm.regEcx
-    , Asm.instrPush $ Asm.Reg Asm.regEdx
-    , Asm.instrPush $ Asm.Reg Asm.regEsi
-    , Asm.instrPush $ Asm.Reg Asm.regEdi
-    , Asm.instrPush $ Asm.Reg regX86Ebp
-    , Asm.instrMov (Asm.Reg Asm.regSp) $ Asm.Mem regX86Esp 32
-    , Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Mem regX86Esp 36
+    , Asm.instrPush $ Asm.Reg Asm.regRax
+    , Asm.instrPush $ Asm.Reg Asm.regRdi
+    , Asm.instrPush $ Asm.Reg Asm.regRsi
+    , Asm.instrPush $ Asm.Reg Asm.regRdx
+    , Asm.instrPush $ Asm.Reg Asm.regRcx
+    , Asm.instrPush $ Asm.Reg Asm.regR8
+    , Asm.instrPush $ Asm.Reg regX86Rbp
+    , Asm.instrMov (Asm.Reg Asm.regSp) $ Asm.Mem regX86Rsp 32
+    , Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Mem regX86Rsp 36
     , Asm.instrMov (Asm.Reg Asm.regHp) $ Asm.Reg Asm.callResultReg
     ] ++
     asmE ++
-    [ Asm.instrPop $ Asm.Reg regX86Ebp
-    , Asm.instrPop $ Asm.Reg Asm.regEdi
-    , Asm.instrPop $ Asm.Reg Asm.regEsi
-    , Asm.instrPop $ Asm.Reg Asm.regEdx
-    , Asm.instrPop $ Asm.Reg Asm.regEcx
-    , Asm.instrPop $ Asm.Reg Asm.regEbx
-    , Asm.instrPop $ Asm.Reg Asm.regEax
+    [ Asm.instrPop $ Asm.Reg regX86Rbp
+    , Asm.instrPop $ Asm.Reg Asm.regR8
+    , Asm.instrPop $ Asm.Reg Asm.regRcx
+    , Asm.instrPop $ Asm.Reg Asm.regRdx
+    , Asm.instrPop $ Asm.Reg Asm.regRsi
+    , Asm.instrPop $ Asm.Reg Asm.regRdi
+    , Asm.instrPop $ Asm.Reg Asm.regRax
     , Asm.instrRet
     ]

@@ -39,90 +39,90 @@ spec =
     specHelper validCase3 $ Right $ Asm.Prog [] [] (Asm.Ans $ Asm.Set 42)
     specHelper validCase4 $ Right $ Asm.Prog [] [] (Asm.Ans $ Asm.Set 42)
     specHelper validCase5 $
-      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add Asm.regEax (Asm.C 2)
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Add Asm.regRax (Asm.C 2)
     specHelper validCase6 $
-      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 3) $ Asm.Ans $ Asm.Sub Asm.regEax (Asm.C 4)
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regRax, Type.Int) (Asm.Set 3) $ Asm.Ans $ Asm.Sub Asm.regRax (Asm.C 4)
     specHelper validCase7 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 5) $
-      Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 6) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 5) $
+      Asm.Ans $ Asm.IfEq Asm.regRax (Asm.C 6) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
     specHelper validCase8 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 7) $
-      Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 8) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 7) $
+      Asm.Ans $ Asm.IfEq Asm.regRax (Asm.C 8) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
     specHelper validCase9 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 9) $
-      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 10) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 9) $
+      Asm.Ans $ Asm.IfLe Asm.regRax (Asm.C 10) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
     specHelper validCase10 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 12) $
-      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 11) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 12) $
+      Asm.Ans $ Asm.IfLe Asm.regRax (Asm.C 11) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
     specHelper validCase11 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 14) $
-      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 13) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 14) $
+      Asm.Ans $ Asm.IfLe Asm.regRax (Asm.C 13) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
     specHelper validCase12 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 15) $
-      Asm.Ans $ Asm.IfLe Asm.regEax (Asm.C 16) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 15) $
+      Asm.Ans $ Asm.IfLe Asm.regRax (Asm.C 16) (Asm.Ans $ Asm.Set 0) (Asm.Ans $ Asm.Set 1)
     specHelper validCase13 $
-      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regEax, Type.Int) (Asm.Set 42) $ Asm.Ans $ Asm.Mov Asm.regEax
+      Right $ Asm.Prog [] [] $ Asm.Let (Asm.regRax, Type.Int) (Asm.Set 42) $ Asm.Ans $ Asm.Mov Asm.regRax
     specHelper validCase14 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Neg Asm.regEax) $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Set 2) $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Neg Asm.regEbx) $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Sub Asm.regEbx $ Asm.C 3) $
-      Asm.Ans $ Asm.IfEq Asm.regEax (Asm.V Asm.regEbx) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Neg Asm.regRax) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Neg Asm.regRdi) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Sub Asm.regRdi $ Asm.C 3) $
+      Asm.Ans $ Asm.IfEq Asm.regRax (Asm.V Asm.regRdi) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0)
     specHelper validCase15 $
       Right $
       Asm.Prog [] [] $
-      Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
       Asm.Ans $
       Asm.IfEq
-        Asm.regEax
+        Asm.regRax
         (Asm.C 0)
-        (Asm.Let (Asm.regEax, Type.Int) (Asm.Set 1) $
-         Asm.Ans $ Asm.IfEq Asm.regEax (Asm.C 0) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0))
+        (Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+         Asm.Ans $ Asm.IfEq Asm.regRax (Asm.C 0) (Asm.Ans $ Asm.Set 1) (Asm.Ans $ Asm.Set 0))
         (Asm.Ans $ Asm.Set 0)
     specHelper validCase16 $
       Right $
-      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regEbx] [] (Asm.Ans $ Asm.Add Asm.regEbx $ Asm.C 1) Type.Int] $
+      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regRdi] [] (Asm.Ans $ Asm.Add Asm.regRdi $ Asm.C 1) Type.Int] $
       Asm.Ans $ Asm.Set 2
     specHelper validCase17 $
       Right $
-      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regEbx] [] (Asm.Ans $ Asm.Add Asm.regEbx $ Asm.C 1) Type.Int] $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEbx] []
+      Asm.Prog [] [Asm.Fundef (Id.L "f.0") [Asm.regRdi] [] (Asm.Ans $ Asm.Add Asm.regRdi $ Asm.C 1) Type.Int] $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regRdi] []
     specHelper validCase18 $
       Right $
       Asm.Prog
         []
-        [Asm.Fundef (Id.L "f.0") [Asm.regEbx, Asm.regEcx] [] (Asm.Ans $ Asm.Add Asm.regEbx (Asm.V Asm.regEcx)) Type.Int] $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Set 1) $
-      Asm.Let (Asm.regEcx, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEbx, Asm.regEcx] []
+        [Asm.Fundef (Id.L "f.0") [Asm.regRdi, Asm.regRsi] [] (Asm.Ans $ Asm.Add Asm.regRdi (Asm.V Asm.regRsi)) Type.Int] $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regRdi, Asm.regRsi] []
     specHelper validCase19 $
       Right $
       Asm.Prog
         []
         [ Asm.Fundef
             (Id.L "f.0")
-            [Asm.regEbx]
+            [Asm.regRdi]
             []
             (Asm.Ans $
-             Asm.IfLe Asm.regEbx (Asm.C 0) (Asm.Ans $ Asm.Set 0) $
-             Asm.Let (Asm.regEax, Type.Int) (Asm.Sub Asm.regEbx (Asm.C 1)) $
-             Asm.Let ("Tu6", Type.Unit) (Asm.Save Asm.regEbx "n.1") $
-             Asm.Let (Asm.regEax, Type.Int) (Asm.CallDir (Id.L "f.0") [Asm.regEax] []) $
-             Asm.Let (Asm.regEbx, Type.Int) (Asm.Restore "n.1") $ Asm.Ans $ Asm.Add Asm.regEbx (Asm.V Asm.regEax))
+             Asm.IfLe Asm.regRdi (Asm.C 0) (Asm.Ans $ Asm.Set 0) $
+             Asm.Let (Asm.regRax, Type.Int) (Asm.Sub Asm.regRdi (Asm.C 1)) $
+             Asm.Let ("Tu6", Type.Unit) (Asm.Save Asm.regRdi "n.1") $
+             Asm.Let (Asm.regRax, Type.Int) (Asm.CallDir (Id.L "f.0") [Asm.regRax] []) $
+             Asm.Let (Asm.regRdi, Type.Int) (Asm.Restore "n.1") $ Asm.Ans $ Asm.Add Asm.regRdi (Asm.V Asm.regRax))
             Type.Int
         ] $
-      Asm.Let (Asm.regEbx, Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regEbx] []
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallDir (Id.L "f.0") [Asm.regRdi] []
