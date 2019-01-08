@@ -178,24 +178,24 @@ data Operand
   | Lab Label
   deriving (Show, Eq)
 
-instrPush (Reg reg) = instr1 "pushl" reg
+instrPush (Reg reg) = instr1 "pushq" reg
 
-instrPop (Reg reg) = instr1 "popl" reg
+instrPop (Reg reg) = instr1 "popq" reg
 
-instrMov (Reg dst) (Reg src) = instr2 "movl" src dst
-instrMov (Reg dst) (Imm imm) = instr2 "movl" ("$" ++ show imm) dst
-instrMov (Reg dst) (Mem base offset) = instr2 "movl" (show offset ++ "(" ++ base ++ ")") dst
+instrMov (Reg dst) (Reg src) = instr2 "movq" src dst
+instrMov (Reg dst) (Imm imm) = instr2 "movq" ("$" ++ show imm) dst
+instrMov (Reg dst) (Mem base offset) = instr2 "movq" (show offset ++ "(" ++ base ++ ")") dst
 
-instrNeg (Reg reg) = instr1 "negl" reg
+instrNeg (Reg reg) = instr1 "negq" reg
 
-instrAdd (Reg reg1) (Reg reg2) = instr2 "addl" reg2 reg1
-instrAdd (Reg reg) (Imm imm)   = instr2 "addl" ("$" ++ show imm) reg
+instrAdd (Reg reg1) (Reg reg2) = instr2 "addq" reg2 reg1
+instrAdd (Reg reg) (Imm imm)   = instr2 "addq" ("$" ++ show imm) reg
 
-instrSub (Reg reg1) (Reg reg2) = instr2 "subl" reg2 reg1
-instrSub (Reg reg) (Imm imm)   = instr2 "subl" ("$" ++ show imm) reg
+instrSub (Reg reg1) (Reg reg2) = instr2 "subq" reg2 reg1
+instrSub (Reg reg) (Imm imm)   = instr2 "subq" ("$" ++ show imm) reg
 
-instrCmp (Reg reg1) (Reg reg2) = instr2 "cmpl" reg2 reg1
-instrCmp (Reg reg) (Imm imm)   = instr2 "cmpl" ("$" ++ show imm) reg
+instrCmp (Reg reg1) (Reg reg2) = instr2 "cmpq" reg2 reg1
+instrCmp (Reg reg) (Imm imm)   = instr2 "cmpq" ("$" ++ show imm) reg
 
 instrJmp (Lab label) = instr1 "jmp" label
 
