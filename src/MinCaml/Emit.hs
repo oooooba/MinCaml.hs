@@ -42,9 +42,6 @@ out1 instr op1 = out [instr, op1]
 out2 :: String -> String -> String -> MinCamlEmit ()
 out2 instr op1 op2 = out [instr, op1, ",", op2]
 
-regX86Rsp :: String
-regX86Rsp = "%rsp"
-
 regX86Rbp :: String
 regX86Rbp = "%rbp"
 
@@ -167,23 +164,18 @@ f' prog = do
     [ [".global", "min_caml_start"]
     , Asm.pinstrLabel "min_caml_start"
     , Asm.instrPush $ Asm.Reg Asm.regRax
-    , Asm.instrPush $ Asm.Reg Asm.regRdi
-    , Asm.instrPush $ Asm.Reg Asm.regRsi
     , Asm.instrPush $ Asm.Reg Asm.regRdx
     , Asm.instrPush $ Asm.Reg Asm.regRcx
     , Asm.instrPush $ Asm.Reg Asm.regR8
     , Asm.instrPush $ Asm.Reg regX86Rbp
-    , Asm.instrMov (Asm.Reg Asm.regSp) $ Asm.Mem regX86Rsp 32
-    , Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Mem regX86Rsp 36
-    , Asm.instrMov (Asm.Reg Asm.regHp) $ Asm.Reg Asm.callResultReg
+    , Asm.instrMov (Asm.Reg Asm.regSp) $ Asm.Reg Asm.regRdi
+    , Asm.instrMov (Asm.Reg Asm.regHp) $ Asm.Reg Asm.regRsi
     ] ++
     asmE ++
     [ Asm.instrPop $ Asm.Reg regX86Rbp
     , Asm.instrPop $ Asm.Reg Asm.regR8
     , Asm.instrPop $ Asm.Reg Asm.regRcx
     , Asm.instrPop $ Asm.Reg Asm.regRdx
-    , Asm.instrPop $ Asm.Reg Asm.regRsi
-    , Asm.instrPop $ Asm.Reg Asm.regRdi
     , Asm.instrPop $ Asm.Reg Asm.regRax
     , Asm.instrRet
     ]

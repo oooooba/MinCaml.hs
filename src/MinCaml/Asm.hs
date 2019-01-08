@@ -182,6 +182,8 @@ instrPush (Reg reg) = instr1 "pushq" reg
 
 instrPop (Reg reg) = instr1 "popq" reg
 
+instrMov (Reg dst) (Reg src)
+  | dst == regHp = instr2 "movq" src $ regHp ++ "(%rip)"
 instrMov (Reg dst) (Reg src) = instr2 "movq" src dst
 instrMov (Reg dst) (Imm imm) = instr2 "movq" ("$" ++ show imm) dst
 instrMov (Reg dst) (Mem base offset) = instr2 "movq" (show offset ++ "(" ++ base ++ ")") dst
