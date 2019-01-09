@@ -16,7 +16,7 @@ import qualified MinCaml.Type               as Type
 
 data EmitStatus = EmitStatus
   { globalStatus :: GlobalStatus
-  , buffer       :: [[String]]
+  , buffer       :: [String]
   , stackset     :: Set.Set Id.T
   } deriving (Show, Eq)
 
@@ -27,20 +27,11 @@ data Dest
   | NonTail Id.T
   deriving (Show, Eq)
 
-out :: [String] -> MinCamlEmit ()
+out :: String -> MinCamlEmit ()
 out line = do
   s <- get
   let buf = buffer s
   put $ s {buffer = line : buf}
-
-out0 :: String -> MinCamlEmit ()
-out0 instr = out [instr]
-
-out1 :: String -> String -> MinCamlEmit ()
-out1 instr op1 = out [instr, op1]
-
-out2 :: String -> String -> String -> MinCamlEmit ()
-out2 instr op1 op2 = out [instr, op1, ",", op2]
 
 regX86Rbp :: String
 regX86Rbp = "%rbp"
@@ -69,7 +60,7 @@ gAuxNonRetHelper exp = do
   genVarHelper Type.Unit >>= (\x -> gAux (NonTail x, exp))
   out Asm.instrRet
 
-gAuxTailIf :: Asm.T -> Asm.T -> String -> (Asm.Operand -> [String]) -> MinCamlEmit ()
+gAuxTailIf :: Asm.T -> Asm.T -> String -> (Asm.Operand -> String) -> MinCamlEmit ()
 gAuxTailIf e1 e2 labelBase bn = do
   bElse <- genIdHelper (labelBase ++ "_else")
   out $ bn $ Asm.Lab bElse
@@ -79,7 +70,7 @@ gAuxTailIf e1 e2 labelBase bn = do
   modify (\s -> s {stackset = stacksetBack})
   g (Tail, e2)
 
-gAuxNonTailIf :: Dest -> Asm.T -> Asm.T -> String -> (Asm.Operand -> [String]) -> MinCamlEmit ()
+gAuxNonTailIf :: Dest -> Asm.T -> Asm.T -> String -> (Asm.Operand -> String) -> MinCamlEmit ()
 gAuxNonTailIf dest e1 e2 labelBase bn = do
   bElse <- genIdHelper (labelBase ++ "_else")
   bCont <- genIdHelper (labelBase ++ "_cont")
@@ -139,11 +130,11 @@ h = undefined
 run :: MinCamlEmit a -> EmitStatus -> (a, EmitStatus)
 run e s = runIdentity $ runStateT e s
 
-f :: Asm.Prog -> MinCaml ([[String]], [[String]], [[String]])
+f :: Asm.Prog -> MinCaml ([String], [String], [String])
 f (Asm.Prog fdata fundefs e) = do
   gs <- get
   let es = EmitStatus gs [] Set.empty
-      (_, es') = run (mapM_ (\(Id.L x, d) -> out [show x, show d]) fdata) es
+      (_, es') = run (mapM_ undefined fdata) es
       asmFdata = reverse $ buffer es'
       (_, es'') = run (mapM_ h fundefs) es'
       asmFundefs = reverse $ buffer es''
@@ -153,15 +144,15 @@ f (Asm.Prog fdata fundefs e) = do
   put gs'
   return (asmFdata, asmFundefs, asmE)
 
-f' :: Asm.Prog -> MinCaml [[String]]
+f' :: Asm.Prog -> MinCaml [String]
 f' prog = do
   (asmFdata, asmFundefs, asmE) <- f prog
   return $
-    [[".data"], [".balign", show 8]] ++
+    [".data", ".balign 8"] ++
     asmFdata ++
-    [[".text"]] ++
+    [".text"] ++
     asmFundefs ++
-    [ [".global", "min_caml_start"]
+    [ ".global min_caml_start"
     , Asm.pinstrLabel "min_caml_start"
     , Asm.instrPush $ Asm.Reg Asm.regRax
     , Asm.instrPush $ Asm.Reg Asm.regRdx

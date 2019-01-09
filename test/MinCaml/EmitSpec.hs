@@ -21,7 +21,7 @@ import qualified MinCaml.Virtual  as Virtual
 
 import           MinCaml.TestCase
 
-specHelper :: TestCase -> Either String ([[String]], [[String]], [[String]]) -> Spec
+specHelper :: TestCase -> Either String ([String], [String], [String]) -> Spec
 specHelper testCase expected =
   it (name testCase) $
   evalMinCaml

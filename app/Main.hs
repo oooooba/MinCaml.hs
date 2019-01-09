@@ -20,7 +20,7 @@ import qualified MinCaml.Type       as Type
 import qualified MinCaml.Typing     as Typing
 import qualified MinCaml.Virtual    as Virtual
 
-compile :: String -> Either String [[String]]
+compile :: String -> Either String [String]
 compile program =
   evalMinCaml
     (Parser.runParser (Lexer.runLexer program) >>= Typing.f >>= KNormal.f . fst >>= Alpha.f >>= Closure.f >>= Virtual.f >>=
@@ -29,15 +29,12 @@ compile program =
      Emit.f')
     initialGlobalStatus
 
-flatten :: [[String]] -> String
-flatten = concatMap (\line -> unwords line ++ "\n")
-
 process :: Handle -> Handle -> IO ()
 process inputHandle outputHandle = do
   program <- hGetContents inputHandle
   case compile program of
     Left error -> hPutStr stderr error
-    Right asm  -> hPutStr outputHandle $ flatten asm
+    Right asm  -> hPutStr outputHandle $ unlines asm
 
 file :: String -> IO ()
 file inputPath = do

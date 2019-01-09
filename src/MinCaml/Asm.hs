@@ -159,11 +159,11 @@ align i =
     then i
     else i + 4
 
-instr0 instr = [instr]
+instr0 instr = instr
 
-instr1 instr op1 = [instr, op1]
+instr1 instr op1 = instr ++ "\t" ++ op1
 
-instr2 instr op1 op2 = [instr, op1, ",", op2]
+instr2 instr op1 op2 = instr ++ "\t" ++ op1 ++ ", " ++ op2
 
 {-
 - ToDo: fix to use intel syntax
