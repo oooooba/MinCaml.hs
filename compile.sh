@@ -5,7 +5,6 @@ RUNTIME=src/runtime
 MAIN=$RUNTIME/main.o
 
 if [ ! -f $MAIN ]; then
-    echo compiling runtime
     cc -c $RUNTIME/main.c -o $MAIN
 fi
 

@@ -154,7 +154,6 @@ f' prog = do
     asmFundefs ++
     [ ".global min_caml_start"
     , Asm.pinstrLabel "min_caml_start"
-    , Asm.instrPush $ Asm.Reg Asm.regRax
     , Asm.instrPush $ Asm.Reg Asm.regRdx
     , Asm.instrPush $ Asm.Reg Asm.regRcx
     , Asm.instrPush $ Asm.Reg Asm.regR8
@@ -167,6 +166,5 @@ f' prog = do
     , Asm.instrPop $ Asm.Reg Asm.regR8
     , Asm.instrPop $ Asm.Reg Asm.regRcx
     , Asm.instrPop $ Asm.Reg Asm.regRdx
-    , Asm.instrPop $ Asm.Reg Asm.regRax
     , Asm.instrRet
     ]

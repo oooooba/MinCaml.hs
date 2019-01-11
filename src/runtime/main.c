@@ -1,7 +1,9 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-extern void min_caml_start(void *sp, void *hp);
+extern intptr_t min_caml_start(void *sp, void *hp);
 void *min_caml_hp;
 
 int main(int argc, char *argv[]) {
@@ -11,7 +13,11 @@ int main(int argc, char *argv[]) {
     if (!hp || !sp) {
         return 1;
     }
-    printf("hp=%p, sp=%p\n", hp, sp);
+    if (argc > 2 && strcmp(argv[1], "--test") == 0) {
+        intptr_t expected = atoll(argv[2]);
+        intptr_t actual = min_caml_start(sp, hp);
+        return expected != actual;
+    }
     min_caml_start(sp, hp);
     return 0;
 }
