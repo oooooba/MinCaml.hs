@@ -46,6 +46,7 @@ integrationTest = do
   testCompiler validCase12
   testCompiler validCase13
   testCompiler validCase14
+  testCompiler validCase15
 
 main :: IO ()
 main = do

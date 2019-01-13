@@ -140,3 +140,23 @@ spec =
           , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifeq_nontail_cont.7"
           ])
+    specHelper validCase15 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 0
+          , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.4"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrCmp (Asm.Reg Asm.regRax) $ Asm.Imm 0
+          , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.6"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.7"
+          , Asm.pinstrLabel "ifeq_nontail_else.6"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
+          , Asm.pinstrLabel "ifeq_nontail_cont.7"
+          , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.5"
+          , Asm.pinstrLabel "ifeq_nontail_else.4"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
+          , Asm.pinstrLabel "ifeq_nontail_cont.5"
+          ])
