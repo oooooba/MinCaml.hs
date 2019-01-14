@@ -160,3 +160,12 @@ spec =
           , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
           , Asm.pinstrLabel "ifeq_nontail_cont.5"
           ])
+    specHelper validCase16 $
+      Right
+        ( []
+        , [ Asm.pinstrLabel "f.0"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrRet
+          ]
+        , [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 2])

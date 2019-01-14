@@ -18,6 +18,7 @@ data EmitStatus = EmitStatus
   { globalStatus :: GlobalStatus
   , buffer       :: [String]
   , stackset     :: Set.Set Id.T
+  , stackmap     :: [Id.T]
   } deriving (Show, Eq)
 
 type MinCamlEmit a = StateT EmitStatus Identity a
@@ -125,7 +126,10 @@ g (dest, Asm.Ans exp)          = gAux (dest, exp)
 g (dest, Asm.Let (x, t) exp e) = gAux (NonTail x, exp) >> g (dest, e)
 
 h :: Asm.Fundef -> MinCamlEmit ()
-h = undefined
+h (Asm.Fundef (Id.L x) _ _ e _) = do
+  out $ Asm.pinstrLabel x
+  modify (\s -> s {stackset = Set.empty, stackmap = []})
+  g (Tail, e)
 
 run :: MinCamlEmit a -> EmitStatus -> (a, EmitStatus)
 run e s = runIdentity $ runStateT e s
@@ -133,7 +137,7 @@ run e s = runIdentity $ runStateT e s
 f :: Asm.Prog -> MinCaml ([String], [String], [String])
 f (Asm.Prog fdata fundefs e) = do
   gs <- get
-  let es = EmitStatus gs [] Set.empty
+  let es = EmitStatus gs [] Set.empty []
       (_, es') = run (mapM_ undefined fdata) es
       asmFdata = reverse $ buffer es'
       (_, es'') = run (mapM_ h fundefs) es'
