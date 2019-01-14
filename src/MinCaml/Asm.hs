@@ -205,6 +205,8 @@ instrJne (Lab label) = instr1 "jne" label
 
 instrJg (Lab label) = instr1 "jg" label
 
+instrCall (Lab label) = instr1 "call" label
+
 instrRet = instr0 "ret"
 
 pinstrLabel label = instr0 $ label ++ ":"
