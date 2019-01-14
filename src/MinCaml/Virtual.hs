@@ -50,7 +50,7 @@ expand xts ini addf addi =
     (\(offset, acc) x -> do
        let offset' = Asm.align offset
        addf x offset' acc >>= \a -> return (offset' + 8, a))
-    (\(offset, acc) x t -> addi x t offset acc >>= \a -> return (offset + 4, a))
+    (\(offset, acc) x t -> addi x t offset acc >>= \a -> return (offset + 8, a))
 
 gIfHelper ::
      (Id.T -> Asm.IdOrImm -> Asm.T -> Asm.T -> Asm.Exp)
@@ -95,7 +95,7 @@ g env (Closure.MakeCls (x, t) (Closure.Closure l ys) e2) = do
   (offset, storeFv) <-
     expand
       (fmap (\y -> (y, env Map.! y)) ys)
-      (4, e2')
+      (8, e2')
       undefined
       (\y _ offset storeFv -> Asm.seq (Asm.St y x (Asm.C offset) 1, storeFv))
   z <- genId "l"
@@ -116,7 +116,7 @@ h (Closure.Fundef (Id.L x, t) yts zts e) = do
   (int, float) <- separate yts
   e' <- g (Map.insert x t $ Util.addList yts $ Util.addList zts Map.empty) e
   (offset, load) <-
-    expand zts (4, e') undefined (\z t offset load -> return $ Asm.Let (z, t) (Asm.Ld x (Asm.C offset) 1) load)
+    expand zts (8, e') undefined (\z t offset load -> return $ Asm.Let (z, t) (Asm.Ld x (Asm.C offset) 1) load)
   case t of
     Type.Fun _ t2 -> return $ Asm.Fundef (Id.L x) int float load t2
     _             -> throwError "Virtual.h never reached"

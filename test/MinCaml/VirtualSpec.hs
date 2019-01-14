@@ -159,17 +159,17 @@ spec =
             (Id.L "g.2")
             ["y.3"]
             []
-            (Asm.Let ("x.1", Type.Int) (Asm.Ld "g.2" (Asm.C 4) 1) $ Asm.Ans $ Asm.Add "x.1" (Asm.V "y.3"))
+            (Asm.Let ("x.1", Type.Int) (Asm.Ld "g.2" (Asm.C 8) 1) $ Asm.Ans $ Asm.Add "x.1" (Asm.V "y.3"))
             Type.Int
         , Asm.Fundef
             (Id.L "f.0")
             ["x.1"]
             []
             (Asm.Let ("g.2", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
-             Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
+             Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
              Asm.Let ("l.7", Type.Int) (Asm.SetL $ Id.L "g.2") $
              Asm.Let ("Tu4", Type.Unit) (Asm.St "l.7" "g.2" (Asm.C 0) 1) $
-             Asm.Let ("Tu3", Type.Unit) (Asm.St "x.1" "g.2" (Asm.C 4) 1) $ Asm.Ans $ Asm.Mov "g.2") $
+             Asm.Let ("Tu3", Type.Unit) (Asm.St "x.1" "g.2" (Asm.C 8) 1) $ Asm.Ans $ Asm.Mov "g.2") $
           Type.Fun [Type.Int] Type.Int
         ] $
       Asm.Let ("Ti0.5", Type.Int) (Asm.Set 1) $
@@ -183,7 +183,7 @@ spec =
             (Id.L "f.1")
             ["y.2"]
             []
-            (Asm.Let ("x.0", Type.Int) (Asm.Ld "f.1" (Asm.C 4) 1) $ Asm.Ans $ Asm.Add "x.0" $ Asm.V "y.2")
+            (Asm.Let ("x.0", Type.Int) (Asm.Ld "f.1" (Asm.C 8) 1) $ Asm.Ans $ Asm.Add "x.0" $ Asm.V "y.2")
             Type.Int
         , Asm.Fundef
             (Id.L "g.3")
@@ -194,10 +194,10 @@ spec =
         ] $
       Asm.Let ("x.0", Type.Int) (Asm.Set 1) $
       Asm.Let ("f.1", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
-      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
       Asm.Let ("l.11", Type.Int) (Asm.SetL $ Id.L "f.1") $
       Asm.Let ("Tu7", Type.Unit) (Asm.St "l.11" "f.1" (Asm.C 0) 1) $
-      Asm.Let ("Tu6", Type.Unit) (Asm.St "x.0" "f.1" (Asm.C 4) 1) $
+      Asm.Let ("Tu6", Type.Unit) (Asm.St "x.0" "f.1" (Asm.C 8) 1) $
       Asm.Let ("g.3", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
       Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
       Asm.Let ("l.10", Type.Int) (Asm.SetL $ Id.L "g.3") $

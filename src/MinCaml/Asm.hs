@@ -157,7 +157,7 @@ align :: Int -> Int
 align i =
   if (i `mod` 8) == 0
     then i
-    else i + 4
+    else error $ "found invalid align: " ++ show i
 
 instr0 instr = instr
 
