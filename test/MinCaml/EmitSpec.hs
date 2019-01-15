@@ -169,3 +169,24 @@ spec =
           , Asm.instrRet
           ]
         , [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 2])
+    specHelper validCase17 $
+      Right
+        ( []
+        , [ Asm.pinstrLabel "f.0"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrRet
+          ]
+        , [Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 2, Asm.instrCall (Asm.Lab "f.0")])
+    specHelper validCase18 $
+      Right
+        ( []
+        , [ Asm.pinstrLabel "f.0"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRsi
+          , Asm.instrRet
+          ]
+        , [ Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRsi) $ Asm.Imm 2
+          , Asm.instrCall (Asm.Lab "f.0")
+          ])

@@ -3,10 +3,15 @@ module MinCaml.Emit
   , f'
   ) where
 
+import           Control.Arrow              ((***))
+import           Control.Exception          (assert)
+import           Control.Monad              (when)
 import           Control.Monad.Identity     (Identity, runIdentity)
 import           Control.Monad.State.Strict (StateT, get, modify, put,
                                              runStateT)
 import           Data.Either                (fromRight)
+import qualified Data.List                  as List
+import qualified Data.Maybe                 as Maybe
 import qualified Data.Set                   as Set
 
 import qualified MinCaml.Asm                as Asm
@@ -52,9 +57,28 @@ genIdHelper s = callMinCaml (genId s)
 genVarHelper :: Type.Type -> MinCamlEmit Id.T
 genVarHelper t = callMinCaml (genVar t)
 
+stacksize :: MinCamlEmit Int
+stacksize = fmap (\s -> Asm.align $ length (stackmap s) * 8) get
+
 ppIdOrImm :: Asm.IdOrImm -> Asm.Operand
 ppIdOrImm (Asm.V x) = Asm.Reg x
 ppIdOrImm (Asm.C i) = Asm.Imm i
+
+shuffle :: Asm.Operand -> [(Asm.Operand, Asm.Operand)] -> [(Asm.Operand, Asm.Operand)]
+shuffle tmpSlot xys =
+  let (_, xys') = List.partition (uncurry (==)) xys
+  in case List.partition (\(_, y) -> Maybe.isJust $ List.lookup y xys') xys' of
+       ([], []) -> []
+       ((x, y):xys, []) ->
+         let xys' =
+               fmap
+                 (\yz@(y', z) ->
+                    if y == y'
+                      then (tmpSlot, z)
+                      else yz)
+                 xys
+         in (y, tmpSlot) : (x, y) : shuffle tmpSlot xys'
+       (xys, acyc) -> acyc ++ shuffle tmpSlot xys
 
 gAuxNonRetHelper :: Asm.Exp -> MinCamlEmit ()
 gAuxNonRetHelper exp = do
@@ -86,6 +110,14 @@ gAuxNonTailIf dest e1 e2 labelBase bn = do
   out $ Asm.pinstrLabel bCont
   stackset2 <- fmap stackset get
   modify (\s -> s {stackset = Set.intersection stackset1 stackset2})
+
+gAuxArgs :: [(Id.T, Id.T)] -> [Id.T] -> [Id.T] -> MinCamlEmit ()
+gAuxArgs xRegCl ys zs = do
+  assert (length ys <= length Asm.callArgumentRegs - length xRegCl) $ return ()
+  assert (length zs <= length Asm.fregs) $ return ()
+  let (_, yrs) = foldl (\(i, yrs) y -> (i + 1, (y, Asm.callArgumentRegs !! i) : yrs)) (0, xRegCl) ys
+  tmpSlot <- fmap (Asm.Mem Asm.regSp) stacksize
+  mapM_ (\(y, r) -> out $ Asm.instrMov r y) (shuffle tmpSlot $ fmap (Asm.Reg *** Asm.Reg) yrs)
 
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
@@ -120,6 +152,14 @@ gAux (NonTail z, Asm.IfEq x y' e1 e2) =
   out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifeq_nontail" Asm.instrJne
 gAux (NonTail z, Asm.IfLe x y' e1 e2) =
   out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifle_nontail" Asm.instrJg
+gAux (Tail, Asm.CallDir (Id.L x) ys zs) = gAuxArgs [] ys zs >> out (Asm.instrJmp $ Asm.Lab x)
+gAux (NonTail a, Asm.CallDir (Id.L x) ys zs) = do
+  gAuxArgs [] ys zs
+  ss <- stacksize
+  when (ss > 0) $ out $ Asm.instrAdd (Asm.Reg Asm.regSp) $ Asm.Imm ss
+  out $ Asm.instrCall $ Asm.Lab x
+  when (ss > 0) $ out $ Asm.instrSub (Asm.Reg Asm.regSp) $ Asm.Imm ss
+  when (a /= Asm.callResultReg) $ out $ Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Reg a
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
