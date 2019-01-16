@@ -187,6 +187,7 @@ instrMov (Reg dst) (Reg src)
 instrMov (Reg dst) (Reg src) = instr2 "movq" src dst
 instrMov (Reg dst) (Imm imm) = instr2 "movq" ("$" ++ show imm) dst
 instrMov (Reg dst) (Mem base offset) = instr2 "movq" (show offset ++ "(" ++ base ++ ")") dst
+instrMov (Mem base offset) (Reg src) = instr2 "movq" src (show offset ++ "(" ++ base ++ ")")
 
 instrNeg (Reg reg) = instr1 "negq" reg
 
