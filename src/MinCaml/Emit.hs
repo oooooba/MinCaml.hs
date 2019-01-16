@@ -3,6 +3,7 @@ module MinCaml.Emit
   , f'
   ) where
 
+import           Control.Applicative        ((<$>))
 import           Control.Arrow              ((***))
 import           Control.Exception          (assert)
 import           Control.Monad              (when)
@@ -56,6 +57,28 @@ genIdHelper s = callMinCaml (genId s)
 
 genVarHelper :: Type.Type -> MinCamlEmit Id.T
 genVarHelper t = callMinCaml (genVar t)
+
+save :: Id.T -> MinCamlEmit ()
+save x = do
+  es <- get
+  let ss' = Set.insert x $ stackset es
+      sm = stackmap es
+      sm' =
+        if x `elem` sm
+          then sm
+          else sm ++ [x]
+  put $ es {stackset = ss', stackmap = sm'}
+
+locate :: Id.T -> MinCamlEmit [Int]
+locate x = fmap (loc . stackmap) get
+  where
+    loc [] = []
+    loc (y:zs)
+      | x == y = 0 : fmap succ (loc zs)
+    loc (y:zs) = fmap succ (loc zs)
+
+offset :: Id.T -> MinCamlEmit Int
+offset x = ((8 *) . head) <$> locate x
 
 stacksize :: MinCamlEmit Int
 stacksize = fmap (\s -> Asm.align $ length (stackmap s) * 8) get
@@ -138,12 +161,28 @@ gAux (NonTail x, Asm.Sub y z')
 gAux (NonTail x, Asm.Sub y z')
   | x /= y = out (Asm.instrMov (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrSub (Asm.Reg x) $ ppIdOrImm z')
 gAux (NonTail x, Asm.Sub y z') = out $ Asm.instrSub (Asm.Reg x) $ ppIdOrImm z'
+gAux (NonTail _, Asm.Save x y) = do
+  es <- get
+  if x `elem` Asm.callArgumentRegs && not (y `Set.member` stackset es)
+    then do
+      save y
+      n <- offset y
+      out $ Asm.instrMov (Asm.Mem Asm.regSp n) $ Asm.Reg x
+    else assert (y `Set.member` stackset es) $ return ()
+gAux (NonTail x, Asm.Restore y)
+  | x `elem` Asm.callArgumentRegs = offset y >>= \n -> out $ Asm.instrMov (Asm.Reg x) $ Asm.Mem Asm.regSp n
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Save _ _)) = gAuxNonRetHelper exp >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@(Asm.Restore x)) = do
+  l <- locate x
+  case l of
+    [i] -> gAux (NonTail Asm.callResultReg, exp)
+  out Asm.instrRet
 gAux (Tail, Asm.IfEq x y' e1 e2) =
   out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxTailIf e1 e2 "ifeq_tail" Asm.instrJne
 gAux (Tail, Asm.IfLe x y' e1 e2) =

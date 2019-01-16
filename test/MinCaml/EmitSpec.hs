@@ -190,3 +190,24 @@ spec =
           , Asm.instrMov (Asm.Reg Asm.regRsi) $ Asm.Imm 2
           , Asm.instrCall (Asm.Lab "f.0")
           ])
+    specHelper validCase19 $
+      Right
+        ( []
+        , [ Asm.pinstrLabel "f.0"
+          , Asm.instrCmp (Asm.Reg Asm.regRdi) $ Asm.Imm 0
+          , Asm.instrJg (Asm.Lab "ifle_tail_else.7")
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 0
+          , Asm.instrRet
+          , Asm.pinstrLabel "ifle_tail_else.7"
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          , Asm.instrSub (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Mem Asm.regSp 0) $ Asm.Reg Asm.regRdi
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Reg Asm.regRax
+          , Asm.instrAdd (Asm.Reg Asm.regSp) $ Asm.Imm 8
+          , Asm.instrCall (Asm.Lab "f.0")
+          , Asm.instrSub (Asm.Reg Asm.regSp) $ Asm.Imm 8
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Mem Asm.regSp 0
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          , Asm.instrRet
+          ]
+        , [Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 5, Asm.instrCall (Asm.Lab "f.0")])
