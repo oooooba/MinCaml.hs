@@ -4,7 +4,7 @@ module MinCaml.RegAlloc
 
 import           Control.Applicative        ((<$>))
 import           Control.Exception          (assert)
-import           Control.Monad              (liftM2)
+import           Control.Monad              (liftM2, liftM3, liftM4)
 import           Control.Monad.Except       (ExceptT, runExceptT, throwError)
 import           Control.Monad.Identity     (Identity, runIdentity)
 import           Control.Monad.State.Strict (StateT, get, put, runStateT)
@@ -48,6 +48,8 @@ target' src (dest, t) (Asm.Mov x)
   | x == src && Asm.isReg dest = assert (t /= Type.Unit) (False, [dest])
 target' src (dest, t) (Asm.IfEq _ _ e1 e2) = targetHelper src (dest, t) e1 e2
 target' src (dest, t) (Asm.IfLe _ _ e1 e2) = targetHelper src (dest, t) e1 e2
+target' src (dest, t) (Asm.CallCls x ys zs) =
+  (True, targetArgs src Asm.callArgumentRegs 0 ys ++ targetArgs src Asm.fregs 0 zs ++ [Asm.regCl | x == src])
 target' src (dest, t) (Asm.CallDir _ ys zs) =
   (True, targetArgs src Asm.callArgumentRegs 0 ys ++ targetArgs src Asm.fregs 0 zs)
 target' _ _ _ = (False, [])
@@ -203,15 +205,24 @@ gAuxCall dest cont regenv exp constr ys zs = do
 gAux :: (Id.T, Type.Type) -> Asm.T -> RegEnv -> Asm.Exp -> MinCamlRegAlloc (Asm.T, RegEnv)
 gAux dest cont regenv exp@Asm.Nop = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Set _) = return (Asm.Ans exp, regenv)
+gAux dest cont regenv exp@(Asm.SetL _) = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Restore _) = return (Asm.Ans exp, regenv)
 gAux dest cont regenv exp@(Asm.Mov x) = wrapExp regenv . Asm.Mov <$> find x Type.Int regenv
 gAux dest cont regenv exp@(Asm.Neg x) = wrapExp regenv . Asm.Neg <$> find x Type.Int regenv
 gAux dest cont regenv (Asm.Add x y') = wrapExp regenv <$> liftM2 Asm.Add (find x Type.Int regenv) (find' y' regenv)
 gAux dest cont regenv (Asm.Sub x y') = wrapExp regenv <$> liftM2 Asm.Sub (find x Type.Int regenv) (find' y' regenv)
+gAux dest cont regenv (Asm.Ld x y' i) =
+  wrapExp regenv <$> liftM3 Asm.Ld (find x Type.Int regenv) (find' y' regenv) (return i)
+gAux dest cont regenv (Asm.St x y z' i) =
+  wrapExp regenv <$> liftM4 Asm.St (find x Type.Int regenv) (find y Type.Int regenv) (find' z' regenv) (return i)
 gAux dest cont regenv exp@(Asm.IfEq x y' e1 e2) =
   gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfEq Type.Int regenv x y') e1 e2
 gAux dest cont regenv exp@(Asm.IfLe x y' e1 e2) =
   gAuxIf dest cont regenv exp (gAuxIfHelper Asm.IfLe Type.Int regenv x y') e1 e2
+gAux dest cont regenv exp@(Asm.CallCls x ys zs) =
+  if length ys > length Asm.callArgumentRegs - 1 || length zs > length Asm.fregs
+    then error $ "cannot allocate registers for arguments to " ++ show x
+    else find x Type.Int regenv >>= \r -> gAuxCall dest cont regenv exp (Asm.CallCls r) ys zs
 gAux dest cont regenv exp@(Asm.CallDir (Id.L x) ys zs) =
   if length ys > length Asm.callArgumentRegs || length zs > length Asm.fregs
     then error $ "cannot allocate registers for arguments to " ++ show x
