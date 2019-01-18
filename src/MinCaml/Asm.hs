@@ -186,8 +186,8 @@ instrMov (Reg dst) (Reg src)
   | dst == regHp = instr2 "movq" src $ regHp ++ "(%rip)"
 instrMov (Reg dst) (Reg src) = instr2 "movq" src dst
 instrMov (Reg dst) (Imm imm) = instr2 "movq" ("$" ++ show imm) dst
-instrMov (Reg dst) (Mem base offset) = instr2 "movq" (show offset ++ "(" ++ base ++ ")") dst
-instrMov (Mem base offset) (Reg src) = instr2 "movq" src (show offset ++ "(" ++ base ++ ")")
+instrMov (Reg dst) (Mem base displacement) = instr2 "movq" (show displacement ++ "(" ++ base ++ ")") dst
+instrMov (Mem base displacement) (Reg src) = instr2 "movq" src (show displacement ++ "(" ++ base ++ ")")
 
 instrNeg (Reg reg) = instr1 "negq" reg
 
