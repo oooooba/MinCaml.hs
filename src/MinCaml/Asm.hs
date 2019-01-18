@@ -175,6 +175,10 @@ data Operand
   | Imm Int
   | Mem Id.T
         Int
+  | Mem' Id.T
+         Id.T
+         Int
+         Int
   | Lab Label
   deriving (Show, Eq)
 
@@ -184,15 +188,24 @@ instrPop (Reg reg) = instr1 "popq" reg
 
 instrMov (Reg dst) (Reg src)
   | dst == regHp = instr2 "movq" src $ regHp ++ "(%rip)"
+instrMov (Reg dst) (Reg src)
+  | src == regHp = instr2 "movq" (regHp ++ "(%rip)") dst
 instrMov (Reg dst) (Reg src) = instr2 "movq" src dst
 instrMov (Reg dst) (Imm imm) = instr2 "movq" ("$" ++ show imm) dst
 instrMov (Reg dst) (Mem base displacement) = instr2 "movq" (show displacement ++ "(" ++ base ++ ")") dst
 instrMov (Mem base displacement) (Reg src) = instr2 "movq" src (show displacement ++ "(" ++ base ++ ")")
+instrMov (Reg dst) (Mem' base index scale displacement) =
+  instr2 "movq" (show displacement ++ "(" ++ base ++ ", " ++ index ++ ", " ++ show scale ++ ")") dst
+instrMov (Mem' base index scale displacement) (Reg src) =
+  instr2 "movq" src $ show displacement ++ "(" ++ base ++ ", " ++ index ++ ", " ++ show scale ++ ")"
+instrMov (Reg dst) (Lab label) = instr2 "movq" (label ++ "(%rip)") dst
 
 instrNeg (Reg reg) = instr1 "negq" reg
 
 instrAdd (Reg reg1) (Reg reg2) = instr2 "addq" reg2 reg1
-instrAdd (Reg reg) (Imm imm)   = instr2 "addq" ("$" ++ show imm) reg
+instrAdd (Reg reg) (Imm imm)
+  | reg == regHp = instr2 "addq" ("$" ++ show imm) regHp ++ "(%rip)"
+instrAdd (Reg reg) (Imm imm) = instr2 "addq" ("$" ++ show imm) reg
 
 instrSub (Reg reg1) (Reg reg2) = instr2 "subq" reg2 reg1
 instrSub (Reg reg) (Imm imm)   = instr2 "subq" ("$" ++ show imm) reg
@@ -201,12 +214,14 @@ instrCmp (Reg reg1) (Reg reg2) = instr2 "cmpq" reg2 reg1
 instrCmp (Reg reg) (Imm imm)   = instr2 "cmpq" ("$" ++ show imm) reg
 
 instrJmp (Lab label) = instr1 "jmp" label
+instrJmp (Reg reg)   = instr1 "jmp" reg
 
 instrJne (Lab label) = instr1 "jne" label
 
 instrJg (Lab label) = instr1 "jg" label
 
 instrCall (Lab label) = instr1 "call" label
+instrCall (Reg reg)   = instr1 "call" $ "*" ++ reg ++ ""
 
 instrRet = instr0 "ret"
 
