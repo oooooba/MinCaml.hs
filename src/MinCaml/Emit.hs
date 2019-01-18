@@ -145,6 +145,7 @@ gAuxArgs xRegCl ys zs = do
 gAux :: (Dest, Asm.Exp) -> MinCamlEmit ()
 gAux (NonTail _, Asm.Nop) = return ()
 gAux (NonTail x, Asm.Set i) = out $ Asm.instrMov (Asm.Reg x) $ Asm.Imm i
+gAux (NonTail x, Asm.SetL (Id.L y)) = out $ Asm.instrMov (Asm.Reg x) $ Asm.Lab y
 gAux (NonTail x, Asm.Mov y)
   | x /= y = out $ Asm.instrMov (Asm.Reg x) $ Asm.Reg y
 gAux (NonTail x, Asm.Mov y) = return ()
@@ -161,6 +162,10 @@ gAux (NonTail x, Asm.Sub y z')
 gAux (NonTail x, Asm.Sub y z')
   | x /= y = out (Asm.instrMov (Asm.Reg x) $ Asm.Reg y) >> out (Asm.instrSub (Asm.Reg x) $ ppIdOrImm z')
 gAux (NonTail x, Asm.Sub y z') = out $ Asm.instrSub (Asm.Reg x) $ ppIdOrImm z'
+gAux (NonTail x, Asm.Ld y (Asm.V z) i) = out $ Asm.instrMov (Asm.Reg x) $ Asm.Mem' y z i 0
+gAux (NonTail x, Asm.Ld y (Asm.C j) i) = out $ Asm.instrMov (Asm.Reg x) $ Asm.Mem y $ j * i
+gAux (NonTail _, Asm.St x y (Asm.V z) i) = out $ Asm.instrMov (Asm.Mem' y z i 0) $ Asm.Reg x
+gAux (NonTail _, Asm.St x y (Asm.C j) i) = out $ Asm.instrMov (Asm.Mem y $ j * i) $ Asm.Reg x
 gAux (NonTail _, Asm.Save x y) = do
   es <- get
   if x `elem` Asm.callArgumentRegs && not (y `Set.member` stackset es)
@@ -172,12 +177,15 @@ gAux (NonTail _, Asm.Save x y) = do
 gAux (NonTail x, Asm.Restore y)
   | x `elem` Asm.callArgumentRegs = offset y >>= \n -> out $ Asm.instrMov (Asm.Reg x) $ Asm.Mem Asm.regSp n
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out Asm.instrRet
+gAux (Tail, exp@Asm.St {}) = gAuxNonRetHelper exp >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Save _ _)) = gAuxNonRetHelper exp >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.SetL {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Ld {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Restore x)) = do
   l <- locate x
   case l of
@@ -191,14 +199,22 @@ gAux (NonTail z, Asm.IfEq x y' e1 e2) =
   out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifeq_nontail" Asm.instrJne
 gAux (NonTail z, Asm.IfLe x y' e1 e2) =
   out (Asm.instrCmp (Asm.Reg x) $ ppIdOrImm y') >> gAuxNonTailIf (NonTail z) e1 e2 "ifle_nontail" Asm.instrJg
+gAux (Tail, Asm.CallCls x ys zs) = gAuxArgs [(x, Asm.regCl)] ys zs >> out (Asm.instrJmp $ Asm.Reg Asm.regCl)
 gAux (Tail, Asm.CallDir (Id.L x) ys zs) = gAuxArgs [] ys zs >> out (Asm.instrJmp $ Asm.Lab x)
+gAux (NonTail a, Asm.CallCls x ys zs) = do
+  gAuxArgs [(x, Asm.regCl)] ys zs
+  ss <- stacksize
+  when (ss > 0) $ out $ Asm.instrAdd (Asm.Reg Asm.regSp) $ Asm.Imm ss
+  out $ Asm.instrCall $ Asm.Reg Asm.regCl
+  when (ss > 0) $ out $ Asm.instrSub (Asm.Reg Asm.regSp) $ Asm.Imm ss
+  when (a /= Asm.callResultReg) $ out $ Asm.instrMov (Asm.Reg a) $ Asm.Reg Asm.callResultReg
 gAux (NonTail a, Asm.CallDir (Id.L x) ys zs) = do
   gAuxArgs [] ys zs
   ss <- stacksize
   when (ss > 0) $ out $ Asm.instrAdd (Asm.Reg Asm.regSp) $ Asm.Imm ss
   out $ Asm.instrCall $ Asm.Lab x
   when (ss > 0) $ out $ Asm.instrSub (Asm.Reg Asm.regSp) $ Asm.Imm ss
-  when (a /= Asm.callResultReg) $ out $ Asm.instrMov (Asm.Reg Asm.callResultReg) $ Asm.Reg a
+  when (a /= Asm.callResultReg) $ out $ Asm.instrMov (Asm.Reg a) $ Asm.Reg Asm.callResultReg
 
 g :: (Dest, Asm.T) -> MinCamlEmit ()
 g (dest, Asm.Ans exp)          = gAux (dest, exp)
