@@ -178,13 +178,13 @@ gAux (NonTail x, Asm.Restore y)
   | x `elem` Asm.callArgumentRegs = offset y >>= \n -> out $ Asm.instrMov (Asm.Reg x) $ Asm.Mem Asm.regSp n
 gAux (Tail, exp@Asm.Nop) = gAuxNonRetHelper exp >> out Asm.instrRet
 gAux (Tail, exp@Asm.St {}) = gAuxNonRetHelper exp >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Save _ _)) = gAuxNonRetHelper exp >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Set _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Save {}) = gAuxNonRetHelper exp >> out Asm.instrRet
+gAux (Tail, exp@Asm.Set {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@Asm.SetL {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Mov _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Neg _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Add _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
-gAux (Tail, exp@(Asm.Sub _ _)) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Mov {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Neg {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Add {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
+gAux (Tail, exp@Asm.Sub {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@Asm.Ld {}) = gAux (NonTail Asm.callResultReg, exp) >> out Asm.instrRet
 gAux (Tail, exp@(Asm.Restore x)) = do
   l <- locate x
