@@ -151,3 +151,31 @@ spec =
       Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 1) $
       Asm.Let (Asm.regR8, Type.Fun [Type.Int] Type.Int) (Asm.CallDir (Id.L "f.0") [Asm.regRdi] []) $
       Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $ Asm.Ans $ Asm.CallCls Asm.regR8 [Asm.regRdi] []
+    specHelper validCase21 $
+      Right $
+      Asm.Prog
+        []
+        [ Asm.Fundef
+            (Id.L "f.1")
+            [Asm.regRdi]
+            []
+            (Asm.Let (Asm.regRax, Type.Int) (Asm.Ld Asm.regR8 (Asm.C 8) 1) $
+             Asm.Ans $ Asm.Add Asm.regRax $ Asm.V Asm.regRdi)
+            Type.Int
+        , Asm.Fundef (Id.L "g.3") [Asm.regRdi] [] (Asm.Ans $ Asm.Add Asm.regRdi $ Asm.C 2) Type.Int
+        ] $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRdi, Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.SetL $ Id.L "f.1") $
+      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRsi Asm.regRdi (Asm.C 0) 1) $
+      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRax Asm.regRdi (Asm.C 8) 1) $
+      Asm.Let (Asm.regRax, Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.SetL $ Id.L "g.3") $
+      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRsi Asm.regRax (Asm.C 0) 1) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.Set 3) $
+      Asm.Let
+        (Asm.regR8, Type.Fun [Type.Int] Type.Int)
+        (Asm.IfEq Asm.regRsi (Asm.C 4) (Asm.Ans $ Asm.Mov Asm.regRdi) (Asm.Ans $ Asm.Mov Asm.regRax)) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallCls Asm.regR8 [Asm.regRdi] []
