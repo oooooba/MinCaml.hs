@@ -144,8 +144,8 @@ spec =
             (Asm.Let (Asm.regRax, Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
              Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
              Asm.Let (Asm.regRsi, Type.Int) (Asm.SetL $ Id.L "g.2") $
-             Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRsi Asm.regRax (Asm.C 0) 1) $
-             Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRdi Asm.regRax (Asm.C 8) 1) $ Asm.Ans $ Asm.Mov Asm.regRax) $
+             Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRsi Asm.regRax (Asm.C 0) 1) $
+             Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRdi Asm.regRax (Asm.C 8) 1) $ Asm.Ans $ Asm.Mov Asm.regRax) $
           Type.Fun [Type.Int] Type.Int
         ] $
       Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 1) $
@@ -168,12 +168,12 @@ spec =
       Asm.Let (Asm.regRdi, Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
       Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
       Asm.Let (Asm.regRsi, Type.Int) (Asm.SetL $ Id.L "f.1") $
-      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRsi Asm.regRdi (Asm.C 0) 1) $
-      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRax Asm.regRdi (Asm.C 8) 1) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRsi Asm.regRdi (Asm.C 0) 1) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRax Asm.regRdi (Asm.C 8) 1) $
       Asm.Let (Asm.regRax, Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
       Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 8)) $
       Asm.Let (Asm.regRsi, Type.Int) (Asm.SetL $ Id.L "g.3") $
-      Asm.Let ("%unit", Type.Unit) (Asm.St Asm.regRsi Asm.regRax (Asm.C 0) 1) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRsi Asm.regRax (Asm.C 0) 1) $
       Asm.Let (Asm.regRsi, Type.Int) (Asm.Set 3) $
       Asm.Let
         (Asm.regR8, Type.Fun [Type.Int] Type.Int)

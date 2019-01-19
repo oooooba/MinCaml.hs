@@ -92,7 +92,7 @@ alloc cont regenv x t prefer = assert (not (Map.member x regenv)) $ allocBody ()
         _         -> Asm.allocatableRegs
     allocBody :: () -> AllocResult
     allocBody _
-      | null all = Alloc "%unit"
+      | null all = Alloc Asm.regVoid
     allocBody _
       | Asm.isReg x = Alloc x
     allocBody _ =

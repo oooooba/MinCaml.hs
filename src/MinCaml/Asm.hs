@@ -94,6 +94,9 @@ regR8 = "%r8"
 regSp :: String
 regSp = "%rbp"
 
+regVoid :: String
+regVoid = "%_unused_register_"
+
 callArgumentRegs :: [Id.T]
 callArgumentRegs = [regRdi, regRsi, regRdx, regRcx, regR8]
 
