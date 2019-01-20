@@ -134,8 +134,8 @@ spec =
             (Id.L "f.0")
             ["x.1"]
             []
-            (Asm.Let ("g.2", Type.Fun [Type.Int] Type.Int) (Asm.Mov "min_caml_hp") $
-             Asm.Let ("min_caml_hp", Type.Int) (Asm.Add "min_caml_hp" (Asm.C 16)) $
+            (Asm.Let ("g.2", Type.Fun [Type.Int] Type.Int) (Asm.Mov Asm.regHp) $
+             Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp (Asm.C 16)) $
              Asm.Let ("l.7", Type.Int) (Asm.SetL $ Id.L "g.2") $
              Asm.Let ("Tu4", Type.Unit) (Asm.St "l.7" "g.2" (Asm.C 0) 1) $
              Asm.Let ("Tu3", Type.Unit) (Asm.St "x.1" "g.2" (Asm.C 8) 1) $ Asm.Ans $ Asm.Mov "g.2") $
