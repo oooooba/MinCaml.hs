@@ -171,3 +171,9 @@ spec =
         ("Tf2.6", Type.Fun [Type.Int] Type.Int)
         (Asm.IfEq "Ti0.7" (Asm.C 4) (Asm.Ans $ Asm.Mov "f.1") (Asm.Ans $ Asm.Mov "g.3")) $
       Asm.Let ("Ti3.9", Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallCls "Tf2.6" ["Ti3.9"] []
+    specHelper validCase22 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti0.2", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti2.1", Type.Int) (Asm.Add "Ti0.2" (Asm.C 2)) $
+      Asm.Let ("Ti4.0", Type.Int) (Asm.Add "Ti2.1" (Asm.C 3)) $ Asm.Ans $ Asm.Add "Ti4.0" (Asm.C 4)
