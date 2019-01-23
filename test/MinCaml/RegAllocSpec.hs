@@ -179,3 +179,9 @@ spec =
         (Asm.regR8, Type.Fun [Type.Int] Type.Int)
         (Asm.IfEq Asm.regRsi (Asm.C 4) (Asm.Ans $ Asm.Mov Asm.regRdi) (Asm.Ans $ Asm.Mov Asm.regRax)) $
       Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 5) $ Asm.Ans $ Asm.CallCls Asm.regR8 [Asm.regRdi] []
+    specHelper validCase22 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax (Asm.C 2)) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax (Asm.C 3)) $ Asm.Ans $ Asm.Add Asm.regRax (Asm.C 4)
