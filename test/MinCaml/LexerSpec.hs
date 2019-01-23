@@ -199,3 +199,17 @@ spec = do
       , Lexer.PLUS
       , Lexer.INT 4
       ]
+    specHelper
+      validCase25
+      [ Lexer.LET
+      , Lexer.IDENT "_"
+      , Lexer.EQUAL
+      , Lexer.INT 42
+      , Lexer.IN
+      , Lexer.LPAREN
+      , Lexer.LPAREN
+      , Lexer.RPAREN
+      , Lexer.SEMICOLON
+      , Lexer.INT 1
+      , Lexer.RPAREN
+      ]

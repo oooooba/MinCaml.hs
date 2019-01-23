@@ -32,6 +32,8 @@ tokens :-
   let                                    { tokenize LET }
   in                                     { tokenize IN }
   rec                                    { tokenize REC }
+  \_                                     { tokenize $ IDENT "_" }
+  \;                                     { tokenize SEMICOLON }
   $lower ($digit | $lower | $upper | _)* { tokenizeIdent }
 
 {
@@ -57,6 +59,7 @@ data Token
   | IN
   | REC
   | IDENT String
+  | SEMICOLON
   deriving (Show, Eq)
 
 tokenize :: Token -> String -> Token
