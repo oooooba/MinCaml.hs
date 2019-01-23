@@ -1,6 +1,7 @@
 {
 module MinCaml.Parser (runParser) where
 
+import           Control.Applicative ((<$>))
 import           Control.Monad  (liftM, liftM2, liftM3)
 
 import           MinCaml.Global
@@ -35,9 +36,11 @@ import qualified MinCaml.Type   as Type
   in    { IN }
   rec   { REC }
   ident { IDENT $$ }
+  ';'   { SEMICOLON }
 
 %nonassoc in
 %right prec_let
+%right SEMICOLON
 %right prec_if
 %left '=' '<>' '<' '>' '<=' '>='
 %left '+' '-'
@@ -61,6 +64,7 @@ exp : simple_exp  { $1 }
     | let ident '=' exp in exp %prec prec_let { Let (addTmpType $2) $4 $6 }
     | let rec fundef in exp %prec prec_let    { LetRec $3 $5 }
     | simple_exp actual_args %prec prec_app   { App $1 $2 }
+    | exp ';' exp                             { Let ("_", Type.Unit) $1 $3 }
 
 simple_exp : '(' exp ')' { $2 }
            | '(' ')'     { Unit }
@@ -80,7 +84,8 @@ actual_args : actual_args simple_exp %prec prec_app { $1 ++ [$2] }
 runParser :: [Token] -> MinCaml T
 runParser tokens = do
   let exp = parser tokens
-  addType exp
+  exp' <- addType exp
+  replaceVar exp'
 
 addTmpType :: String -> (Id.T, Type.Type)
 addTmpType x = (x, Type.Var $ -1)
@@ -105,6 +110,30 @@ addType (LetRec fundef e) = do
   return $ LetRec (Fundef (x, xt) yts body') e'
 addType (App e es) = liftM2 App (addType e) (mapM addType es)
 addType e = return e
+
+replaceVarHelper :: (Id.T, Type.Type) -> MinCaml (Id.T, Type.Type)
+replaceVarHelper ("_", _) = flip (,) Type.Unit <$> genVar Type.Unit
+replaceVarHelper xt = return xt
+
+replaceVar :: T -> MinCaml T
+replaceVar (Not e) = liftM Not $ replaceVar e
+replaceVar (Neg e) = liftM Neg $ replaceVar e
+replaceVar (Add e1 e2) = liftM2 Add (replaceVar e1) (replaceVar e2)
+replaceVar (Sub e1 e2) = liftM2 Sub (replaceVar e1) (replaceVar e2)
+replaceVar (Eq e1 e2) = liftM2 Eq (replaceVar e1) (replaceVar e2)
+replaceVar (Le e1 e2) = liftM2 Le (replaceVar e1) (replaceVar e2)
+replaceVar (If e1 e2 e3) = liftM3 If (replaceVar e1) (replaceVar e2) (replaceVar e3)
+replaceVar (Let xt e1 e2) = liftM3 Let (replaceVarHelper xt) (replaceVar e1) (replaceVar e2)
+replaceVar (Let (x, t) e1 e2) = liftM2 (Let (x, t)) (replaceVar e1) (replaceVar e2)
+replaceVar (Var "_") = error "Parse error: invalid identifier ('_')"
+replaceVar (LetRec fundef e) = do
+  xt <- replaceVarHelper $ name fundef
+  yts <- mapM replaceVarHelper $ args fundef
+  body' <- replaceVar $ body fundef
+  e' <- replaceVar e
+  return $ LetRec (Fundef xt yts body') e'
+replaceVar (App e es) = liftM2 App (replaceVar e) (mapM replaceVar es)
+replaceVar e = return e
 
 parseError :: [Token] -> a
 parseError tokens = error $ "Parse error: " ++ show tokens
