@@ -33,6 +33,9 @@ tokens :-
   in                                     { tokenize IN }
   rec                                    { tokenize REC }
   \_                                     { tokenize $ IDENT "_" }
+  Array.make                             { tokenize ARRAY_MAKE }
+  \.                                     { tokenize DOT }
+  \<\-                                   { tokenize LESS_MINUS }
   \;                                     { tokenize SEMICOLON }
   $lower ($digit | $lower | $upper | _)* { tokenizeIdent }
 
@@ -60,6 +63,9 @@ data Token
   | REC
   | IDENT String
   | SEMICOLON
+  | ARRAY_MAKE
+  | DOT
+  | LESS_MINUS
   deriving (Show, Eq)
 
 tokenize :: Token -> String -> Token

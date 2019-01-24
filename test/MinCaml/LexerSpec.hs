@@ -216,3 +216,28 @@ spec = do
       , Lexer.INT 1
       , Lexer.RPAREN
       ]
+    specHelper
+      validCase26
+      [ Lexer.LET
+      , Lexer.IDENT "a"
+      , Lexer.EQUAL
+      , Lexer.ARRAY_MAKE
+      , Lexer.INT 2
+      , Lexer.INT 1
+      , Lexer.IN
+      , Lexer.LPAREN
+      , Lexer.IDENT "a"
+      , Lexer.DOT
+      , Lexer.LPAREN
+      , Lexer.INT 0
+      , Lexer.RPAREN
+      , Lexer.LESS_MINUS
+      , Lexer.INT 2
+      , Lexer.SEMICOLON
+      , Lexer.IDENT "a"
+      , Lexer.DOT
+      , Lexer.LPAREN
+      , Lexer.INT 1
+      , Lexer.RPAREN
+      , Lexer.RPAREN
+      ]
