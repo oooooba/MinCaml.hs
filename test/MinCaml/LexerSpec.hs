@@ -210,6 +210,9 @@ spec = do
       , Lexer.LPAREN
       , Lexer.RPAREN
       , Lexer.SEMICOLON
+      , Lexer.LPAREN
+      , Lexer.RPAREN
+      , Lexer.SEMICOLON
       , Lexer.INT 1
       , Lexer.RPAREN
       ]

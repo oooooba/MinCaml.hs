@@ -60,4 +60,4 @@ validCase23 = TestCase {name = "validCase23", input = "(1-2)+(3-4)", output = "-
 
 validCase24 = TestCase {name = "validCase24", input = "1+(2-3)+4", output = "4"}
 
-validCase25 = TestCase {name = "validCase25", input = "let _ = 42 in ((); 1)", output = "1"}
+validCase25 = TestCase {name = "validCase25", input = "let _ = 42 in ((); (); 1)", output = "1"}

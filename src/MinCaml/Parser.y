@@ -40,7 +40,7 @@ import qualified MinCaml.Type   as Type
 
 %nonassoc in
 %right prec_let
-%right SEMICOLON
+%right ';'
 %right prec_if
 %left '=' '<>' '<' '>' '<=' '>='
 %left '+' '-'
