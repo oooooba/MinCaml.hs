@@ -16,61 +16,69 @@ import qualified MinCaml.Type   as Type
 %error { parseError }
 
 %token
-  '('   { LPAREN }
-  ')'   { RPAREN }
-  bool  { BOOL $$ }
-  int   { INT $$ }
-  not   { NOT }
-  '+'   { PLUS }
-  '-'   { MINUS }
-  '='   { EQUAL }
-  '<>'  { LESS_GREATER }
-  '<='  { LESS_EQUAL }
-  '>='  { GREATER_EQUAL }
-  '<'   { LESS }
-  '>'   { GREATER }
-  if    { IF }
-  then  { THEN }
-  else  { ELSE }
-  let   { LET }
-  in    { IN }
-  rec   { REC }
-  ident { IDENT $$ }
-  ';'   { SEMICOLON }
+  '('          { LPAREN }
+  ')'          { RPAREN }
+  bool         { BOOL $$ }
+  int          { INT $$ }
+  not          { NOT }
+  '+'          { PLUS }
+  '-'          { MINUS }
+  '='          { EQUAL }
+  '<>'         { LESS_GREATER }
+  '<='         { LESS_EQUAL }
+  '>='         { GREATER_EQUAL }
+  '<'          { LESS }
+  '>'          { GREATER }
+  if           { IF }
+  then         { THEN }
+  else         { ELSE }
+  let          { LET }
+  in           { IN }
+  rec          { REC }
+  ident        { IDENT $$ }
+  ';'          { SEMICOLON }
+  'Array.make' { ARRAY_MAKE }
+  '.'          { DOT }
+  '<-'         { LESS_MINUS }
 
 %nonassoc in
 %right prec_let
 %right ';'
 %right prec_if
+%right '<-'
 %left '=' '<>' '<' '>' '<=' '>='
 %left '+' '-'
 %right prec_unary_minus
 %left prec_app
+%left '.'
 
 %%
 
-exp : simple_exp  { $1 }
-    | not exp %prec prec_app                  { Not $2 }
-    | '-' exp %prec prec_unary_minus          { Neg $2 }
-    | exp '+' exp                             { Add $1 $3 }
-    | exp '-' exp                             { Sub $1 $3 }
-    | exp '=' exp                             { Eq $1 $3 }
-    | exp '<>' exp                            { Not $ Eq $1 $3 }
-    | exp '<' exp                             { Not $ Le $3 $1 }
-    | exp '>' exp                             { Not $ Le $1 $3 }
-    | exp '<=' exp                            { Le $1 $3 }
-    | exp '>=' exp                            { Le $3 $1 }
-    | if exp then exp else exp %prec prec_if  { If $2 $4 $6 }
-    | let ident '=' exp in exp %prec prec_let { Let (addTmpType $2) $4 $6 }
-    | let rec fundef in exp %prec prec_let    { LetRec $3 $5 }
-    | simple_exp actual_args %prec prec_app   { App $1 $2 }
-    | exp ';' exp                             { Let ("_", Type.Unit) $1 $3 }
+exp : simple_exp                                        { $1 }
+    | not exp %prec prec_app                            { Not $2 }
+    | '-' exp %prec prec_unary_minus                    { Neg $2 }
+    | exp '+' exp                                       { Add $1 $3 }
+    | exp '-' exp                                       { Sub $1 $3 }
+    | exp '=' exp                                       { Eq $1 $3 }
+    | exp '<>' exp                                      { Not $ Eq $1 $3 }
+    | exp '<' exp                                       { Not $ Le $3 $1 }
+    | exp '>' exp                                       { Not $ Le $1 $3 }
+    | exp '<=' exp                                      { Le $1 $3 }
+    | exp '>=' exp                                      { Le $3 $1 }
+    | if exp then exp else exp %prec prec_if            { If $2 $4 $6 }
+    | let ident '=' exp in exp %prec prec_let           { Let (addTmpType $2) $4 $6 }
+    | let rec fundef in exp %prec prec_let              { LetRec $3 $5 }
+    | simple_exp actual_args %prec prec_app             { App $1 $2 }
+    | simple_exp '.' '(' exp ')' '<-' exp               { Put $1 $4 $7 }
+    | exp ';' exp                                       { Let ("_", Type.Unit) $1 $3 }
+    | 'Array.make' simple_exp simple_exp %prec prec_app { Array $2 $3 }
 
-simple_exp : '(' exp ')' { $2 }
-           | '(' ')'     { Unit }
-           | bool        { Bool $1 }
-           | int         { Int $1 }
-           | ident       { Var $1 }
+simple_exp : '(' exp ')'                { $2 }
+           | '(' ')'                    { Unit }
+           | bool                       { Bool $1 }
+           | int                        { Int $1 }
+           | ident                      { Var $1 }
+           | simple_exp '.' '(' exp ')' { Get $1 $4 }
 
 fundef : ident formal_args '=' exp { Fundef (addTmpType $1) $2 $4 }
 

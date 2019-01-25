@@ -28,6 +28,13 @@ data T
            T
   | App T
         [T]
+  | Array T
+          T
+  | Get T
+        T
+  | Put T
+        T
+        T
   deriving (Show, Eq)
 
 data Fundef = Fundef
