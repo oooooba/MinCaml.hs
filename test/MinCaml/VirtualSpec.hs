@@ -217,3 +217,21 @@ spec =
       Asm.Let ("Ti3.4", Type.Int) (Asm.Set 3) $
       Asm.Let ("Ti4.0", Type.Int) (Asm.Add "Ti2.1" (Asm.V "Ti3.4")) $
       Asm.Let ("Ti5.5", Type.Int) (Asm.Set 4) $ Asm.Ans $ Asm.Add "Ti4.0" (Asm.V "Ti5.5")
+    specHelper validCase23 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti0.1", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti1.2", Type.Int) (Asm.Set 2) $
+      Asm.Let ("Ti2.0", Type.Int) (Asm.Sub "Ti0.1" $ Asm.V "Ti1.2") $
+      Asm.Let ("Ti3.4", Type.Int) (Asm.Set 3) $
+      Asm.Let ("Ti4.5", Type.Int) (Asm.Set 4) $
+      Asm.Let ("Ti5.3", Type.Int) (Asm.Sub "Ti3.4" $ Asm.V "Ti4.5") $ Asm.Ans $ Asm.Add "Ti2.0" $ Asm.V "Ti5.3"
+    specHelper validCase24 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti0.1", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti1.3", Type.Int) (Asm.Set 2) $
+      Asm.Let ("Ti2.4", Type.Int) (Asm.Set 3) $
+      Asm.Let ("Ti3.2", Type.Int) (Asm.Sub "Ti1.3" $ Asm.V "Ti2.4") $
+      Asm.Let ("Ti4.0", Type.Int) (Asm.Add "Ti0.1" $ Asm.V "Ti3.2") $
+      Asm.Let ("Ti5.5", Type.Int) (Asm.Set 4) $ Asm.Ans $ Asm.Add "Ti4.0" $ Asm.V "Ti5.5"
