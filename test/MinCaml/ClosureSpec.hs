@@ -174,3 +174,27 @@ spec =
             Closure.Let ("Ti1.3", Type.Int) (Closure.Int 2) $ Closure.Add "Ti0.2" "Ti1.3") $
          Closure.Let ("Ti3.4", Type.Int) (Closure.Int 3) $ Closure.Add "Ti2.1" "Ti3.4") $
       Closure.Let ("Ti5.5", Type.Int) (Closure.Int 4) $ Closure.Add "Ti4.0" "Ti5.5"
+    specHelper validCase23 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let
+        ("Ti2.0", Type.Int)
+        (Closure.Let ("Ti0.1", Type.Int) (Closure.Int 1) $
+         Closure.Let ("Ti1.2", Type.Int) (Closure.Int 2) $ Closure.Sub "Ti0.1" "Ti1.2") $
+      Closure.Let
+        ("Ti5.3", Type.Int)
+        (Closure.Let ("Ti3.4", Type.Int) (Closure.Int 3) $
+         Closure.Let ("Ti4.5", Type.Int) (Closure.Int 4) $ Closure.Sub "Ti3.4" "Ti4.5") $
+      Closure.Add "Ti2.0" "Ti5.3"
+    specHelper validCase24 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let
+        ("Ti4.0", Type.Int)
+        (Closure.Let ("Ti0.1", Type.Int) (Closure.Int 1) $
+         Closure.Let
+           ("Ti3.2", Type.Int)
+           (Closure.Let ("Ti1.3", Type.Int) (Closure.Int 2) $
+            Closure.Let ("Ti2.4", Type.Int) (Closure.Int 3) $ Closure.Sub "Ti1.3" "Ti2.4") $
+         Closure.Add "Ti0.1" "Ti3.2") $
+      Closure.Let ("Ti5.5", Type.Int) (Closure.Int 4) $ Closure.Add "Ti4.0" "Ti5.5"
