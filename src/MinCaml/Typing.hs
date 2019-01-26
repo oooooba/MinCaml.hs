@@ -57,6 +57,9 @@ derefTerm (Syntax.LetRec (Syntax.Fundef xt yts e1) e2) = do
   fundef <- liftM3 Syntax.Fundef (derefIdType xt) (mapM derefIdType yts) (derefTerm e1)
   Syntax.LetRec fundef <$> derefTerm e2
 derefTerm (Syntax.App e es) = liftM2 Syntax.App (derefTerm e) (mapM derefTerm es)
+derefTerm (Syntax.Array e1 e2) = liftM2 Syntax.Array (derefTerm e1) (derefTerm e2)
+derefTerm (Syntax.Get e1 e2) = liftM2 Syntax.Get (derefTerm e1) (derefTerm e2)
+derefTerm (Syntax.Put e1 e2 e3) = liftM3 Syntax.Put (derefTerm e1) (derefTerm e2) (derefTerm e3)
 derefTerm e = return e
 
 occur :: Type.TypeVarId -> Type.Type -> MinCaml Bool
@@ -139,6 +142,25 @@ g env (Syntax.App e es) = do
   eTy <- g env e
   unify eTy $ Type.Fun esTy t
   return t
+g env (Syntax.Array e1 e2) = do
+  t1 <- g env e1
+  unify t1 Type.Int
+  t2 <- g env e2
+  return $ Type.Array t2
+g env (Syntax.Get e1 e2) = do
+  t <- genType
+  t1 <- g env e1
+  unify (Type.Array t) t1
+  t2 <- g env e2
+  unify Type.Int t2
+  return t
+g env (Syntax.Put e1 e2 e3) = do
+  t3 <- g env e3
+  t1 <- g env e1
+  unify (Type.Array t3) t1
+  t2 <- g env e2
+  unify Type.Int t2
+  return Type.Unit
 
 gBinOpHelper :: Map.Map Id.T Type.Type -> Syntax.T -> Syntax.T -> MinCaml Type.Type
 gBinOpHelper env e1 e2 = do
