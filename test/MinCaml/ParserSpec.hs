@@ -90,7 +90,7 @@ spec = do
       Right $ Syntax.Add (Syntax.Add (Syntax.Int 1) $ Syntax.Sub (Syntax.Int 2) $ Syntax.Int 3) $ Syntax.Int 4
     specHelper validCase25 $
       Right $
-      Syntax.Let ("Tu0", Type.Unit) (Syntax.Int 42) $
+      Syntax.Let ("Tv0", Type.Var 0) (Syntax.Int 42) $
       Syntax.Let ("Tu1", Type.Unit) Syntax.Unit $ Syntax.Let ("Tu2", Type.Unit) Syntax.Unit $ Syntax.Int 1
     specHelper validCase26 $
       Right $

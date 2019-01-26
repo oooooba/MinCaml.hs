@@ -1,7 +1,6 @@
 {
 module MinCaml.Parser (runParser) where
 
-import           Control.Applicative ((<$>))
 import           Control.Monad  (liftM, liftM2, liftM3)
 
 import           MinCaml.Global
@@ -120,7 +119,7 @@ addType (App e es) = liftM2 App (addType e) (mapM addType es)
 addType e = return e
 
 replaceVarHelper :: (Id.T, Type.Type) -> MinCaml (Id.T, Type.Type)
-replaceVarHelper ("_", _) = flip (,) Type.Unit <$> genVar Type.Unit
+replaceVarHelper ("_", t) = liftM2 (,) (genVar t) $ return t
 replaceVarHelper xt = return xt
 
 replaceVar :: T -> MinCaml T
