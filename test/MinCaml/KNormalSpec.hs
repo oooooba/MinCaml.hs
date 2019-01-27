@@ -175,6 +175,10 @@ spec = do
             KNormal.Let ("Ti2", Type.Int) (KNormal.Int 3) $ KNormal.Sub "Ti1" "Ti2") $
          KNormal.Add "Ti0" "Ti3") $
       KNormal.Let ("Ti5", Type.Int) (KNormal.Int 4) $ KNormal.Add "Ti4" "Ti5"
+    specHelper validCase25 $
+      Right $
+      KNormal.Let ("Tv0", Type.Int) (KNormal.Int 42) $
+      KNormal.Let ("Tu1", Type.Unit) KNormal.Unit $ KNormal.Let ("Tu2", Type.Unit) KNormal.Unit $ KNormal.Int 1
   describe "k-normalization without continuations" $ do
     specHelper2 validCase1
     specHelper2 validCase2
@@ -200,3 +204,4 @@ spec = do
     specHelper2 validCase22
     specHelper2 validCase23
     specHelper2 validCase24
+    specHelper2 validCase25
