@@ -38,6 +38,14 @@ data T
            T
   | App Id.T
         [Id.T]
+  | Get Id.T
+        Id.T
+  | Put Id.T
+        Id.T
+        Id.T
+  | ExtArray Id.T
+  | ExtFunApp Id.T
+              [Id.T]
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -114,6 +122,27 @@ g env (Syntax.App e1 e2s) = do
               insertLet p2 (\x -> bind (xs ++ [x]) e2s)
         in bind [] e2s
     _ -> error "assert"
+g env (Syntax.Array e1 e2) = do
+  p1 <- g env e1
+  insertLet p1 $ \x -> do
+    p2 <- g env e2
+    let (_, t2) = p2
+    insertLet p2 $ \y -> return (ExtFunApp "create_array" [x, y], Type.Array t2)
+g env (Syntax.Get e1 e2) = do
+  p1 <- g env e1
+  case p1 of
+    (_, Type.Array t) ->
+      insertLet p1 $ \x -> do
+        p2 <- g env e2
+        insertLet p2 $ \y -> return (Get x y, t)
+    _ -> error "assert"
+g env (Syntax.Put e1 e2 e3) = do
+  p1 <- g env e1
+  insertLet p1 $ \x -> do
+    p2 <- g env e2
+    insertLet p2 $ \y -> do
+      p3 <- g env e3
+      insertLet p3 $ \z -> return (Put x y z, Type.Unit)
 
 f :: Syntax.T -> MinCaml T
 f e = fst <$> g Map.empty e

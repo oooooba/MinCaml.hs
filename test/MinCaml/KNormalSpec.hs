@@ -179,6 +179,17 @@ spec = do
       Right $
       KNormal.Let ("Tv0", Type.Int) (KNormal.Int 42) $
       KNormal.Let ("Tu1", Type.Unit) KNormal.Unit $ KNormal.Let ("Tu2", Type.Unit) KNormal.Unit $ KNormal.Int 1
+    specHelper validCase26 $
+      Right $
+      KNormal.Let
+        ("a", Type.Array Type.Int)
+        (KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $
+         KNormal.Let ("Ti2", Type.Int) (KNormal.Int 1) $ KNormal.ExtFunApp "create_array" ["Ti1", "Ti2"]) $
+      KNormal.Let
+        ("Tu0", Type.Unit)
+        (KNormal.Let ("Ti3", Type.Int) (KNormal.Int 0) $
+         KNormal.Let ("Ti4", Type.Int) (KNormal.Int 2) $ KNormal.Put "a" "Ti3" "Ti4") $
+      KNormal.Let ("Ti5", Type.Int) (KNormal.Int 1) $ KNormal.Get "a" "Ti5"
   describe "k-normalization without continuations" $ do
     specHelper2 validCase1
     specHelper2 validCase2
