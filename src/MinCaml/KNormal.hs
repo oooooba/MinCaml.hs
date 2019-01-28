@@ -212,6 +212,19 @@ g2 env (Syntax.App e1 e2s) = do
             bind (x2 : x2s, k2 : k2s) e2s
       bind ([], []) e2s
     _ -> error "assert"
+g2 env (Syntax.Array e1 e2) = do
+  (x1, _, k1) <- insertLet2 env e1
+  (x2, t2, k2) <- insertLet2 env e2
+  return (k1 $ k2 $ ExtFunApp "create_array" [x1, x2], Type.Array t2)
+g2 env (Syntax.Get e1 e2) = do
+  (x1, Type.Array t, k1) <- insertLet2 env e1
+  (x2, _, k2) <- insertLet2 env e2
+  return (k1 $ k2 $ Get x1 x2, t)
+g2 env (Syntax.Put e1 e2 e3) = do
+  (x1, _, k1) <- insertLet2 env e1
+  (x2, _, k2) <- insertLet2 env e2
+  (x3, _, k3) <- insertLet2 env e3
+  return (k1 $ k2 $ k3 $ Put x1 x2 x3, Type.Unit)
 
 f2 :: Syntax.T -> MinCaml T
 f2 e = fst <$> g2 Map.empty e
