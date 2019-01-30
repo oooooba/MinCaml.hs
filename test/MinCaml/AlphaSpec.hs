@@ -177,3 +177,14 @@ spec =
       Right $
       KNormal.Let ("Tv0.0", Type.Int) (KNormal.Int 42) $
       KNormal.Let ("Tu1.1", Type.Unit) KNormal.Unit $ KNormal.Let ("Tu2.2", Type.Unit) KNormal.Unit $ KNormal.Int 1
+    specHelper validCase26 $
+      Right $
+      KNormal.Let
+        ("a.0", Type.Array Type.Int)
+        (KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 2) $
+         KNormal.Let ("Ti2.2", Type.Int) (KNormal.Int 1) $ KNormal.ExtFunApp "create_array" ["Ti1.1", "Ti2.2"]) $
+      KNormal.Let
+        ("Tu0.3", Type.Unit)
+        (KNormal.Let ("Ti3.4", Type.Int) (KNormal.Int 0) $
+         KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 2) $ KNormal.Put "a.0" "Ti3.4" "Ti4.5") $
+      KNormal.Let ("Ti5.6", Type.Int) (KNormal.Int 1) $ KNormal.Get "a.0" "Ti5.6"
