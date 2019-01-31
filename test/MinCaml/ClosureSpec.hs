@@ -198,3 +198,8 @@ spec =
             Closure.Let ("Ti2.4", Type.Int) (Closure.Int 3) $ Closure.Sub "Ti1.3" "Ti2.4") $
          Closure.Add "Ti0.1" "Ti3.2") $
       Closure.Let ("Ti5.5", Type.Int) (Closure.Int 4) $ Closure.Add "Ti4.0" "Ti5.5"
+    specHelper validCase25 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let ("Tv0.0", Type.Int) (Closure.Int 42) $
+      Closure.Let ("Tu1.1", Type.Unit) Closure.Unit $ Closure.Let ("Tu2.2", Type.Unit) Closure.Unit $ Closure.Int 1
