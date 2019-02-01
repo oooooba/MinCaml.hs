@@ -203,3 +203,16 @@ spec =
       Closure.Prog [] $
       Closure.Let ("Tv0.0", Type.Int) (Closure.Int 42) $
       Closure.Let ("Tu1.1", Type.Unit) Closure.Unit $ Closure.Let ("Tu2.2", Type.Unit) Closure.Unit $ Closure.Int 1
+    specHelper validCase26 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let
+        ("a.0", Type.Array Type.Int)
+        (Closure.Let ("Ti1.1", Type.Int) (Closure.Int 2) $
+         Closure.Let ("Ti2.2", Type.Int) (Closure.Int 1) $
+         Closure.AppDir (Id.L "min_caml_create_array") ["Ti1.1", "Ti2.2"]) $
+      Closure.Let
+        ("Tu0.3", Type.Unit)
+        (Closure.Let ("Ti3.4", Type.Int) (Closure.Int 0) $
+         Closure.Let ("Ti4.5", Type.Int) (Closure.Int 2) $ Closure.Put "a.0" "Ti3.4" "Ti4.5") $
+      Closure.Let ("Ti5.6", Type.Int) (Closure.Int 1) $ Closure.Get "a.0" "Ti5.6"

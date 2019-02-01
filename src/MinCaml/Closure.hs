@@ -49,6 +49,11 @@ data T
            [Id.T]
   | AppDir Id.L
            [Id.T]
+  | Get Id.T
+        Id.T
+  | Put Id.T
+        Id.T
+        Id.T
   deriving (Show, Eq)
 
 data Fundef = Fundef
@@ -83,6 +88,8 @@ fv (Var x) = Set.singleton x
 fv (MakeCls (x, t) (Closure l ys) e) = Set.delete x $ Set.union (Set.fromList ys) (fv e)
 fv (AppCls x ys) = Set.fromList $ x : ys
 fv (AppDir _ xs) = Set.fromList xs
+fv (Get x y) = Set.fromList [x, y]
+fv (Put x y z) = Set.fromList [x, y, z]
 
 g :: Map.Map Id.T Type.Type -> Set.Set Id.T -> KNormal.T -> MinCamlClosure T
 g _ _ KNormal.Unit = return Unit
@@ -120,6 +127,9 @@ g env known (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
 g env known (KNormal.App x ys)
   | x `elem` known = return $ AppDir (Id.L x) ys
 g env known (KNormal.App f xs) = return $ AppCls f xs
+g env known (KNormal.Get x y) = return $ Get x y
+g env known (KNormal.Put x y z) = return $ Put x y z
+g env known (KNormal.ExtFunApp x ys) = return $ AppDir (Id.L $ "min_caml_" ++ x) ys
 
 f :: KNormal.T -> MinCaml Prog
 f e = do
