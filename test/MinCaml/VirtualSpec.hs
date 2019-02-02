@@ -235,3 +235,8 @@ spec =
       Asm.Let ("Ti3.2", Type.Int) (Asm.Sub "Ti1.3" $ Asm.V "Ti2.4") $
       Asm.Let ("Ti4.0", Type.Int) (Asm.Add "Ti0.1" $ Asm.V "Ti3.2") $
       Asm.Let ("Ti5.5", Type.Int) (Asm.Set 4) $ Asm.Ans $ Asm.Add "Ti4.0" $ Asm.V "Ti5.5"
+    specHelper validCase25 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Tv0.0", Type.Int) (Asm.Set 42) $
+      Asm.Let ("Tu1.1", Type.Unit) Asm.Nop $ Asm.Let ("Tu2.2", Type.Unit) Asm.Nop $ Asm.Ans $ Asm.Set 1
