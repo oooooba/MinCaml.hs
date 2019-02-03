@@ -110,6 +110,18 @@ g env (Closure.AppCls x ys) = do
 g env (Closure.AppDir (Id.L x) ys) = do
   (int, float) <- separate (fmap (\y -> (y, env Map.! y)) ys)
   return $ Asm.Ans $ Asm.CallDir (Id.L x) int float
+g env (Closure.Get x y) =
+  return $
+  case Map.lookup x env of
+    Just (Type.Array Type.Unit) -> Asm.Ans Asm.Nop
+    Just (Type.Array _)         -> Asm.Ans $ Asm.Ld x (Asm.V y) 8
+    _                           -> error "Virtual: wrong type (Get)"
+g env (Closure.Put x y z) =
+  return $
+  case Map.lookup x env of
+    Just (Type.Array Type.Unit) -> Asm.Ans Asm.Nop
+    Just (Type.Array _)         -> Asm.Ans $ Asm.St z x (Asm.V y) 8
+    _                           -> error "Virtual: wrong type (Get)"
 
 h :: Closure.Fundef -> MinCaml Asm.Fundef
 h (Closure.Fundef (Id.L x, t) yts zts e) = do
