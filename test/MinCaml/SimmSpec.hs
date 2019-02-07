@@ -193,3 +193,11 @@ spec =
     specHelper validCase25 $
       Right $
       Asm.Prog [] [] $ Asm.Let ("Tu1.1", Type.Unit) Asm.Nop $ Asm.Let ("Tu2.2", Type.Unit) Asm.Nop $ Asm.Ans $ Asm.Set 1
+    specHelper validCase26 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti1.1", Type.Int) (Asm.Set 2) $
+      Asm.Let ("Ti2.2", Type.Int) (Asm.Set 1) $
+      Asm.Let ("a.0", Type.Array Type.Int) (Asm.CallDir (Id.L "min_caml_create_array") ["Ti1.1", "Ti2.2"] []) $
+      Asm.Let ("Ti4.5", Type.Int) (Asm.Set 2) $
+      Asm.Let ("Tu0.3", Type.Unit) (Asm.St "Ti4.5" "a.0" (Asm.C 0) 8) $ Asm.Ans $ Asm.Ld "a.0" (Asm.C 1) 8
