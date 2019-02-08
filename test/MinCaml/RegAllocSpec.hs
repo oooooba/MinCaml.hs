@@ -185,3 +185,16 @@ spec =
       Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
       Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax (Asm.C 2)) $
       Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax (Asm.C 3)) $ Asm.Ans $ Asm.Add Asm.regRax (Asm.C 4)
+    specHelper validCase23 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Sub Asm.regRax $ Asm.C 2) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 3) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Sub Asm.regRdi $ Asm.C 4) $ Asm.Ans $ Asm.Add Asm.regRax $ Asm.V Asm.regRdi
+    specHelper validCase24 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 2) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Sub Asm.regRax $ Asm.C 3) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax $ Asm.C 1) $ Asm.Ans $ Asm.Add Asm.regRax $ Asm.C 4
