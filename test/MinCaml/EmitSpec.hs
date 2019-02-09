@@ -267,3 +267,31 @@ spec =
           , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 5
           , Asm.instrCall $ Asm.Reg Asm.regR8
           ])
+    specHelper validCase22 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 2
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 3
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 4
+          ])
+    specHelper validCase23 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrSub (Asm.Reg Asm.regRax) $ Asm.Imm 2
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 3
+          , Asm.instrSub (Asm.Reg Asm.regRdi) $ Asm.Imm 4
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRdi
+          ])
+    specHelper validCase24 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 2
+          , Asm.instrSub (Asm.Reg Asm.regRax) $ Asm.Imm 3
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 4
+          ])
