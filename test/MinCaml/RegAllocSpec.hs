@@ -198,3 +198,7 @@ spec =
       Asm.Let (Asm.regRax, Type.Int) (Asm.Set 2) $
       Asm.Let (Asm.regRax, Type.Int) (Asm.Sub Asm.regRax $ Asm.C 3) $
       Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax $ Asm.C 1) $ Asm.Ans $ Asm.Add Asm.regRax $ Asm.C 4
+    specHelper validCase25 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regVoid, Type.Unit) Asm.Nop $ Asm.Let (Asm.regVoid, Type.Unit) Asm.Nop $ Asm.Ans $ Asm.Set 1

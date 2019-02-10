@@ -295,3 +295,4 @@ spec =
           , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 1
           , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 4
           ])
+    specHelper validCase25 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1])
