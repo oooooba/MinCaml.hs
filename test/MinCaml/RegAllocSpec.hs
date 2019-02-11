@@ -202,3 +202,12 @@ spec =
       Right $
       Asm.Prog [] [] $
       Asm.Let (Asm.regVoid, Type.Unit) Asm.Nop $ Asm.Let (Asm.regVoid, Type.Unit) Asm.Nop $ Asm.Ans $ Asm.Set 1
+    specHelper validCase26 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Array Type.Int) (Asm.CallDir (Id.L "min_caml_create_array") [Asm.regRdi, Asm.regRsi] []) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRdi Asm.regRax (Asm.C 0) 8) $
+      Asm.Ans $ Asm.Ld Asm.regRax (Asm.C 1) 8
