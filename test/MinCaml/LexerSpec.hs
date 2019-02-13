@@ -241,3 +241,40 @@ spec = do
       , Lexer.RPAREN
       , Lexer.RPAREN
       ]
+    specHelper
+      validCase27
+      [ Lexer.LET
+      , Lexer.IDENT "t"
+      , Lexer.EQUAL
+      , Lexer.LPAREN
+      , Lexer.INT 1
+      , Lexer.PLUS
+      , Lexer.INT 2
+      , Lexer.COMMA
+      , Lexer.BOOL True
+      , Lexer.COMMA
+      , Lexer.INT 3
+      , Lexer.RPAREN
+      , Lexer.IN
+      , Lexer.LET
+      , Lexer.LPAREN
+      , Lexer.IDENT "x"
+      , Lexer.COMMA
+      , Lexer.IDENT "b"
+      , Lexer.COMMA
+      , Lexer.IDENT "y"
+      , Lexer.RPAREN
+      , Lexer.EQUAL
+      , Lexer.IDENT "t"
+      , Lexer.IN
+      , Lexer.IF
+      , Lexer.IDENT "b"
+      , Lexer.THEN
+      , Lexer.IDENT "x"
+      , Lexer.PLUS
+      , Lexer.IDENT "y"
+      , Lexer.ELSE
+      , Lexer.IDENT "x"
+      , Lexer.MINUS
+      , Lexer.IDENT "y"
+      ]

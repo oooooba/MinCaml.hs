@@ -32,6 +32,7 @@ tokens :-
   let                                    { tokenize LET }
   in                                     { tokenize IN }
   rec                                    { tokenize REC }
+  \,                                     { tokenize COMMA }
   \_                                     { tokenize $ IDENT "_" }
   Array.make                             { tokenize ARRAY_MAKE }
   \.                                     { tokenize DOT }
@@ -61,6 +62,7 @@ data Token
   | LET
   | IN
   | REC
+  | COMMA
   | IDENT String
   | SEMICOLON
   | ARRAY_MAKE

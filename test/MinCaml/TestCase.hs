@@ -63,3 +63,5 @@ validCase24 = TestCase {name = "validCase24", input = "1+(2-3)+4", output = "4"}
 validCase25 = TestCase {name = "validCase25", input = "let _ = 42 in ((); (); 1)", output = "1"}
 
 validCase26 = TestCase {name = "validCase26", input = "let a = Array.make 2 1 in (a.(0) <- 2; a.(1))", output = "1"}
+
+validCase27 = TestCase {name = "validCase27", input = "let t = (1+2, true, 3) in let (x, b, y) = t in if b then x+y else x-y", output = "6"}
