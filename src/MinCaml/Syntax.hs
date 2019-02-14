@@ -28,6 +28,10 @@ data T
            T
   | App T
         [T]
+  | Tuple [T]
+  | LetTuple [(Id.T, Type.Type)]
+             T
+             T
   | Array T
           T
   | Get T

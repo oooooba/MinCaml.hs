@@ -39,12 +39,15 @@ import qualified MinCaml.Type   as Type
   'Array.make' { ARRAY_MAKE }
   '.'          { DOT }
   '<-'         { LESS_MINUS }
+  ','          { COMMA }
 
 %nonassoc in
 %right prec_let
 %right ';'
 %right prec_if
 %right '<-'
+%nonassoc prec_tuple
+%left ','
 %left '=' '<>' '<' '>' '<=' '>='
 %left '+' '-'
 %right prec_unary_minus
@@ -68,6 +71,8 @@ exp : simple_exp                                        { $1 }
     | let ident '=' exp in exp %prec prec_let           { Let (addTmpType $2) $4 $6 }
     | let rec fundef in exp %prec prec_let              { LetRec $3 $5 }
     | simple_exp actual_args %prec prec_app             { App $1 $2 }
+    | elems %prec prec_tuple                            { Tuple $1 }
+    | let '(' pat ')' '=' exp in exp                    { LetTuple $3 $6 $8 }
     | simple_exp '.' '(' exp ')' '<-' exp               { Put $1 $4 $7 }
     | exp ';' exp                                       { Let ("_", Type.Unit) $1 $3 }
     | 'Array.make' simple_exp simple_exp %prec prec_app { Array $2 $3 }
@@ -86,6 +91,12 @@ formal_args : ident formal_args { addTmpType $1 : $2 }
 
 actual_args : actual_args simple_exp %prec prec_app { $1 ++ [$2] }
             | simple_exp %prec prec_app             { [$1] }
+
+elems : elems ',' exp { $1 ++ [$3] }
+      | exp ',' exp   { [$1, $3] }
+
+pat : pat ',' ident   { $1 ++ [addTmpType $3] }
+    | ident ',' ident { [addTmpType $1, addTmpType $3] }
 
 {
 runParser :: [Token] -> MinCaml T
@@ -116,6 +127,10 @@ addType (LetRec fundef e) = do
   e' <- addType e
   return $ LetRec (Fundef (x, xt) yts body') e'
 addType (App e es) = liftM2 App (addType e) (mapM addType es)
+addType (Tuple es) = fmap Tuple (mapM addType es)
+addType (LetTuple xts e1 e2) = do
+  xts' <- mapM (\xt -> if snd xt /= Type.Var (-1) then error "addType" else genType >>= (\t -> return (fst xt, t))) xts
+  liftM2 (LetTuple xts') (addType e1) (addType e2)
 addType e = return e
 
 replaceVarHelper :: (Id.T, Type.Type) -> MinCaml (Id.T, Type.Type)
@@ -140,6 +155,10 @@ replaceVar (LetRec fundef e) = do
   e' <- replaceVar e
   return $ LetRec (Fundef xt yts body') e'
 replaceVar (App e es) = liftM2 App (replaceVar e) (mapM replaceVar es)
+replaceVar (Tuple es) = fmap Tuple (mapM replaceVar es)
+replaceVar (LetTuple xts e1 e2) = do
+  xts' <- mapM replaceVarHelper xts
+  liftM2 (LetTuple xts') (replaceVar e1) (replaceVar e2)
 replaceVar e = return e
 
 parseError :: [Token] -> a

@@ -97,3 +97,11 @@ spec = do
       Syntax.Let ("a", Type.Var 0) (Syntax.Array (Syntax.Int 2) $ Syntax.Int 1) $
       Syntax.Let ("Tu0", Type.Unit) (Syntax.Put (Syntax.Var "a") (Syntax.Int 0) $ Syntax.Int 2) $
       Syntax.Get (Syntax.Var "a") $ Syntax.Int 1
+    specHelper validCase27 $
+      Right $
+      Syntax.Let
+        ("t", Type.Var 0)
+        (Syntax.Tuple [Syntax.Add (Syntax.Int 1) $ Syntax.Int 2, Syntax.Bool True, Syntax.Int 3]) $
+      Syntax.LetTuple [("x", Type.Var 1), ("b", Type.Var 2), ("y", Type.Var 3)] (Syntax.Var "t") $
+      Syntax.If (Syntax.Var "b") (Syntax.Add (Syntax.Var "x") $ Syntax.Var "y") $
+      (Syntax.Sub (Syntax.Var "x") $ Syntax.Var "y")
