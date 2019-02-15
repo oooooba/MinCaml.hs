@@ -131,6 +131,9 @@ addType (Tuple es) = fmap Tuple (mapM addType es)
 addType (LetTuple xts e1 e2) = do
   xts' <- mapM (\xt -> if snd xt /= Type.Var (-1) then error "addType" else genType >>= (\t -> return (fst xt, t))) xts
   liftM2 (LetTuple xts') (addType e1) (addType e2)
+addType (Array e1 e2) = liftM2 Array (addType e1) (addType e2)
+addType (Get e1 e2) = liftM2 Get (addType e1) (addType e2)
+addType (Put e1 e2 e3) = liftM3 Put (addType e1) (addType e2) (addType e3)
 addType e = return e
 
 replaceVarHelper :: (Id.T, Type.Type) -> MinCaml (Id.T, Type.Type)
@@ -159,6 +162,9 @@ replaceVar (Tuple es) = fmap Tuple (mapM replaceVar es)
 replaceVar (LetTuple xts e1 e2) = do
   xts' <- mapM replaceVarHelper xts
   liftM2 (LetTuple xts') (replaceVar e1) (replaceVar e2)
+replaceVar (Array e1 e2) = liftM2 Array (replaceVar e1) (replaceVar e2)
+replaceVar (Get e1 e2) = liftM2 Get (replaceVar e1) (replaceVar e2)
+replaceVar (Put e1 e2 e3) = liftM3 Put (replaceVar e1) (replaceVar e2) (replaceVar e3)
 replaceVar e = return e
 
 parseError :: [Token] -> a
