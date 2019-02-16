@@ -149,7 +149,6 @@ replaceVar (Eq e1 e2) = liftM2 Eq (replaceVar e1) (replaceVar e2)
 replaceVar (Le e1 e2) = liftM2 Le (replaceVar e1) (replaceVar e2)
 replaceVar (If e1 e2 e3) = liftM3 If (replaceVar e1) (replaceVar e2) (replaceVar e3)
 replaceVar (Let xt e1 e2) = liftM3 Let (replaceVarHelper xt) (replaceVar e1) (replaceVar e2)
-replaceVar (Let (x, t) e1 e2) = liftM2 (Let (x, t)) (replaceVar e1) (replaceVar e2)
 replaceVar (Var "_") = error "Parse error: invalid identifier ('_')"
 replaceVar (LetRec fundef e) = do
   xt <- replaceVarHelper $ name fundef
