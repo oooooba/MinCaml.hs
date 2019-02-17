@@ -57,6 +57,8 @@ derefTerm (Syntax.LetRec (Syntax.Fundef xt yts e1) e2) = do
   fundef <- liftM3 Syntax.Fundef (derefIdType xt) (mapM derefIdType yts) (derefTerm e1)
   Syntax.LetRec fundef <$> derefTerm e2
 derefTerm (Syntax.App e es) = liftM2 Syntax.App (derefTerm e) (mapM derefTerm es)
+derefTerm (Syntax.Tuple es) = Syntax.Tuple <$> mapM derefTerm es
+derefTerm (Syntax.LetTuple xts e1 e2) = liftM3 Syntax.LetTuple (mapM derefIdType xts) (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Array e1 e2) = liftM2 Syntax.Array (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Get e1 e2) = liftM2 Syntax.Get (derefTerm e1) (derefTerm e2)
 derefTerm (Syntax.Put e1 e2 e3) = liftM3 Syntax.Put (derefTerm e1) (derefTerm e2) (derefTerm e3)
@@ -142,6 +144,10 @@ g env (Syntax.App e es) = do
   eTy <- g env e
   unify eTy $ Type.Fun esTy t
   return t
+g env (Syntax.Tuple es) = Type.Tuple <$> mapM (g env) es
+g env (Syntax.LetTuple xts e1 e2) = do
+  g env e1 >>= unify (Type.Tuple $ fmap snd xts)
+  g (Util.addList xts env) e2
 g env (Syntax.Array e1 e2) = do
   t1 <- g env e1
   unify t1 Type.Int

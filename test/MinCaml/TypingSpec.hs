@@ -146,3 +146,12 @@ spec = do
           Syntax.Let ("Tu0", Type.Unit) (Syntax.Put (Syntax.Var "a") (Syntax.Int 0) $ Syntax.Int 2) $
           Syntax.Get (Syntax.Var "a") $ Syntax.Int 1
         , Type.Int)
+    specHelper validCase27 $
+      Right
+        ( Syntax.Let
+            ("t", Type.Tuple [Type.Int, Type.Bool, Type.Int])
+            (Syntax.Tuple [Syntax.Add (Syntax.Int 1) $ Syntax.Int 2, Syntax.Bool True, Syntax.Int 3]) $
+          Syntax.LetTuple [("x", Type.Int), ("b", Type.Bool), ("y", Type.Int)] (Syntax.Var "t") $
+          Syntax.If (Syntax.Var "b") (Syntax.Add (Syntax.Var "x") $ Syntax.Var "y") $
+          Syntax.Sub (Syntax.Var "x") $ Syntax.Var "y"
+        , Type.Int)
