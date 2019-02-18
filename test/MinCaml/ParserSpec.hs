@@ -104,4 +104,4 @@ spec = do
         (Syntax.Tuple [Syntax.Add (Syntax.Int 1) $ Syntax.Int 2, Syntax.Bool True, Syntax.Int 3]) $
       Syntax.LetTuple [("x", Type.Var 1), ("b", Type.Var 2), ("y", Type.Var 3)] (Syntax.Var "t") $
       Syntax.If (Syntax.Var "b") (Syntax.Add (Syntax.Var "x") $ Syntax.Var "y") $
-      (Syntax.Sub (Syntax.Var "x") $ Syntax.Var "y")
+      Syntax.Sub (Syntax.Var "x") $ Syntax.Var "y"
