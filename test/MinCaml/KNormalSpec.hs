@@ -24,10 +24,10 @@ specHelper testCase expected =
 specHelper2 :: TestCase -> Spec
 specHelper2 testCase =
   it (name testCase) $
-  runMinCaml ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f . fst) initialGlobalStatus `shouldBe`
   runMinCaml
     ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f2 . fst)
-    initialGlobalStatus
+    initialGlobalStatus `shouldBe`
+  runMinCaml ((Parser.runParser . Lexer.runLexer $ input testCase) >>= Typing.f >>= KNormal.f . fst) initialGlobalStatus
 
 spec :: Spec
 spec = do
