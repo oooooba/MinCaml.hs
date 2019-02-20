@@ -38,6 +38,10 @@ data T
            T
   | App Id.T
         [Id.T]
+  | Tuple [Id.T]
+  | LetTuple [(Id.T, Type.Type)]
+             Id.T
+             T
   | Get Id.T
         Id.T
   | Put Id.T
@@ -122,6 +126,17 @@ g env (Syntax.App e1 e2s) = do
               insertLet p2 (\x -> bind (xs ++ [x]) e2s)
         in bind [] e2s
     _ -> error "assert"
+g env (Syntax.Tuple es) = do
+  let bind xs ts [] = return (Tuple xs, Type.Tuple ts)
+      bind xs ts (e:es) = do
+        p1@(_, t) <- g env e
+        insertLet p1 (\x -> bind (xs ++ [x]) (ts ++ [t]) es)
+  bind [] [] es
+g env (Syntax.LetTuple xts e1 e2) = do
+  p1 <- g env e1
+  insertLet p1 $ \y -> do
+    (e2', t2) <- g (Util.addList xts env) e2
+    return (LetTuple xts y e2', t2)
 g env (Syntax.Array e1 e2) = do
   p1 <- g env e1
   insertLet p1 $ \x -> do

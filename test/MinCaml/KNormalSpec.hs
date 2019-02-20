@@ -190,6 +190,18 @@ spec = do
         (KNormal.Let ("Ti3", Type.Int) (KNormal.Int 0) $
          KNormal.Let ("Ti4", Type.Int) (KNormal.Int 2) $ KNormal.Put "a" "Ti3" "Ti4") $
       KNormal.Let ("Ti5", Type.Int) (KNormal.Int 1) $ KNormal.Get "a" "Ti5"
+    specHelper validCase27 $
+      Right $
+      KNormal.Let
+        ("t", Type.Tuple [Type.Int, Type.Bool, Type.Int])
+        (KNormal.Let
+           ("Ti2", Type.Int)
+           (KNormal.Let ("Ti0", Type.Int) (KNormal.Int 1) $
+            KNormal.Let ("Ti1", Type.Int) (KNormal.Int 2) $ KNormal.Add "Ti0" "Ti1") $
+         KNormal.Let ("Ti3", Type.Int) (KNormal.Int 1) $
+         KNormal.Let ("Ti4", Type.Int) (KNormal.Int 3) $ KNormal.Tuple ["Ti2", "Ti3", "Ti4"]) $
+      KNormal.LetTuple [("x", Type.Int), ("b", Type.Bool), ("y", Type.Int)] "t" $
+      KNormal.Let ("Ti5", Type.Int) (KNormal.Int 0) $ KNormal.IfEq "b" "Ti5" (KNormal.Sub "x" "y") $ KNormal.Add "x" "y"
   describe "k-normalization without continuations" $ do
     specHelper2 validCase1
     specHelper2 validCase2
