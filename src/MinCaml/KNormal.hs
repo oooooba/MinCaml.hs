@@ -227,6 +227,16 @@ g2 env (Syntax.App e1 e2s) = do
             bind (x2 : x2s, k2 : k2s) e2s
       bind ([], []) e2s
     _ -> error "assert"
+g2 env (Syntax.Tuple es) = do
+  let bind xs ts ks [] = return (foldl (\e k -> k e) (Tuple $ reverse xs) ks, Type.Tuple $ reverse ts)
+      bind xs ts ks (e:es) = do
+        (x, t, k) <- insertLet2 env e
+        bind (x : xs) (t : ts) (k : ks) es
+  bind [] [] [] es
+g2 env (Syntax.LetTuple xts e1 e2) = do
+  (x1, _, k1) <- insertLet2 env e1
+  (e2', t2) <- g2 (Util.addList xts env) e2
+  return (k1 $ LetTuple xts x1 e2', t2)
 g2 env (Syntax.Array e1 e2) = do
   (x1, _, k1) <- insertLet2 env e1
   (x2, t2, k2) <- insertLet2 env e2

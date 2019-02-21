@@ -229,3 +229,4 @@ spec = do
     specHelper2 validCase24
     specHelper2 validCase25
     specHelper2 validCase26
+    specHelper2 validCase27
