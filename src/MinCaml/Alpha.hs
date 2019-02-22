@@ -35,6 +35,14 @@ g env (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
   fundef <- KNormal.Fundef (find x env', t) (fmap (\(y, t) -> (find y env'', t)) yts) <$> g env'' e1
   KNormal.LetRec fundef <$> g env' e2
 g env (KNormal.App x ys) = return $ KNormal.App (find x env) $ fmap (`find` env) ys
+g env (KNormal.Tuple xs) = return $ KNormal.Tuple $ fmap (`find` env) xs
+g env (KNormal.LetTuple xts y e) = do
+  let xs = fmap fst xts
+  xs' <- mapM genId xs
+  let env' = Util.addList2 xs xs' env
+  let xts' = fmap (\(x, t) -> (find x env', t)) xts
+  e' <- g env' e
+  return $ KNormal.LetTuple xts' (find y env) e'
 g env (KNormal.Get x y) = return $ KNormal.Get (find x env) $ find y env
 g env (KNormal.Put x y z) = return $ KNormal.Put (find x env) (find y env) $ find z env
 g env (KNormal.ExtFunApp x ys) = return $ KNormal.ExtFunApp x $ fmap (`find` env) ys
