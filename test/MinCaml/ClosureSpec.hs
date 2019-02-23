@@ -216,3 +216,17 @@ spec =
         (Closure.Let ("Ti3.4", Type.Int) (Closure.Int 0) $
          Closure.Let ("Ti4.5", Type.Int) (Closure.Int 2) $ Closure.Put "a.0" "Ti3.4" "Ti4.5") $
       Closure.Let ("Ti5.6", Type.Int) (Closure.Int 1) $ Closure.Get "a.0" "Ti5.6"
+    specHelper validCase27 $
+      Right $
+      Closure.Prog [] $
+      Closure.Let
+        ("t.0", Type.Tuple [Type.Int, Type.Bool, Type.Int])
+        (Closure.Let
+           ("Ti2.1", Type.Int)
+           (Closure.Let ("Ti0.2", Type.Int) (Closure.Int 1) $
+            Closure.Let ("Ti1.3", Type.Int) (Closure.Int 2) $ Closure.Add "Ti0.2" "Ti1.3") $
+         Closure.Let ("Ti3.4", Type.Int) (Closure.Int 1) $
+         Closure.Let ("Ti4.5", Type.Int) (Closure.Int 3) $ Closure.Tuple ["Ti2.1", "Ti3.4", "Ti4.5"]) $
+      Closure.LetTuple [("x.6", Type.Int), ("b.7", Type.Bool), ("y.8", Type.Int)] "t.0" $
+      Closure.Let ("Ti5.9", Type.Int) (Closure.Int 0) $
+      Closure.IfEq "b.7" "Ti5.9" (Closure.Sub "x.6" "y.8") $ Closure.Add "x.6" "y.8"

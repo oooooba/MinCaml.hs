@@ -6,6 +6,7 @@ module MinCaml.Closure
   , f
   ) where
 
+import           Control.Applicative        ((<$>))
 import           Control.Monad              (liftM2)
 import           Control.Monad.State.Strict (State, get, modify, runState)
 import qualified Data.Map                   as Map
@@ -49,6 +50,10 @@ data T
            [Id.T]
   | AppDir Id.L
            [Id.T]
+  | Tuple [Id.T]
+  | LetTuple [(Id.T, Type.Type)]
+             Id.T
+             T
   | Get Id.T
         Id.T
   | Put Id.T
@@ -127,6 +132,8 @@ g env known (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
 g env known (KNormal.App x ys)
   | x `elem` known = return $ AppDir (Id.L x) ys
 g env known (KNormal.App f xs) = return $ AppCls f xs
+g env known (KNormal.Tuple xs) = return $ Tuple xs
+g env known (KNormal.LetTuple xts y e) = LetTuple xts y <$> g (Util.addList xts env) known e
 g env known (KNormal.Get x y) = return $ Get x y
 g env known (KNormal.Put x y z) = return $ Put x y z
 g env known (KNormal.ExtFunApp x ys) = return $ AppDir (Id.L $ "min_caml_" ++ x) ys
