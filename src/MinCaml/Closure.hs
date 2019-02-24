@@ -4,6 +4,7 @@ module MinCaml.Closure
   , T(..)
   , Prog(..)
   , f
+  , fv
   ) where
 
 import           Control.Applicative        ((<$>))
@@ -93,6 +94,8 @@ fv (Var x) = Set.singleton x
 fv (MakeCls (x, t) (Closure l ys) e) = Set.delete x $ Set.union (Set.fromList ys) (fv e)
 fv (AppCls x ys) = Set.fromList $ x : ys
 fv (AppDir _ xs) = Set.fromList xs
+fv (Tuple xs) = Set.fromList xs
+fv (LetTuple xts y e) = Set.insert y $ Set.difference (fv e) $ Set.fromList $ fmap fst xts
 fv (Get x y) = Set.fromList [x, y]
 fv (Put x y z) = Set.fromList [x, y, z]
 

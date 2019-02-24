@@ -7,6 +7,7 @@ import           Control.Monad        (foldM)
 import           Control.Monad.Except (throwError)
 import qualified Data.Map             as Map
 
+import qualified Data.Set             as Set
 import qualified MinCaml.Asm          as Asm
 import qualified MinCaml.Closure      as Closure
 import           MinCaml.Global
@@ -110,6 +111,30 @@ g env (Closure.AppCls x ys) = do
 g env (Closure.AppDir (Id.L x) ys) = do
   (int, float) <- separate (fmap (\y -> (y, env Map.! y)) ys)
   return $ Asm.Ans $ Asm.CallDir (Id.L x) int float
+g env (Closure.Tuple xs) = do
+  y <- genId "t"
+  (offset, store) <-
+    expand
+      (fmap (\x -> (x, env Map.! x)) xs)
+      (0, Asm.Ans $ Asm.Mov y)
+      undefined
+      (\x _ offset store -> Asm.seq (Asm.St x y (Asm.C offset) 1, store))
+  return $
+    Asm.Let (y, Type.Tuple $ fmap (\x -> env Map.! x) xs) (Asm.Mov Asm.regHp) $
+    Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp $ Asm.C $ Asm.align offset) store
+g env (Closure.LetTuple xts y e2) = do
+  let s = Closure.fv e2
+  e2' <- g (Util.addList xts env) e2
+  (offset, load) <-
+    expand
+      xts
+      (0, e2')
+      undefined
+      (\x t offset load ->
+         if not (x `Set.member` s)
+           then return load
+           else return $ Asm.Let (x, t) (Asm.Ld y (Asm.C offset) 1) load)
+  return load
 g env (Closure.Get x y) =
   return $
   case Map.lookup x env of

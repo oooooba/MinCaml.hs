@@ -250,3 +250,23 @@ spec =
       Asm.Let ("Ti4.5", Type.Int) (Asm.Set 2) $
       Asm.Let ("Tu0.3", Type.Unit) (Asm.St "Ti4.5" "a.0" (Asm.V "Ti3.4") 8) $
       Asm.Let ("Ti5.6", Type.Int) (Asm.Set 1) $ Asm.Ans $ Asm.Ld "a.0" (Asm.V "Ti5.6") 8
+    specHelper validCase27 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let ("Ti0.2", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti1.3", Type.Int) (Asm.Set 2) $
+      Asm.Let ("Ti2.1", Type.Int) (Asm.Add "Ti0.2" $ Asm.V "Ti1.3") $
+      Asm.Let ("Ti3.4", Type.Int) (Asm.Set 1) $
+      Asm.Let ("Ti4.5", Type.Int) (Asm.Set 3) $
+      Asm.Let ("t.10", Type.Tuple [Type.Int, Type.Int, Type.Int]) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp $ Asm.C 24) $
+      Asm.Let ("Tu8", Type.Unit) (Asm.St "Ti4.5" "t.10" (Asm.C 16) 1) $
+      Asm.Let ("Tu7", Type.Unit) (Asm.St "Ti3.4" "t.10" (Asm.C 8) 1) $
+      Asm.Let ("Tu6", Type.Unit) (Asm.St "Ti2.1" "t.10" (Asm.C 0) 1) $
+      Asm.Let ("t.0", Type.Tuple [Type.Int, Type.Bool, Type.Int]) (Asm.Mov "t.10") $
+      Asm.Let ("y.8", Type.Int) (Asm.Ld "t.0" (Asm.C 16) 1) $
+      Asm.Let ("b.7", Type.Bool) (Asm.Ld "t.0" (Asm.C 8) 1) $
+      Asm.Let ("x.6", Type.Int) (Asm.Ld "t.0" (Asm.C 0) 1) $
+      Asm.Let ("Ti5.9", Type.Int) (Asm.Set 0) $
+      Asm.Ans $
+      Asm.IfEq "b.7" (Asm.V "Ti5.9") (Asm.Ans $ Asm.Sub "x.6" $ Asm.V "y.8") $ Asm.Ans $ Asm.Add "x.6" $ Asm.V "y.8"
