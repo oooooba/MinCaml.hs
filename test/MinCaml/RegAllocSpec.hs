@@ -211,3 +211,22 @@ spec =
       Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 2) $
       Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRdi Asm.regRax (Asm.C 0) 8) $
       Asm.Ans $ Asm.Ld Asm.regRax (Asm.C 1) 8
+    specHelper validCase27 $
+      Right $
+      Asm.Prog [] [] $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Add Asm.regRax $ Asm.C 2) $
+      Asm.Let (Asm.regRdi, Type.Int) (Asm.Set 1) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.Set 3) $
+      Asm.Let (Asm.regRdx, Type.Tuple [Type.Int, Type.Int, Type.Int]) (Asm.Mov Asm.regHp) $
+      Asm.Let (Asm.regHp, Type.Int) (Asm.Add Asm.regHp $ Asm.C 24) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRsi Asm.regRdx (Asm.C 16) 1) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRdi Asm.regRdx (Asm.C 8) 1) $
+      Asm.Let (Asm.regVoid, Type.Unit) (Asm.St Asm.regRax Asm.regRdx (Asm.C 0) 1) $
+      Asm.Let (Asm.regRdx, Type.Tuple [Type.Int, Type.Bool, Type.Int]) (Asm.Mov Asm.regRdx) $
+      Asm.Let (Asm.regRax, Type.Int) (Asm.Ld Asm.regRdx (Asm.C 16) 1) $
+      Asm.Let (Asm.regRdi, Type.Bool) (Asm.Ld Asm.regRdx (Asm.C 8) 1) $
+      Asm.Let (Asm.regRsi, Type.Int) (Asm.Ld Asm.regRdx (Asm.C 0) 1) $
+      Asm.Ans $
+      Asm.IfEq Asm.regRdi (Asm.C 0) (Asm.Ans $ Asm.Sub Asm.regRsi $ Asm.V Asm.regRax) $
+      Asm.Ans $ Asm.Add Asm.regRsi $ Asm.V Asm.regRax
