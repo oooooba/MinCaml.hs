@@ -296,3 +296,14 @@ spec =
           , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 4
           ])
     specHelper validCase25 $ Right ([], [], [Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1])
+    specHelper validCase26 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 2
+          , Asm.instrMov (Asm.Reg Asm.regRsi) $ Asm.Imm 1
+          , Asm.instrCall (Asm.Lab "min_caml_create_array")
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 2
+          , Asm.instrMov (Asm.Mem Asm.regRax 0) $ Asm.Reg Asm.regRdi
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Mem Asm.regRax 8
+          ])
