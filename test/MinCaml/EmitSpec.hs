@@ -307,3 +307,28 @@ spec =
           , Asm.instrMov (Asm.Mem Asm.regRax 0) $ Asm.Reg Asm.regRdi
           , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Mem Asm.regRax 8
           ])
+    specHelper validCase27 $
+      Right
+        ( []
+        , []
+        , [ Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Imm 1
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Imm 2
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Imm 1
+          , Asm.instrMov (Asm.Reg Asm.regRsi) $ Asm.Imm 3
+          , Asm.instrMov (Asm.Reg Asm.regRdx) $ Asm.Reg Asm.regHp
+          , Asm.instrAdd (Asm.Reg Asm.regHp) $ Asm.Imm 24
+          , Asm.instrMov (Asm.Mem Asm.regRdx 16) $ Asm.Reg Asm.regRsi
+          , Asm.instrMov (Asm.Mem Asm.regRdx 8) $ Asm.Reg Asm.regRdi
+          , Asm.instrMov (Asm.Mem Asm.regRdx 0) $ Asm.Reg Asm.regRax
+          , Asm.instrMov (Asm.Reg Asm.regRax) $ Asm.Mem Asm.regRdx 16
+          , Asm.instrMov (Asm.Reg Asm.regRdi) $ Asm.Mem Asm.regRdx 8
+          , Asm.instrMov (Asm.Reg Asm.regRsi) $ Asm.Mem Asm.regRdx 0
+          , Asm.instrCmp (Asm.Reg Asm.regRdi) $ Asm.Imm 0
+          , Asm.instrJne $ Asm.Lab "ifeq_nontail_else.11"
+          , Asm.instrSub (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRsi
+          , Asm.instrNeg $ Asm.Reg Asm.regRax
+          , Asm.instrJmp $ Asm.Lab "ifeq_nontail_cont.12"
+          , Asm.pinstrLabel "ifeq_nontail_else.11"
+          , Asm.instrAdd (Asm.Reg Asm.regRax) $ Asm.Reg Asm.regRsi
+          , Asm.pinstrLabel "ifeq_nontail_cont.12"
+          ])
