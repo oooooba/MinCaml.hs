@@ -1,21 +1,26 @@
 import           Test.Hspec
 
-import           System.Exit          (ExitCode (..))
-import           System.IO            (hClose, hPutStr)
-import           System.Process       (CreateProcess (std_in, std_out),
-                                       StdStream (CreatePipe), proc,
-                                       waitForProcess, withCreateProcess)
+import           System.Exit           (ExitCode (..))
+import           System.IO             (hClose, hPutStr)
+import           System.Process        (CreateProcess (std_in, std_out),
+                                        StdStream (CreatePipe), proc,
+                                        waitForProcess, withCreateProcess)
 
-import qualified MinCaml.AlphaSpec    as AlphaSpec
-import qualified MinCaml.ClosureSpec  as ClosureSpec
-import qualified MinCaml.EmitSpec     as EmitSpec
-import qualified MinCaml.KNormalSpec  as KNormalSpec
-import qualified MinCaml.LexerSpec    as LexerSpec
-import qualified MinCaml.ParserSpec   as ParserSpec
-import qualified MinCaml.RegAllocSpec as RegAllocSpec
-import qualified MinCaml.SimmSpec     as SimmSpec
-import qualified MinCaml.TypingSpec   as TypingSpec
-import qualified MinCaml.VirtualSpec  as VirtualSpec
+import qualified MinCaml.AlphaSpec     as AlphaSpec
+import qualified MinCaml.AssocSpec     as AssocSpec
+import qualified MinCaml.BetaSpec      as BetaSpec
+import qualified MinCaml.ClosureSpec   as ClosureSpec
+import qualified MinCaml.ConstFoldSpec as ConstFoldSpec
+import qualified MinCaml.ElimSpec      as ElimSpec
+import qualified MinCaml.EmitSpec      as EmitSpec
+import qualified MinCaml.InlineSpec    as InlineSpec
+import qualified MinCaml.KNormalSpec   as KNormalSpec
+import qualified MinCaml.LexerSpec     as LexerSpec
+import qualified MinCaml.ParserSpec    as ParserSpec
+import qualified MinCaml.RegAllocSpec  as RegAllocSpec
+import qualified MinCaml.SimmSpec      as SimmSpec
+import qualified MinCaml.TypingSpec    as TypingSpec
+import qualified MinCaml.VirtualSpec   as VirtualSpec
 
 import           MinCaml.TestCase
 
@@ -68,6 +73,11 @@ main = do
   hspec TypingSpec.spec
   hspec KNormalSpec.spec
   hspec AlphaSpec.spec
+  hspec BetaSpec.spec
+  hspec AssocSpec.spec
+  hspec InlineSpec.spec
+  hspec ConstFoldSpec.spec
+  hspec ElimSpec.spec
   hspec ClosureSpec.spec
   hspec VirtualSpec.spec
   hspec SimmSpec.spec
