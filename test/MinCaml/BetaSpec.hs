@@ -28,3 +28,5 @@ spec =
   describe "valid cases" $ do
     specHelper validCase1 $ Right KNormal.Unit
     specHelper validCase2 $ Right KNormal.Unit
+    specHelper validCase3 $ Right $ KNormal.Int 42
+    specHelper validCase4 $ Right $ KNormal.Int 42
