@@ -3,10 +3,12 @@ module MinCaml.KNormal
   , Fundef(..)
   , f
   , f2
+  , fv
   ) where
 
 import           Control.Applicative ((<$>))
 import qualified Data.Map            as Map
+import qualified Data.Set            as Set
 
 import           MinCaml.Global
 import qualified MinCaml.Id          as Id
@@ -57,6 +59,27 @@ data Fundef = Fundef
   , args :: [(Id.T, Type.Type)]
   , body :: T
   } deriving (Show, Eq)
+
+fv :: T -> Set.Set Id.T
+fv Unit = Set.empty
+fv (Int _) = Set.empty
+fv (Neg x) = Set.singleton x
+fv (Add x y) = Set.fromList [x, y]
+fv (Sub x y) = Set.fromList [x, y]
+fv (IfEq x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) $ fv e2
+fv (IfLe x y e1 e2) = Set.insert x $ Set.insert y $ Set.union (fv e1) $ fv e2
+fv (Let (x, t) e1 e2) = Set.union (fv e1) $ Set.delete x $ fv e2
+fv (Var x) = Set.singleton x
+fv (LetRec (Fundef (x, t) yts e1) e2) =
+  let zs = Set.difference (fv e1) (Set.fromList $ fmap fst yts)
+  in Set.difference (Set.union zs $ fv e2) $ Set.singleton x
+fv (App x ys) = Set.fromList $ x : ys
+fv (Tuple xs) = Set.fromList xs
+fv (LetTuple xs y e) = Set.insert y $ Set.difference (fv e) $ Set.fromList $ fmap fst xs
+fv (Get x y) = Set.fromList [x, y]
+fv (Put x y z) = Set.fromList [x, y, z]
+fv (ExtArray _) = Set.empty
+fv (ExtFunApp _ xs) = Set.fromList xs
 
 insertLet :: (T, Type.Type) -> (Id.T -> MinCaml (T, Type.Type)) -> MinCaml (T, Type.Type)
 insertLet (Var x, _) k = k x
