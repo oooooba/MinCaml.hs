@@ -36,4 +36,11 @@ spec =
     specHelper validCase2 $ Right KNormal.Unit
     specHelper validCase3 $ Right $ KNormal.Int 42
     specHelper validCase4 $ Right $ KNormal.Int 42
+    specHelper validCase5 $
+      Right $
+      KNormal.Let ("Ti0.0", Type.Int) (KNormal.Int 1) $ KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 2) $ KNormal.Int 3
+    specHelper validCase6 $
+      Right $
+      KNormal.Let ("Ti0.0", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 4) $ KNormal.Int (-1)
     specHelper validCase13 $ Right $ KNormal.Let ("x_.0", Type.Int) (KNormal.Int 42) $ KNormal.Int 42

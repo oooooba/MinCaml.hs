@@ -21,6 +21,12 @@ findi x env =
     _                    -> error $ "findi: " ++ x
 
 g :: Map.Map Id.T KNormal.T -> KNormal.T -> KNormal.T
+g env (KNormal.Neg x)
+  | memi x env = KNormal.Int $ negate $ findi x env
+g env (KNormal.Add x y)
+  | memi x env && memi y env = KNormal.Int $ findi x env + findi y env
+g env (KNormal.Sub x y)
+  | memi x env && memi y env = KNormal.Int $ findi x env - findi y env
 g env (KNormal.Var x)
   | memi x env = KNormal.Int $ findi x env
 g env (KNormal.Let (x, t) e1 e2) =

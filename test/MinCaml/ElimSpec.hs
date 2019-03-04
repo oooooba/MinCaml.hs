@@ -38,4 +38,6 @@ spec =
     specHelper validCase2 $ Right KNormal.Unit
     specHelper validCase3 $ Right $ KNormal.Int 42
     specHelper validCase4 $ Right $ KNormal.Int 42
+    specHelper validCase5 $ Right $ KNormal.Int 3
+    specHelper validCase6 $ Right $ KNormal.Int (-1)
     specHelper validCase13 $ Right $ KNormal.Int 42

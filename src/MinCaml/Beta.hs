@@ -15,6 +15,9 @@ find x env = fromMaybe x $ Map.lookup x env
 g :: Map.Map Id.T Id.T -> KNormal.T -> KNormal.T
 g env KNormal.Unit = KNormal.Unit
 g env (KNormal.Int i) = KNormal.Int i
+g env (KNormal.Neg x) = KNormal.Neg $ find x env
+g env (KNormal.Add x y) = KNormal.Add (find x env) $ find y env
+g env (KNormal.Sub x y) = KNormal.Sub (find x env) $ find y env
 g env (KNormal.Let (x, t) e1 e2) =
   case g env e1 of
     KNormal.Var y -> g (Map.insert x y env) e2
