@@ -9,10 +9,14 @@ import qualified MinCaml.Id      as Id
 import qualified MinCaml.KNormal as KNormal
 
 effect :: KNormal.T -> Bool
-effect (KNormal.Let _ e1 e2) = effect e1 || effect e2
-effect _                     = False
+effect (KNormal.IfEq _ _ e1 e2) = effect e1 || effect e2
+effect (KNormal.IfLe _ _ e1 e2) = effect e1 || effect e2
+effect (KNormal.Let _ e1 e2)    = effect e1 || effect e2
+effect _                        = False
 
 g :: KNormal.T -> KNormal.T
+g (KNormal.IfEq x y e1 e2) = KNormal.IfEq x y (g e1) $ g e2
+g (KNormal.IfLe x y e1 e2) = KNormal.IfLe x y (g e1) $ g e2
 g (KNormal.Let (x, t) e1 e2) =
   let e1' = g e1
       e2' = g e2

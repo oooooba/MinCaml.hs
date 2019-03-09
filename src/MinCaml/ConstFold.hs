@@ -29,6 +29,18 @@ g env (KNormal.Sub x y)
   | memi x env && memi y env = KNormal.Int $ findi x env - findi y env
 g env (KNormal.Var x)
   | memi x env = KNormal.Int $ findi x env
+g env (KNormal.IfEq x y e1 e2)
+  | memi x env && memi y env =
+    if findi x env == findi y env
+      then g env e1
+      else g env e2
+g env (KNormal.IfEq x y e1 e2) = KNormal.IfEq x y (g env e1) $ g env e2
+g env (KNormal.IfLe x y e1 e2)
+  | memi x env && memi y env =
+    if findi x env <= findi y env
+      then g env e1
+      else g env e2
+g env (KNormal.IfLe x y e1 e2) = KNormal.IfLe x y (g env e1) $ g env e2
 g env (KNormal.Let (x, t) e1 e2) =
   let e1' = g env e1
       e2' = g (Map.insert x e1' env) e2

@@ -40,4 +40,10 @@ spec =
     specHelper validCase4 $ Right $ KNormal.Int 42
     specHelper validCase5 $ Right $ KNormal.Int 3
     specHelper validCase6 $ Right $ KNormal.Int (-1)
+    specHelper validCase7 $ Right $ KNormal.Int 0
+    specHelper validCase8 $ Right $ KNormal.Int 1
+    specHelper validCase9 $ Right $ KNormal.Int 1
+    specHelper validCase10 $ Right $ KNormal.Int 0
+    specHelper validCase11 $ Right $ KNormal.Int 1
+    specHelper validCase12 $ Right $ KNormal.Int 0
     specHelper validCase13 $ Right $ KNormal.Int 42
