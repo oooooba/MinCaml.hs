@@ -65,3 +65,14 @@ spec =
       KNormal.Let ("Ti0.0", Type.Int) (KNormal.Int 15) $
       KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 16) $ KNormal.Int 0
     specHelper validCase13 $ Right $ KNormal.Let ("x_.0", Type.Int) (KNormal.Int 42) $ KNormal.Int 42
+    specHelper validCase14 $
+      Right $
+      KNormal.Let ("Ti0.1", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1.0", Type.Int) (KNormal.Int (-1)) $
+      KNormal.Let ("Ti2.4", Type.Int) (KNormal.Int 2) $
+      KNormal.Let ("Ti3.3", Type.Int) (KNormal.Int (-2)) $
+      KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("Ti5.2", Type.Int) (KNormal.Int (-5)) $ KNormal.Int 0
+    specHelper validCase15 $
+      Right $
+      KNormal.Let ("Ti0.0", Type.Int) (KNormal.Int 1) $ KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 0) $ KNormal.Int 0
