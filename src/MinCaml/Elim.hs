@@ -12,6 +12,7 @@ effect :: KNormal.T -> Bool
 effect (KNormal.IfEq _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.IfLe _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.Let _ e1 e2)    = effect e1 || effect e2
+effect (KNormal.LetRec _ e)     = effect e
 effect _                        = False
 
 g :: KNormal.T -> KNormal.T
@@ -22,6 +23,11 @@ g (KNormal.Let (x, t) e1 e2) =
       e2' = g e2
   in if effect e1' || Set.member x (KNormal.fv e2')
        then KNormal.Let (x, t) e1' e2'
+       else e2'
+g (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) =
+  let e2' = g e2
+  in if Set.member x (KNormal.fv e2)
+       then KNormal.LetRec (KNormal.Fundef (x, t) yts $ g e1) e2'
        else e2'
 g e = e
 

@@ -84,3 +84,9 @@ spec =
         (KNormal.Let ("Ti2.2", Type.Int) (KNormal.Int 1) $
          KNormal.Let ("Ti3.3", Type.Int) (KNormal.Int 0) $ KNormal.IfEq "Ti2.2" "Ti3.3" (KNormal.Int 1) (KNormal.Int 0))
         (KNormal.Int 0)
+    specHelper validCase16 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f.0", Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] $
+         KNormal.Let ("Ti0.2", Type.Int) (KNormal.Int 1) $ KNormal.Add "x.1" "Ti0.2") $
+      KNormal.Int 2

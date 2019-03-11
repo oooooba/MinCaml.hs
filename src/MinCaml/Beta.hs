@@ -26,6 +26,7 @@ g env (KNormal.Let (x, t) e1 e2) =
     e1' ->
       let e2' = g env e2
       in KNormal.Let (x, t) e1' e2'
+g env (KNormal.LetRec (KNormal.Fundef xt yts e1) e2) = KNormal.LetRec (KNormal.Fundef xt yts $ g env e1) $ g env e2
 g env (KNormal.Var x) = KNormal.Var $ find x env
 
 f :: KNormal.T -> MinCaml KNormal.T

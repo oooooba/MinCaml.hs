@@ -49,3 +49,4 @@ spec =
     specHelper validCase13 $ Right $ KNormal.Int 42
     specHelper validCase14 $ Right $ KNormal.Int 0
     specHelper validCase15 $ Right $ KNormal.Int 0
+    specHelper validCase16 $ Right $ KNormal.Int 2
