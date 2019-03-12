@@ -14,6 +14,7 @@ data GlobalStatus = GlobalStatus
   , varIdCounter     :: Int
   , tyVarIdCounter   :: Type.TypeVarId
   , tyVarIdToTypeEnv :: Map.Map Type.TypeVarId Type.Type
+  , inlineThreshold  :: Int
   } deriving (Show, Eq)
 
 type MinCaml a = ExceptT String (StateT GlobalStatus Identity) a
@@ -38,7 +39,14 @@ genType = do
 
 initialGlobalStatus :: GlobalStatus
 initialGlobalStatus =
-  GlobalStatus {extenv = Map.empty, idCounter = 0, varIdCounter = 0, tyVarIdCounter = 0, tyVarIdToTypeEnv = Map.empty}
+  GlobalStatus
+  { extenv = Map.empty
+  , idCounter = 0
+  , varIdCounter = 0
+  , tyVarIdCounter = 0
+  , tyVarIdToTypeEnv = Map.empty
+  , inlineThreshold = 10000
+  }
 
 runMinCaml :: MinCaml a -> GlobalStatus -> (Either String a, GlobalStatus)
 runMinCaml e s = runIdentity (runStateT (runExceptT e) s)
