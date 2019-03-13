@@ -1,5 +1,6 @@
 module MinCaml.Alpha
   ( f
+  , g
   ) where
 
 import           Control.Applicative ((<$>))

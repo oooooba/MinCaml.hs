@@ -6,6 +6,7 @@ import           Control.Monad       (liftM2)
 import           Control.Monad.State (get)
 import qualified Data.Map            as Map
 
+import qualified MinCaml.Alpha       as Alpha
 import           MinCaml.Global
 import qualified MinCaml.Id          as Id
 import qualified MinCaml.KNormal     as KNormal
@@ -31,6 +32,11 @@ g env (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) = do
   e1' <- g env' e1
   e2' <- g env' e2
   return $ KNormal.LetRec (KNormal.Fundef (x, t) yts e1') e2'
+g env (KNormal.App x ys)
+  | Map.member x env = do
+    let (zs, e) = env Map.! x
+        env' = foldl (\e ((z, t), y) -> Map.insert z y e) Map.empty $ zip zs ys
+    Alpha.g env' e
 g _ e = return e
 
 f :: KNormal.T -> MinCaml KNormal.T

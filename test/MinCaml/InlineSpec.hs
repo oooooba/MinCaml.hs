@@ -92,3 +92,45 @@ spec =
         (KNormal.Fundef ("f.0", Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] $
          KNormal.Let ("Ti0.2", Type.Int) (KNormal.Int 1) $ KNormal.Add "x.1" "Ti0.2") $
       KNormal.Int 2
+    specHelper validCase17 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f.0", Type.Fun [Type.Int] Type.Int) [("x.1", Type.Int)] $
+         KNormal.Let ("Ti1.2", Type.Int) (KNormal.Int 1) $ KNormal.Add "x.1" "Ti1.2") $
+      KNormal.Let ("Ti0.3", Type.Int) (KNormal.Int 2) $
+      KNormal.Let ("Ti1.2.4", Type.Int) (KNormal.Int 1) $ KNormal.Add "Ti0.3" "Ti1.2.4"
+    specHelper validCase18 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f.0", Type.Fun [Type.Int, Type.Int] Type.Int) [("x.1", Type.Int), ("y.2", Type.Int)] $
+         KNormal.Add "x.1" "y.2") $
+      KNormal.Let ("Ti0.3", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1.4", Type.Int) (KNormal.Int 2) $ KNormal.Add "Ti0.3" "Ti1.4"
+    specHelper validCase19 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f.0", Type.Fun [Type.Int] Type.Int) [("n.1", Type.Int)] $
+         KNormal.Let ("Ti1.2", Type.Int) (KNormal.Int 0) $
+         KNormal.IfLe
+           "n.1"
+           "Ti1.2"
+           (KNormal.Int 0)
+           (KNormal.Let ("Ti2.5", Type.Int) (KNormal.Int 1) $
+            KNormal.Let ("Ti3.4", Type.Int) (KNormal.Sub "n.1" "Ti2.5") $
+            KNormal.Let
+              ("Ti4.3", Type.Int)
+              (KNormal.Let ("Ti1.2.7", Type.Int) (KNormal.Int 0) $
+               KNormal.IfLe
+                 "Ti3.4"
+                 "Ti1.2.7"
+                 (KNormal.Int 0)
+                 (KNormal.Let ("Ti2.5.8", Type.Int) (KNormal.Int 1) $
+                  KNormal.Let ("Ti3.4.9", Type.Int) (KNormal.Sub "Ti3.4" "Ti2.5.8") $
+                  KNormal.Let ("Ti4.3.10", Type.Int) (KNormal.App "f.0" ["Ti3.4.9"]) $ KNormal.Add "Ti3.4" "Ti4.3.10")) $
+            KNormal.Add "n.1" "Ti4.3")) $
+      KNormal.Let ("Ti0.6", Type.Int) (KNormal.Int 5) $
+      KNormal.Let ("Ti1.2.11", Type.Int) (KNormal.Int 0) $
+      KNormal.IfLe "Ti0.6" "Ti1.2.11" (KNormal.Int 0) $
+      KNormal.Let ("Ti2.5.12", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti3.4.13", Type.Int) (KNormal.Sub "Ti0.6" "Ti2.5.12") $
+      KNormal.Let ("Ti4.3.14", Type.Int) (KNormal.App "f.0" ["Ti3.4.13"]) $ KNormal.Add "Ti0.6" "Ti4.3.14"

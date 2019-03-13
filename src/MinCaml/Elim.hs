@@ -13,6 +13,7 @@ effect (KNormal.IfEq _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.IfLe _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.Let _ e1 e2)    = effect e1 || effect e2
 effect (KNormal.LetRec _ e)     = effect e
+effect (KNormal.App _ _)        = True
 effect _                        = False
 
 g :: KNormal.T -> KNormal.T

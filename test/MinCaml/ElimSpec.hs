@@ -50,3 +50,30 @@ spec =
     specHelper validCase14 $ Right $ KNormal.Int 0
     specHelper validCase15 $ Right $ KNormal.Int 0
     specHelper validCase16 $ Right $ KNormal.Int 2
+    specHelper validCase17 $ Right $ KNormal.Int 3
+    specHelper validCase18 $ Right $ KNormal.Int 3
+    specHelper validCase19 $
+      Right $
+      KNormal.LetRec
+        (KNormal.Fundef ("f.0", Type.Fun [Type.Int] Type.Int) [("n.1", Type.Int)] $
+         KNormal.Let ("Ti1.2", Type.Int) (KNormal.Int 0) $
+         KNormal.IfLe
+           "n.1"
+           "Ti1.2"
+           (KNormal.Int 0)
+           (KNormal.Let ("Ti2.5", Type.Int) (KNormal.Int 1) $
+            KNormal.Let ("Ti3.4", Type.Int) (KNormal.Sub "n.1" "Ti2.5") $
+            KNormal.Let
+              ("Ti4.3", Type.Int)
+              (KNormal.Let ("Ti1.2.7", Type.Int) (KNormal.Int 0) $
+               KNormal.IfLe
+                 "Ti3.4"
+                 "Ti1.2.7"
+                 (KNormal.Int 0)
+                 (KNormal.Let ("Ti2.5.8", Type.Int) (KNormal.Int 1) $
+                  KNormal.Let ("Ti3.4.9", Type.Int) (KNormal.Sub "Ti3.4" "Ti2.5.8") $
+                  KNormal.Let ("Ti4.3.10", Type.Int) (KNormal.App "f.0" ["Ti3.4.9"]) $ KNormal.Add "Ti3.4" "Ti4.3.10")) $
+            KNormal.Add "n.1" "Ti4.3")) $
+      KNormal.Let ("Ti0.6", Type.Int) (KNormal.Int 5) $
+      KNormal.Let ("Ti3.4.13", Type.Int) (KNormal.Int 4) $
+      KNormal.Let ("Ti4.3.14", Type.Int) (KNormal.App "f.0" ["Ti3.4.13"]) $ KNormal.Add "Ti0.6" "Ti4.3.14"
