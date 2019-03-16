@@ -138,3 +138,20 @@ spec =
       KNormal.Let ("Ti4.3.27", Type.Int) (KNormal.Add "Ti3.4.25" "Ti4.3.10.30") $
       KNormal.Let ("Ti4.3.14", Type.Int) (KNormal.Add "Ti3.4.13" "Ti4.3.27") $ KNormal.Add "Ti0.6" "Ti4.3.14"
     specHelper 4 validCase19 $ Right $ KNormal.Int 15
+    specHelper 1 validCase20 $
+      Right $
+      KNormal.Let ("Ti0.5", Type.Int) (KNormal.Int 1) $
+      KNormal.Let
+        ("Tf1.4", Type.Fun [Type.Int] Type.Int)
+        (KNormal.LetRec
+           (KNormal.Fundef ("g.2.7", Type.Fun [Type.Int] Type.Int) [("y.3.8", Type.Int)] $ KNormal.Add "Ti0.5" "y.3.8") $
+         KNormal.Var "g.2.7") $
+      KNormal.Let ("Ti2.6", Type.Int) (KNormal.Int 2) $ KNormal.App "Tf1.4" ["Ti2.6"]
+    specHelper 2 validCase20 $
+      Right $
+      KNormal.Let ("Ti0.5", Type.Int) (KNormal.Int 1) $
+      KNormal.LetRec
+        (KNormal.Fundef ("g.2.7", Type.Fun [Type.Int] Type.Int) [("y.3.8", Type.Int)] $ KNormal.Add "Ti0.5" "y.3.8") $
+      KNormal.Let ("Tf1.4", Type.Fun [Type.Int] Type.Int) (KNormal.Var "g.2.7") $
+      KNormal.Let ("Ti2.6", Type.Int) (KNormal.Int 2) $ KNormal.App "Tf1.4" ["Ti2.6"]
+    specHelper 3 validCase20 $ Right $ KNormal.Int 3
