@@ -163,3 +163,6 @@ spec =
       KNormal.Let ("Tf2.6", Type.Fun [Type.Int] Type.Int) (KNormal.Var "g.3") $
       KNormal.Let ("Ti3.9", Type.Int) (KNormal.Int 5) $ KNormal.App "Tf2.6" ["Ti3.9"]
     specHelper 2 validCase21 $ Right $ KNormal.Int 7
+    specHelper 1 validCase22 $ Right $ KNormal.Int 10
+    specHelper 1 validCase23 $ Right $ KNormal.Int $ -2
+    specHelper 1 validCase24 $ Right $ KNormal.Int 4
