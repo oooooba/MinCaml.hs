@@ -166,3 +166,4 @@ spec =
     specHelper 1 validCase22 $ Right $ KNormal.Int 10
     specHelper 1 validCase23 $ Right $ KNormal.Int $ -2
     specHelper 1 validCase24 $ Right $ KNormal.Int 4
+    specHelper 1 validCase25 $ Right $ KNormal.Int 1

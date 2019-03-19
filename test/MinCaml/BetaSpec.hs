@@ -287,3 +287,7 @@ spec =
             KNormal.Let ("Ti2.4", Type.Int) (KNormal.Int 3) $ KNormal.Sub "Ti1.3" "Ti2.4") $
          KNormal.Add "Ti0.1" "Ti3.2") $
       KNormal.Let ("Ti5.5", Type.Int) (KNormal.Int 4) $ KNormal.Add "Ti4.0" "Ti5.5"
+    specHelper 1 validCase25 $
+      Right $
+      KNormal.Let ("Tv0.0", Type.Int) (KNormal.Int 42) $
+      KNormal.Let ("Tu1.1", Type.Unit) KNormal.Unit $ KNormal.Let ("Tu2.2", Type.Unit) KNormal.Unit $ KNormal.Int 1
