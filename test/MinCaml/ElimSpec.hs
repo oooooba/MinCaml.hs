@@ -167,3 +167,12 @@ spec =
     specHelper 1 validCase23 $ Right $ KNormal.Int $ -2
     specHelper 1 validCase24 $ Right $ KNormal.Int 4
     specHelper 1 validCase25 $ Right $ KNormal.Int 1
+    specHelper 1 validCase26 $
+      Right $
+      KNormal.Let ("Ti1.1", Type.Int) (KNormal.Int 2) $
+      KNormal.Let ("Ti2.2", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("a.0", Type.Array Type.Int) (KNormal.ExtFunApp "create_array" ["Ti1.1", "Ti2.2"]) $
+      KNormal.Let ("Ti3.4", Type.Int) (KNormal.Int 0) $
+      KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 2) $
+      KNormal.Let ("Tu0.3", Type.Unit) (KNormal.Put "a.0" "Ti3.4" "Ti4.5") $
+      KNormal.Let ("Ti5.6", Type.Int) (KNormal.Int 1) $ KNormal.Get "a.0" "Ti5.6"

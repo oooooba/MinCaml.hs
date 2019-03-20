@@ -29,6 +29,9 @@ g env (KNormal.Let (x, t) e1 e2) =
 g env (KNormal.LetRec (KNormal.Fundef xt yts e1) e2) = KNormal.LetRec (KNormal.Fundef xt yts $ g env e1) $ g env e2
 g env (KNormal.Var x) = KNormal.Var $ find x env
 g env (KNormal.App x xs) = KNormal.App (find x env) $ fmap (`find` env) xs
+g env (KNormal.Get x y) = KNormal.Get (find x env) $ find y env
+g env (KNormal.Put x y z) = KNormal.Put (find x env) (find y env) $ find z env
+g env (KNormal.ExtFunApp x ys) = KNormal.ExtFunApp x $ fmap (`find` env) ys
 
 f :: KNormal.T -> MinCaml KNormal.T
 f e = return $ g Map.empty e
