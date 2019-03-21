@@ -28,6 +28,8 @@ g env (KNormal.Let (x, t) e1 e2) =
       in KNormal.Let (x, t) e1' e2'
 g env (KNormal.LetRec (KNormal.Fundef xt yts e1) e2) = KNormal.LetRec (KNormal.Fundef xt yts $ g env e1) $ g env e2
 g env (KNormal.Var x) = KNormal.Var $ find x env
+g env (KNormal.Tuple xs) = KNormal.Tuple $ fmap (`find` env) xs
+g env (KNormal.LetTuple xts y e) = KNormal.LetTuple xts (find y env) $ g env e
 g env (KNormal.App x xs) = KNormal.App (find x env) $ fmap (`find` env) xs
 g env (KNormal.Get x y) = KNormal.Get (find x env) $ find y env
 g env (KNormal.Put x y z) = KNormal.Put (find x env) (find y env) $ find z env

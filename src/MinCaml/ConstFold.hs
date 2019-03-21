@@ -14,11 +14,23 @@ memi x env =
     Just (KNormal.Int _) -> True
     _                    -> False
 
+memt :: Id.T -> Map.Map Id.T KNormal.T -> Bool
+memt x env =
+  case Map.lookup x env of
+    Just (KNormal.Tuple _) -> True
+    _                      -> False
+
 findi :: Id.T -> Map.Map Id.T KNormal.T -> Int
 findi x env =
   case Map.lookup x env of
     Just (KNormal.Int i) -> i
     _                    -> error $ "findi: " ++ x
+
+findt :: Id.T -> Map.Map Id.T KNormal.T -> [Id.T]
+findt x env =
+  case Map.lookup x env of
+    Just (KNormal.Tuple ys) -> ys
+    _                       -> error $ "findt: " ++ x
 
 g :: Map.Map Id.T KNormal.T -> KNormal.T -> KNormal.T
 g env (KNormal.Neg x)
@@ -46,6 +58,9 @@ g env (KNormal.Let (x, t) e1 e2) =
       e2' = g (Map.insert x e1' env) e2
   in KNormal.Let (x, t) e1' e2'
 g env (KNormal.LetRec (KNormal.Fundef xt yts e1) e2) = KNormal.LetRec (KNormal.Fundef xt yts $ g env e1) $ g env e2
+g env (KNormal.LetTuple xts y e)
+  | memt y env = foldl (\e' (xt, z) -> KNormal.Let xt (KNormal.Var z) e') (g env e) $ zip xts (findt y env)
+g env (KNormal.LetTuple xts y e) = KNormal.LetTuple xts y $ g env e
 g env e = e
 
 f :: KNormal.T -> MinCaml KNormal.T

@@ -378,3 +378,21 @@ spec =
       KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 2) $
       KNormal.Let ("Tu0.3", Type.Unit) (KNormal.Put "a.0" "Ti3.4" "Ti4.5") $
       KNormal.Let ("Ti5.6", Type.Int) (KNormal.Int 1) $ KNormal.Get "a.0" "Ti5.6"
+    specHelper 1 validCase27 $
+      Right $
+      KNormal.Let ("Ti0.2", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti1.3", Type.Int) (KNormal.Int 2) $
+      KNormal.Let ("Ti2.1", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("Ti3.4", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("t.0", Type.Tuple [Type.Int, Type.Bool, Type.Int]) (KNormal.Tuple ["Ti2.1", "Ti3.4", "Ti4.5"]) $
+      KNormal.Let ("y.8", Type.Int) (KNormal.Var "Ti4.5") $
+      KNormal.Let ("b.7", Type.Bool) (KNormal.Var "Ti3.4") $
+      KNormal.Let ("x.6", Type.Int) (KNormal.Var "Ti2.1") $
+      KNormal.Let ("Ti5.9", Type.Int) (KNormal.Int 0) $
+      KNormal.IfEq "b.7" "Ti5.9" (KNormal.Sub "x.6" "y.8") $ KNormal.Add "x.6" "y.8"
+    specHelper 2 validCase27 $
+      Right $
+      KNormal.Let ("Ti2.1", Type.Int) (KNormal.Int 3) $
+      KNormal.Let ("Ti3.4", Type.Int) (KNormal.Int 1) $
+      KNormal.Let ("Ti4.5", Type.Int) (KNormal.Int 3) $ KNormal.Let ("Ti5.9", Type.Int) (KNormal.Int 0) $ KNormal.Int 6

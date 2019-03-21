@@ -16,6 +16,7 @@ g (KNormal.Let xt e1 e2) =
       insert e                          = KNormal.Let xt e $ g e2
   in insert $ g e1
 g (KNormal.LetRec (KNormal.Fundef xt yts e1) e2) = KNormal.LetRec (KNormal.Fundef xt yts $ g e1) $ g e2
+g (KNormal.LetTuple xts y e) = KNormal.LetTuple xts y $ g e
 g e = e
 
 f :: KNormal.T -> MinCaml KNormal.T

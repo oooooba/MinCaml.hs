@@ -13,6 +13,7 @@ effect (KNormal.IfEq _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.IfLe _ _ e1 e2) = effect e1 || effect e2
 effect (KNormal.Let _ e1 e2)    = effect e1 || effect e2
 effect (KNormal.LetRec _ e)     = effect e
+effect (KNormal.LetTuple _ _ e) = effect e
 effect KNormal.App {}           = True
 effect KNormal.ExtFunApp {}     = True
 effect KNormal.Put {}           = True
@@ -32,6 +33,13 @@ g (KNormal.LetRec (KNormal.Fundef (x, t) yts e1) e2) =
   in if Set.member x (KNormal.fv e2)
        then KNormal.LetRec (KNormal.Fundef (x, t) yts $ g e1) e2'
        else e2'
+g (KNormal.LetTuple xts y e) =
+  let xs = fmap fst xts
+      e' = g e
+      live = KNormal.fv e'
+  in if any (`Set.member` live) xs
+       then KNormal.LetTuple xts y e'
+       else e'
 g e = e
 
 f :: KNormal.T -> MinCaml KNormal.T

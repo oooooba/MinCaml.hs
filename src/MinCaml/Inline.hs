@@ -17,6 +17,7 @@ size (KNormal.IfEq _ _ e1 e2)                    = 1 + size e1 + size e2
 size (KNormal.IfLe _ _ e1 e2)                    = 1 + size e1 + size e2
 size (KNormal.Let _ e1 e2)                       = 1 + size e1 + size e2
 size (KNormal.LetRec (KNormal.Fundef _ _ e1) e2) = 1 + size e1 + size e2
+size (KNormal.LetTuple _ _ e)                    = 1 + size e
 size _                                           = 1
 
 g :: Map.Map Id.T ([(Id.T, Type.Type)], KNormal.T) -> KNormal.T -> MinCaml KNormal.T
@@ -37,6 +38,7 @@ g env (KNormal.App x ys)
     let (zs, e) = env Map.! x
         env' = foldl (\e ((z, t), y) -> Map.insert z y e) Map.empty $ zip zs ys
     Alpha.g env' e
+g env (KNormal.LetTuple xts y e) = KNormal.LetTuple xts y <$> g env e
 g _ e = return e
 
 f :: KNormal.T -> MinCaml KNormal.T
